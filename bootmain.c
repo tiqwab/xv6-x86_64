@@ -1,0 +1,2 @@
+void bootmain(void) {
+}
