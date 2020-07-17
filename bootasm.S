@@ -55,6 +55,27 @@ set_target_operating_mode:
   int $0x15
   popf
 
+# See http://oswiki.osask.jp/?%28AT%29BIOS or 14-2 in 30 日 OS 自作入門
+# configure_video_mode:
+  mov $0x0,%ah
+  # mov $0x13,%al # 320x200 256 color graphics
+  mov $0x03,%al # 80x25 16 color text
+  int $0x10
+
+print_test:
+  mov $0x13,%ah
+  mov $0x1,%al
+  mov $0x0,%bh
+  mov $0x7,%bl
+  mov $0x0010,%cx
+  mov $0x0,%dl
+  mov $0x0,%dh
+  lea (str),%bp
+  int $0x10
+
 loop:
   hlt
   jmp loop
+
+str:
+  .asciz "hello_xv6-x86_64"
