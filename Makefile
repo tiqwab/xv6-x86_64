@@ -29,7 +29,18 @@ endif
 GDBPORT	:= 12345
 CPUS ?= 1
 
-default: bootblock
+default: xv6.img
+
+OBJS := 
+
+xv6.img: bootblock kernel
+	dd if=/dev/zero of=$@ count=10000
+	dd if=bootblock of=$@ conv=notrunc
+	dd if=kernel of=$@ seek=1 conv=notrunc
+
+kernel: $(OBJS) entry.o kernel.ld
+	$(LD) $(LDFLAGS) -T kernel.ld -o kernel entry.o $(OBJS)
+	$(OBJDUMP) -S kernel > kernel.asm
 
 # boot/base.img is 512 bytes empty file except for last 0x55 0xAA. This is MBR format.
 bootblock: bootasm.S bootmain.c base.img
@@ -40,8 +51,6 @@ bootblock: bootasm.S bootmain.c base.img
 	$(OBJCOPY) -S -O binary -j .text bootblock.o bootblock.bin
 	$(CP) base.img $@
 	$(DD) conv=notrunc if=$@.bin of=$@
-
-image: bootblock
 
 # Prevent deletion of intermediate files, e.g. cat.o, after first build, so
 # that disk image changes after first build are persistent until clean.  More
@@ -64,11 +73,11 @@ gdb:
 	$(GDB) -n -x .gdbinit
 
 # qemu: $(IMAGES) pre-qemu
-qemu: image
+qemu: xv6.img
 	$(QEMU) $(QEMUOPTS)
 
-qemu-gdb: image .gdbinit
+qemu-gdb: xv6.img .gdbinit
 	$(QEMU) $(QEMUOPTS) -S
 
 clean:
-	rm -f *.o *.asm *.bin .gdbinit bootblock qemu.log
+	rm -f *.o *.asm *.bin .gdbinit bootblock qemu.log xv6.img kernel
