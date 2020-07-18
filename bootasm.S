@@ -1,3 +1,5 @@
+#include "mmu.h"
+
 # Start the first CPU: switch to 32-bit protected mode, jump into C.
 # The BIOS loads this code from the first sector of the hard disk into
 # memory at physical address 0x7c00 and starts executing in real mode
@@ -73,9 +75,48 @@ print_test:
   lea (str),%bp
   int $0x10
 
-loop:
+  # Switch from real to protected mode.  Use a bootstrap GDT that makes
+  # virtual addresses map directly to physical addresses so that the
+  # effective memory map doesn't change during the transition.
+  lgdt    gdtdesc
+  movl    %cr0,%eax
+  orl     $CR0_PE,%eax
+  movl    %eax,%cr0
+
+  # Complete the transition to 32-bit protected mode by using a long jmp
+  # to reload %cs and %eip.  The segment descriptors are set up with no
+  # translation, so that the mapping is still the identity mapping.
+  ljmp    $(SEG_KCODE<<3), $start32
+
+.code32  # Tell assembler to generate 32-bit code now.
+start32:
+  # Set up the protected-mode data segment registers
+  movw    $(SEG_KDATA<<3), %ax    # Our data segment selector
+  movw    %ax, %ds                # -> DS: Data Segment
+  movw    %ax, %es                # -> ES: Extra Segment
+  movw    %ax, %ss                # -> SS: Stack Segment
+  movw    $0, %ax                 # Zero segments not ready for use
+  movw    %ax, %fs                # -> FS
+  movw    %ax, %gs                # -> GS
+
+  # Set up the stack pointer and call into C.
+  movl    $start, %esp
+  call    bootmain
+
+spin:
   hlt
-  jmp loop
+  jmp     spin
 
 str:
   .asciz "hello_xv6-x86_64"
+
+# Bootstrap GDT
+.p2align 2                            # force 4 byte alignment
+gdt:
+  SEG_NULL                            # null seg
+  SEG(STA_X|STA_R, 0x0, 0xffffffff)   # code seg
+  SEG(STA_W, 0x0, 0xffffffff)         # data seg
+
+gdtdesc:
+  .word   (gdtdesc - gdt - 1)         # sizeof(gdt) - 1
+  .long   gdt                         # address gdt
