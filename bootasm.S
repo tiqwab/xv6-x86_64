@@ -5,6 +5,7 @@
 # memory at physical address 0x7c00 and starts executing in real mode
 # with %cs=0 %ip=7c00.
 
+.section .boot-first-stage, "awx"
 .code16                       # Assemble for 16-bit mode
 .globl start
 start:
@@ -64,6 +65,39 @@ set_target_operating_mode:
   mov $0x03,%al # 80x25 16 color text
   int $0x10
 
+# check_int13h_extensions:
+#     mov $0x41,%ah
+#     mov $0x55aa,%bx
+#     # dl contains drive number
+#     int $0x13
+#     jc no_int13h_extensions
+
+load_rest_of_bootloader_from_disk:
+  lea (_rest_of_bootloader_start_addr),%eax
+
+  # start of memory buffer
+  mov %ax,(dap_buffer_addr)
+
+  # number of disk blocks to load
+  lea (_rest_of_bootloader_end_addr),%ebx
+  sub %eax,%ebx # end - start
+  shr $9,%ebx # divide by 512 (block size)
+  mov %bx,(dap_blocks)
+
+  # number of start block
+  lea (start),%ebx
+  sub %ebx,%eax
+  shr $9,%eax # divide by 512 (block size)
+  mov %eax,(dap_start_lba)
+
+  lea (dap),%si
+  mov $0x42, %ah
+  # dl should contain drive number when boot.
+  # ref. https://stackoverflow.com/questions/11174399/pc-boot-dl-register-and-drive-number
+  # mov $0x80, %dl
+  int $0x13
+  jc rest_of_bootloader_load_failed
+
 print_test:
   mov $0x13,%ah
   mov $0x1,%al
@@ -88,6 +122,21 @@ print_test:
   # translation, so that the mapping is still the identity mapping.
   ljmp    $(SEG_KCODE<<3), $start32
 
+rest_of_bootloader_load_failed:
+  mov $0x13,%ah
+  mov $0x1,%al
+  mov $0x0,%bh
+  mov $0x7,%bl
+  mov $0x0020,%cx
+  mov $0x0,%dl
+  mov $0x0,%dh
+  lea (rest_of_bootloader_load_failed_str),%bp
+  int $0x10
+
+spin16:
+  hlt
+  jmp spin16
+
 .code32  # Tell assembler to generate 32-bit code now.
 start32:
   # Set up the protected-mode data segment registers
@@ -103,12 +152,14 @@ start32:
   movl    $start, %esp
   call    bootmain
 
-spin:
+spin32:
   hlt
-  jmp     spin
+  jmp     spin32
 
 str:
   .asciz "hello_xv6-x86_64"
+rest_of_bootloader_load_failed_str:
+  .asciz "rest_of_bootloader_load failed!!"
 
 # Bootstrap GDT
 .p2align 2                            # force 4 byte alignment
@@ -120,3 +171,18 @@ gdt:
 gdtdesc:
   .word   (gdtdesc - gdt - 1)         # sizeof(gdt) - 1
   .long   gdt                         # address gdt
+
+dap: # disk access packet
+  .byte 0x10 # size of dap
+  .byte 0 # unused
+dap_blocks:
+  .word 0 # number of sectors
+dap_buffer_addr:
+  .word 0 # offset to memory buffer
+dap_buffer_seg:
+  .word 0 # segment of memory buffer
+dap_start_lba:
+  .quad 0 # start logical block address
+
+.org 510
+.word 0xaa55 # magic number for bootable disk

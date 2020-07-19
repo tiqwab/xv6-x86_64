@@ -36,7 +36,7 @@ OBJS :=
 xv6.img: bootblock kernel
 	dd if=/dev/zero of=$@ count=10000
 	dd if=bootblock of=$@ conv=notrunc
-	dd if=kernel of=$@ seek=1 conv=notrunc
+	dd if=kernel of=$@ seek=8 conv=notrunc
 
 kernel: $(OBJS) entry.o kernel.ld
 	$(LD) $(LDFLAGS) -T kernel.ld -o kernel entry.o $(OBJS)
@@ -46,9 +46,9 @@ kernel: $(OBJS) entry.o kernel.ld
 bootblock: bootasm.S bootmain.c base.img
 	$(CC) $(CFLAGS) -fno-pic -O -nostdinc -I. -c bootmain.c
 	$(CC) $(CFLAGS) -fno-pic -nostdinc -I. -c bootasm.S
-	$(LD) $(LDFLAGS) -N -e start -Ttext 0x7C00 -o bootblock.o bootasm.o bootmain.o
+	$(LD) $(LDFLAGS) -N -T boot.ld -o bootblock.o bootasm.o bootmain.o
 	$(OBJDUMP) -S bootblock.o > bootblock.asm
-	$(OBJCOPY) -S -O binary -j .text bootblock.o bootblock.bin
+	$(OBJCOPY) -S -O binary -j .bootloader bootblock.o bootblock.bin
 	$(CP) base.img $@
 	$(DD) conv=notrunc if=$@.bin of=$@
 

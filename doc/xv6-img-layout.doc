@@ -1,0 +1,11 @@
+         +----------------------+
+sector 0 |         MBR          | loaded at phys addr 0x7c00 (by BIOS)
+         +----------------------+
+sector 1 | remain of bootloader | loaded at phys addr 0x7e00 (by bootasm)
+         +                      +
+         |         ...          |
+         +----------------------+
+sector 8 |        kernel        | loaded at phys addr 0x10000 (by bootmain)
+         +                      +
+         |         ...          |
+         +----------------------+
