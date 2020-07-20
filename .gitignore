@@ -16,3 +16,4 @@ mkfs
 .gdbinit
 *.bin
 qemu.log
+obj/

@@ -3,6 +3,8 @@ ifndef QEMU
 	QEMU = qemu-system-x86_64
 endif
 
+OBJDIR := obj
+
 CC = gcc
 AS = gas
 LD = ld
@@ -10,13 +12,16 @@ OBJCOPY = objcopy
 OBJDUMP = objdump
 CP = cp
 DD = dd
+MKDIR = mkdir
 GDB = gdb
 
-CFLAGS = -fno-pic -static -fno-builtin -fno-strict-aliasing -MD -ggdb -m64 -fno-omit-frame-pointer
+CFLAGS = -fno-pic -static -fno-builtin -fno-strict-aliasing -MD -ggdb -fno-omit-frame-pointer
 CFLAGS += -O2 -std=c11 -Wall -Wextra -Wno-format -Wno-unused -Wno-address-of-packed-member -Werror
 CFLAGS += $(shell $(CC) -fno-stack-protector -E -x c /dev/null >/dev/null 2>&1 && echo -fno-stack-protector)
 # ASFLAGS = -m32 -gdwarf-2 -Wa,-divide
-LDFLAGS += -m elf_x86_64
+# LDFLAGS += -m elf_x86_64
+# LDFLAGS += -m elf_i386
+LDFLAGS :=
 
 # Disable PIE when possible (for Ubuntu 16.10 toolchain)
 ifneq ($(shell $(CC) -dumpspecs 2>/dev/null | grep -e '[^f]no-pie'),)
@@ -28,29 +33,19 @@ endif
 
 GDBPORT	:= 12345
 CPUS ?= 1
+IMAGE := xv6.img
 
-default: xv6.img
+default: $(OBJDIR)/$(IMAGE)
 
-OBJS := 
+-include *.d
 
-xv6.img: bootblock kernel
+include boot/module.mk
+include kern/module.mk
+
+$(OBJDIR)/$(IMAGE): $(OBJDIR)/$(BOOT_BLOCK) $(OBJDIR)/$(KERNEL)
 	dd if=/dev/zero of=$@ count=10000
-	dd if=bootblock of=$@ conv=notrunc
-	dd if=kernel of=$@ seek=8 conv=notrunc
-
-kernel: $(OBJS) entry.o kernel.ld
-	$(LD) $(LDFLAGS) -T kernel.ld -o kernel entry.o $(OBJS)
-	$(OBJDUMP) -S kernel > kernel.asm
-
-# boot/base.img is 512 bytes empty file except for last 0x55 0xAA. This is MBR format.
-bootblock: bootasm.S bootmain.c base.img
-	$(CC) $(CFLAGS) -fno-pic -O -nostdinc -I. -c bootmain.c
-	$(CC) $(CFLAGS) -fno-pic -nostdinc -I. -c bootasm.S
-	$(LD) $(LDFLAGS) -N -T boot.ld -o bootblock.o bootasm.o bootmain.o
-	$(OBJDUMP) -S bootblock.o > bootblock.asm
-	$(OBJCOPY) -S -O binary -j .bootloader bootblock.o bootblock.bin
-	$(CP) base.img $@
-	$(DD) conv=notrunc if=$@.bin of=$@
+	dd if=$(OBJDIR)/$(BOOT_BLOCK) of=$@ conv=notrunc
+	dd if=$(OBJDIR)/$(KERNEL) of=$@ seek=8 conv=notrunc
 
 # Prevent deletion of intermediate files, e.g. cat.o, after first build, so
 # that disk image changes after first build are persistent until clean.  More
@@ -58,12 +53,11 @@ bootblock: bootasm.S bootmain.c base.img
 # http://www.gnu.org/software/make/manual/html_node/Chained-Rules.html
 .PRECIOUS: %.o
 
--include *.d
-
 # Enter QEMU monitor by 'Ctrl+a then c' if -serial mon:stdio is specified
 # ref. https://kashyapc.wordpress.com/2016/02/11/qemu-command-line-behavior-of-serial-stdio-vs-serial-monstdio/
 QEMUOPTS := $(QEMUOPTS)
-QEMUOPTS += -drive file=bootblock,index=0,media=disk,format=raw -serial mon:stdio -gdb tcp::$(GDBPORT) -smp $(CPUS)
+QEMUOPTS += -drive file=$(OBJDIR)/$(IMAGE),index=0,media=disk,format=raw \
+			-serial mon:stdio -gdb tcp::$(GDBPORT) -smp $(CPUS)
 QEMUOPTS += $(shell if $(QEMU) -nographic -help | grep -q '^-D '; then echo '-D qemu.log'; fi)
 
 .gdbinit: .gdbinit.tmpl
@@ -73,11 +67,12 @@ gdb:
 	$(GDB) -n -x .gdbinit
 
 # qemu: $(IMAGES) pre-qemu
-qemu: xv6.img
+qemu: $(OBJDIR)/$(IMAGE)
 	$(QEMU) $(QEMUOPTS)
 
-qemu-gdb: xv6.img .gdbinit
+qemu-gdb: $(OBJDIR)/$(IMAGE) .gdbinit
 	$(QEMU) $(QEMUOPTS) -S
 
 clean:
-	rm -f *.o *.asm *.bin .gdbinit bootblock qemu.log xv6.img kernel
+	rm -f *.o *.d *.asm *.bin .gdbinit qemu.log
+	rm -rf $(OBJDIR)
