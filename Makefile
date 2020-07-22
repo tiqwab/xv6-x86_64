@@ -37,8 +37,6 @@ IMAGE := xv6.img
 
 default: $(OBJDIR)/$(IMAGE)
 
--include *.d
-
 include boot/module.mk
 include kern/module.mk
 

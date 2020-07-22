@@ -10,6 +10,8 @@ BOOT_LINKER_SCRIPT := $(BOOT_DIR)/boot.ld
 
 BOOT_BLOCK := $(BOOT_DIR)/bootblock
 
+-include $(OBJDIR)/$(BOOT_DIR)/*.d
+
 $(OBJDIR)/$(BOOT_BLOCK): $(BOOT_OBJS) $(BOOT_LINKER_SCRIPT)
 	$(LD) $(BOOT_LDFLAGS) -N -T $(BOOT_LINKER_SCRIPT) -o $@.o $(BOOT_OBJS)
 	$(OBJDUMP) -S $@.o > $@.asm

@@ -8,6 +8,8 @@ KERN_LINKER_SCRIPT := $(KERN_DIR)/kernel.ld
 
 KERNEL := $(KERN_DIR)/kernel
 
+-include $(OBJDIR)/$(KERN_DIR)/*.d
+
 $(OBJDIR)/$(KERNEL): $(KERN_OBJS) $(KERN_LINKER_SCRIPT)
 	$(LD) $(KERN_LDFLAGS) -T $(KERN_LINKER_SCRIPT) -o $@ $(KERN_OBJS)
 	$(OBJDUMP) -S $@ > $@.asm
