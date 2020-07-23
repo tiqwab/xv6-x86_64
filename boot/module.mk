@@ -1,9 +1,9 @@
 BOOT_DIR := boot
 BOOT_OBJS := \
-	$(OBJDIR)/$(BOOT_DIR)/bootasm.o \
-	$(OBJDIR)/$(BOOT_DIR)/bootmain.o \
-	$(OBJDIR)/$(BOOT_DIR)/entrypgdir.o \
+	$(OBJDIR)/$(BOOT_DIR)/stage_1.o \
+	$(OBJDIR)/$(BOOT_DIR)/stage_2.o \
 	$(OBJDIR)/$(BOOT_DIR)/stage_3.o \
+	$(OBJDIR)/$(BOOT_DIR)/entrypgdir.o \
 
 BOOT_CFLAGS := $(CFLAGS) -m32
 BOOT_LDFLAGS := $(LDFLAGS) -m elf_i386

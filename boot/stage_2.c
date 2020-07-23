@@ -1,9 +1,8 @@
 // Boot loader.
 //
-// Part of the boot block, along with bootasm.S, which calls bootmain().
-// bootasm.S has put the processor into protected 32-bit mode.
-// bootmain() loads an ELF kernel image from the disk starting at
-// sector 1 and then jumps to the kernel entry routine.
+// Part of the boot block, along with stage_1.S, which calls stage_2().
+// stage_1.S has put the processor into protected 32-bit mode.
+// stage_2() loads an ELF kernel image from the disk and then jumps to the stage_3.
 
 #include "types.h"
 #include "x86.h"
@@ -16,9 +15,9 @@
 void (*kernel_entry)(void);
 
 void readseg(uchar*, uint, uint);
-void set_up_page_table(void);
+void stage_3(void);
 
-void bootmain(void) {
+void stage_2(void) {
   struct elfhdr *elf;
   struct proghdr *ph, *eph;
   uchar* pa;
@@ -30,7 +29,7 @@ void bootmain(void) {
 
   // Is this an ELF executable?
   if(elf->magic != ELF_MAGIC)
-    return;  // let bootasm.S handle error
+    return;  // let stage_1.S handle error
 
   // Load each program segment (ignores ph flags).
   ph = (struct proghdr*) ((uchar*) elf + elf->phoff);
@@ -44,7 +43,7 @@ void bootmain(void) {
 
   kernel_entry = (void(*)(void))((uint32_t) elf->entry);
 
-  set_up_page_table();
+  stage_3();
 }
 
 void waitdisk(void) {

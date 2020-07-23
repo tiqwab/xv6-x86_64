@@ -2,7 +2,9 @@
 
 .text
 
-.global set_up_page_table
+.global stage_3
+stage_3:
+
 set_up_page_table:
   #for p4
   lea (p4),%edx

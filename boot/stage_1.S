@@ -150,7 +150,7 @@ start32:
 
   # Set up the stack pointer and call into C.
   movl    $start, %esp
-  call    bootmain
+  call    stage_2
 
 spin32:
   hlt

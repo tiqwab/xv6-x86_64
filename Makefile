@@ -42,7 +42,7 @@ include boot/module.mk
 include kern/module.mk
 
 # Disc sector start no where kernel image is loaded
-# TODO: duplicated with KERNEL_START_SECTOR in boot/bootmain.c
+# TODO: duplicated with KERNEL_START_SECTOR in boot/stage_2.c
 KERNEL_START_SECTOR := 32
 
 $(OBJDIR)/$(IMAGE): $(OBJDIR)/$(BOOT_BLOCK) $(OBJDIR)/$(KERNEL)
