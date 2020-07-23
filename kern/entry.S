@@ -10,10 +10,15 @@
 .globl _start
 _start = V2P_WO(entry)
 
-# Entering xv6 on boot processor, with paging off.
 .globl entry
+# entrypoint just for jmp to high address
 entry:
-  hlt
-  jmp entry
+  # FIXME: What is the best way to jump to high address? (currently run around 0x100000)
+  # linker doesn't allow get the address of entry_high_address...
+  mov $0xffff80000010000c,%rax # entry_high_address
+  jmp *%rax
 
-# TODO: jump to high address (currently run around 0x100000)
+# actual entrypoint
+entry_high_address:
+  hlt
+  jmp entry_high_address
