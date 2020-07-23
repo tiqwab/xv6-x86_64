@@ -40,10 +40,14 @@ default: $(OBJDIR)/$(IMAGE)
 include boot/module.mk
 include kern/module.mk
 
+# Disc sector start no where kernel image is loaded
+# TODO: duplicated with KERNEL_START_SECTOR in boot/bootmain.c
+KERNEL_START_SECTOR := 32
+
 $(OBJDIR)/$(IMAGE): $(OBJDIR)/$(BOOT_BLOCK) $(OBJDIR)/$(KERNEL)
 	dd if=/dev/zero of=$@ count=10000
 	dd if=$(OBJDIR)/$(BOOT_BLOCK) of=$@ conv=notrunc
-	dd if=$(OBJDIR)/$(KERNEL) of=$@ seek=8 conv=notrunc
+	dd if=$(OBJDIR)/$(KERNEL) of=$@ seek=$(KERNEL_START_SECTOR) conv=notrunc
 
 # Prevent deletion of intermediate files, e.g. cat.o, after first build, so
 # that disk image changes after first build are persistent until clean.  More

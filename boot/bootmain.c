@@ -11,9 +11,10 @@
 
 #define SECTSIZE  512
 #define KERNEL_START_PHYS_ADDR 0x10000
-#define KERNEL_START_SECTOR 8
+#define KERNEL_START_SECTOR 32 // TODO: duplicated with KERNEL_START_SECTOR in Makefile
 
 void readseg(uchar*, uint, uint);
+void set_up_page_table(void);
 
 void bootmain(void) {
   struct elfhdr *elf;
@@ -39,6 +40,8 @@ void bootmain(void) {
     if(ph->memsz > ph->filesz)
       stosb(pa + ph->filesz, 0, ph->memsz - ph->filesz);
   }
+
+  set_up_page_table();
 
   // Call the entry point from the ELF header.
   // Does not return!

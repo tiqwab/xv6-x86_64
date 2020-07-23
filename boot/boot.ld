@@ -12,18 +12,26 @@ ENTRY(start)
 
 SECTIONS {
     . = 0x7c00;
-
-    .bootloader : {
+    .stage_1 : {
         /* first stage */
         *(.boot-first-stage)
+    }
 
+    _rest_of_bootloader_start_addr = .;
+
+    .rest_of_bootloader : {
         /* rest of bootloader */
-        _rest_of_bootloader_start_addr = .;
         *(.text .text.*)
         *(.rodata .rodata.*)
         *(.data .data.*)
         *(.got)
-        . = ALIGN(512);
-        _rest_of_bootloader_end_addr = .;
     }
+
+    . = ALIGN(0x1000);
+    .page_table : {
+        *(.entrypgdir)
+    }
+
+    . = ALIGN(512);
+    _rest_of_bootloader_end_addr = .;
 }
