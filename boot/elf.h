@@ -2,6 +2,7 @@
 #define XV6_X86_64_ELF_H
 
 // Format of an ELF executable file
+// This definitions are used for *64-bit* ELF executable.
 
 #include "types.h"
 
@@ -9,33 +10,33 @@
 
 // File header
 struct elfhdr {
-  uint magic;  // must equal ELF_MAGIC
-  uchar elf[12]; // CLASS, DATA, VERSION, OSABI, ABIVERSION, PAD
-  ushort type;
-  ushort machine;
-  uint version;
-  uintptr_t entry;
-  ulong phoff;
-  ulong shoff;
-  uint flags;
-  ushort ehsize;
-  ushort phentsize;
-  ushort phnum;
-  ushort shentsize;
-  ushort shnum;
-  ushort shstrndx;
+  uint32_t magic;  // must equal ELF_MAGIC
+  uint8_t elf[12]; // CLASS, DATA, VERSION, OSABI, ABIVERSION, PAD
+  uint16_t type;
+  uint16_t machine;
+  uint32_t version;
+  uint64_t entry;
+  uint64_t phoff;
+  uint64_t shoff;
+  uint32_t flags;
+  uint16_t ehsize;
+  uint16_t phentsize;
+  uint16_t phnum;
+  uint16_t shentsize;
+  uint16_t shnum;
+  uint16_t shstrndx;
 };
 
 // Program section header
 struct proghdr {
-  uint type;
-  uint flags;
-  ulong off;
-  uintptr_t vaddr;
-  uintptr_t paddr;
-  ulong filesz;
-  ulong memsz;
-  ulong align;
+  uint32_t type;
+  uint32_t flags;
+  uint64_t off;
+  uint64_t vaddr;
+  uint64_t paddr;
+  uint64_t filesz;
+  uint64_t memsz;
+  uint64_t align;
 };
 
 // Values for Proghdr type

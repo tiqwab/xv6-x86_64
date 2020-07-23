@@ -15,3 +15,5 @@ _start = V2P_WO(entry)
 entry:
   hlt
   jmp entry
+
+# TODO: jump to high address (currently run around 0x100000)

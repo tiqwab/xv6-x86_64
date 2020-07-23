@@ -58,6 +58,25 @@ enable_paging:
     or $0x80000000,%eax
     mov %eax,%cr0
 
-loop:
+load_64bit_gdt:
+    lgdt gdt64desc                # Load GDT.Pointer defined below.
+
+jump_to_long_mode:
+    push $0x8
+    mov kernel_entry,%eax
+    push %eax
+    retf # Load CS with 64 bit segment and flush the instruction cache
+
+spin64:
   hlt
-  jmp loop
+  jmp spin64
+
+.p2align 2
+gdt64:
+    .quad 0x0000000000000000      # Null Descriptor - should be present.
+    .quad 0x00209A0000000000      # 64-bit code descriptor (exec/read).
+    .quad 0x0000920000000000      # 64-bit data descriptor (read/write).
+
+gdt64desc:
+    .word gdt64desc - gdt64 - 1    # 16-bit Size (Limit) of GDT.
+    .long gdt64                   # 32-bit Base Address of GDT. (CPU will zero extend to 64-bit)

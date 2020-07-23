@@ -13,13 +13,14 @@
 #define KERNEL_START_PHYS_ADDR 0x10000
 #define KERNEL_START_SECTOR 32 // TODO: duplicated with KERNEL_START_SECTOR in Makefile
 
+void (*kernel_entry)(void);
+
 void readseg(uchar*, uint, uint);
 void set_up_page_table(void);
 
 void bootmain(void) {
   struct elfhdr *elf;
   struct proghdr *ph, *eph;
-  void (*entry)(void);
   uchar* pa;
 
   elf = (struct elfhdr*) KERNEL_START_PHYS_ADDR;  // scratch space
@@ -32,21 +33,18 @@ void bootmain(void) {
     return;  // let bootasm.S handle error
 
   // Load each program segment (ignores ph flags).
-  ph = (struct proghdr*)((uchar*)elf + elf->phoff);
+  ph = (struct proghdr*) ((uchar*) elf + elf->phoff);
   eph = ph + elf->phnum;
   for(; ph < eph; ph++){
-    pa = (uchar*)ph->paddr;
+    pa = (uchar*) ((uint32_t) ph->paddr);
     readseg(pa, ph->filesz, ph->off);
     if(ph->memsz > ph->filesz)
       stosb(pa + ph->filesz, 0, ph->memsz - ph->filesz);
   }
 
-  set_up_page_table();
+  kernel_entry = (void(*)(void))((uint32_t) elf->entry);
 
-  // Call the entry point from the ELF header.
-  // Does not return!
-  entry = (void(*)(void))(elf->entry);
-  entry();
+  set_up_page_table();
 }
 
 void waitdisk(void) {
