@@ -1,6 +1,7 @@
 # Try to infer the correct QEMU
 ifndef QEMU
 	QEMU = qemu-system-x86_64
+	# QEMU = qemu-system-i386
 endif
 
 OBJDIR := obj
