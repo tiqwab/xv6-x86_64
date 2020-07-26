@@ -1,3 +1,6 @@
+#ifndef XV6_X86_64_MEMLAYOUT_H
+#define XV6_X86_64_MEMLAYOUT_H
+
 /*
  * This file contains definitions for memory management in our OS,
  * which are relevant to both the kernel and user-mode software.
@@ -26,3 +29,5 @@
  *    KERNBASE  ---->  +------------------------------+ 0xffff800000000000
  *
  */
+
+#endif /* XV6_X86_64_MEMLAYOUT_H */

@@ -1,6 +1,7 @@
 KERN_DIR := kern
 KERN_OBJS := $(OBJDIR)/$(KERN_DIR)/entry.o
 
+# KERN_CFLAGS := $(CFLAGS) -m64 -mcmodel=kernel
 KERN_CFLAGS := $(CFLAGS) -m64
 KERN_LDFLAGS := $(LDFLAGS) -m elf_x86_64
 
