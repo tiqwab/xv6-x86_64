@@ -36,6 +36,8 @@ GDBPORT	:= 12345
 CPUS ?= 1
 IMAGE := xv6.img
 
+.PHONY: clean default format
+
 default: $(OBJDIR)/$(IMAGE)
 
 include boot/module.mk
@@ -45,7 +47,7 @@ include kern/module.mk
 # TODO: duplicated with KERNEL_START_SECTOR in boot/stage_2.c
 KERNEL_START_SECTOR := 32
 
-$(OBJDIR)/$(IMAGE): $(OBJDIR)/$(BOOT_BLOCK) $(OBJDIR)/$(KERNEL)
+$(OBJDIR)/$(IMAGE): format $(OBJDIR)/$(BOOT_BLOCK) $(OBJDIR)/$(KERNEL)
 	dd if=/dev/zero of=$@ count=10000
 	dd if=$(OBJDIR)/$(BOOT_BLOCK) of=$@ conv=notrunc
 	dd if=$(OBJDIR)/$(KERNEL) of=$@ seek=$(KERNEL_START_SECTOR) conv=notrunc
@@ -75,6 +77,9 @@ qemu: $(OBJDIR)/$(IMAGE)
 
 qemu-gdb: $(OBJDIR)/$(IMAGE) .gdbinit
 	$(QEMU) $(QEMUOPTS) -S
+
+format:
+	./format.sh
 
 clean:
 	rm -f *.o *.d *.asm *.bin .gdbinit qemu.log
