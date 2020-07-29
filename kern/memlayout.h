@@ -7,7 +7,7 @@
  */
 
 // Key addresses for address space layout (see kmap in vm.c for layout)
-#define KERNBASE 0xffff800000000000 // First kernel virtual address
+#define KERNBASE 0xffffffff80000000 // First kernel text virtual address
 
 #define V2P_WO(x) ((x)-KERNBASE)   // same as V2P, but without casts
 #define P2V_WO(x) ((x) + KERNBASE) // same as P2V, but without casts
@@ -19,14 +19,14 @@
  *    256 TB --------> +------------------------------+
  *                     |                              | RW/--
  *                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *                     :                              : RW/--
+ *                     :      kernel text mapping     : RW/--
+ *                     :                              : RW/--
+ *     KERNBASE ---->  |~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~| 0xffffffff80000000
  *                     :              .               :
  *                     :              .               :
  *                     :              .               :
- *                     |~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~| RW/--
- *                     |                              | RW/--
- *                     |   Remapped Physical Memory   | RW/--
- *                     |                              | RW/--
- *    KERNBASE  ---->  +------------------------------+ 0xffff800000000000
+ *          ??? ---->  +------------------------------+ 0xffff800000000000 start of kernel space
  *
  */
 

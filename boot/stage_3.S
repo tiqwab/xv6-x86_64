@@ -15,10 +15,10 @@ set_up_page_table:
   mov $0,%ecx
   mov %eax,(%edx,%ecx,8)
 
-  # entry 256 for kernel mapping (1 GiB from 0xffff800000000000)
+  # entry 511 for kernel mapping (0xff8000000000)
   lea (p3_2),%eax
   or $0x3,%eax # present, writable
-  mov $256,%ecx
+  mov $511,%ecx
   mov %eax,(%edx,%ecx,8)
 
   # for p3_1
@@ -28,10 +28,12 @@ set_up_page_table:
   mov %eax,(%edx)
 
   # for p3_2
+  # entry 510 ((0xffff80000000 - 0xff8000000000) / 1 GiB)
   lea (p3_2),%edx
   xor %eax,%eax
   or $0x83,%eax # present, writable, huge page
-  mov %eax,(%edx)
+  mov $510,%ecx
+  mov %eax,(%edx,%ecx,8)
 
 # ref. https://wiki.osdev.org/Setting_Up_Long_Mode
 enable_paging:
