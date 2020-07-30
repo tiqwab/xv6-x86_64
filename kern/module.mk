@@ -1,8 +1,13 @@
 KERN_DIR := kern
-KERN_OBJS := $(OBJDIR)/$(KERN_DIR)/entry.o
+KERN_OBJS := \
+	$(OBJDIR)/$(KERN_DIR)/entry.o \
+	$(OBJDIR)/$(KERN_DIR)/main.o \
+	$(OBJDIR)/$(KERN_DIR)/kalloc.o \
+	$(OBJDIR)/$(KERN_DIR)/spinlock.o \
+	$(OBJDIR)/$(KERN_DIR)/console.o \
+	$(OBJDIR)/$(KERN_DIR)/string.o \
 
-# KERN_CFLAGS := $(CFLAGS) -m64 -mcmodel=kernel
-KERN_CFLAGS := $(CFLAGS) -m64
+KERN_CFLAGS := $(CFLAGS) -m64 -mcmodel=kernel
 KERN_LDFLAGS := $(LDFLAGS) -m elf_x86_64
 
 KERN_LINKER_SCRIPT := $(KERN_DIR)/kernel.ld

@@ -26,8 +26,7 @@ entry:
 
 # actual entrypoint
 entry_high_address:
-  hlt
-  jmp entry_high_address
+  jmp main
 
 # .comm is to prepare data in BSS
 .comm stack, KSTACKSIZE
