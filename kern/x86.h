@@ -3,6 +3,17 @@
 
 #include "types.h"
 
+static inline uchar inb(ushort port) {
+  uchar data;
+
+  __asm__ volatile("in %1,%0" : "=a"(data) : "d"(port));
+  return data;
+}
+
+static inline void outb(ushort port, uchar data) {
+  __asm__ volatile("out %0,%1" : : "a"(data), "d"(port));
+}
+
 static inline void stosb(void *addr, int data, int cnt) {
   __asm__ volatile("cld; rep stosb"
                    : "=D"(addr), "=c"(cnt)

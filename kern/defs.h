@@ -6,6 +6,7 @@
 struct spinlock;
 
 // console.c
+void cprintf(char *, ...);
 void panic(char *) __attribute__((noreturn));
 
 // kalloc.c
@@ -23,5 +24,6 @@ void popcli(void);
 
 // string.c
 void *memset(void *, int, size_t);
+void *memmove(void *, const void *, size_t);
 
-#endif /* XV6_X86_64_DEFS_H */
+#endif /* ifndef XV6_X86_64_DEFS_H */
