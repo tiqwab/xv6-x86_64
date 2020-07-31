@@ -8,6 +8,7 @@
 // ref. https://os.phil-opp.com/vga-text-mode/
 
 // TODO 1: uart
+// TODO 2: add useful info to panic
 
 static void consputc(int);
 
@@ -18,11 +19,11 @@ static struct {
   int locking;
 } cons;
 
-static void printint(int xx, int base, int sign) {
+static void printint(long xx, int base, int sign) {
   static char digits[] = "0123456789abcdef";
   char buf[16];
   int i;
-  uint x;
+  ulong x;
 
   if (sign && (sign = xx < 0))
     x = -xx;
@@ -42,9 +43,10 @@ static void printint(int xx, int base, int sign) {
 }
 
 // Print to the console. only understands %d, %x, %p, %s.
+// FIXME: Accept up to 4 arguments for now.
 void cprintf(char *fmt, ...) {
   int i, c, locking;
-  uintptr_t *argp;
+  void **argp;
   char *s;
 
   locking = cons.locking;
@@ -54,7 +56,13 @@ void cprintf(char *fmt, ...) {
   if (fmt == 0)
     panic("null fmt");
 
-  argp = (uintptr_t *)(void *)(&fmt + 1);
+  void *args[4] = {0, 0, 0, 0};
+  __asm__ volatile("mov %%rsi,%0" : "=a"(args[0]) : :);
+  __asm__ volatile("mov %%rdx,%0" : "=a"(args[1]) : :);
+  __asm__ volatile("mov %%rcx,%0" : "=a"(args[2]) : :);
+  __asm__ volatile("mov %%r8,%0" : "=a"(args[3]) : :);
+  argp = args;
+
   for (i = 0; (c = fmt[i] & 0xff) != 0; i++) {
     if (c != '%') {
       consputc(c);
@@ -65,11 +73,16 @@ void cprintf(char *fmt, ...) {
       break;
     switch (c) {
     case 'd':
-      printint(*argp++, 10, 1);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpointer-to-int-cast"
+      // it has to cast as int or accept value sign extended
+      printint((long)(int)*argp++, 10, 1);
+#pragma GCC diagnostic pop
+#pragma GCC diagnostic pop
       break;
     case 'x':
     case 'p':
-      printint(*argp++, 16, 0);
+      printint((long)*argp++, 16, 0);
       break;
     case 's':
       if ((s = (char *)*argp++) == 0)
@@ -93,7 +106,18 @@ void cprintf(char *fmt, ...) {
 }
 
 void panic(char *s) {
-  // TODO: implement
+  // TODO2
+  int i;
+  uint pcs[10];
+
+  cli();
+  cons.locking = 0;
+  // use lapiccpunum so that we can call panic from mycpu()
+  // cprintf("lapicid %d: panic: ", lapicid());
+  cprintf("kernel panic! lapicid %d: panic: %s\n", -1, s);
+  // getcallerpcs(&s, pcs);
+  // for(i=0; i<10; i++)
+  //   cprintf(" %p", pcs[i]);
   panicked = 1; // freeze other CPU
   for (;;)
     ;
