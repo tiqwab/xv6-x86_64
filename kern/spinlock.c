@@ -1,13 +1,15 @@
 #include "spinlock.h"
 #include "defs.h"
+#include "mmu.h"
+#include "proc.h"
 #include "x86.h"
 
-// TODO 1: count cli count in struct cpu
 // TODO 2: handle lk->CPU and lk->pcs in initlock, acquire, and release
 
 void initlock(struct spinlock *lk, char *name) {
   lk->name = name;
   lk->locked = 0;
+  // TODO for multicore
   // lk->cpu = 0;
 }
 
@@ -29,7 +31,7 @@ void acquire(struct spinlock *lk) {
   // references happen after the lock is acquired.
   __sync_synchronize();
 
-  // TODO3
+  // TODO2
   // Record info about lock acquisition for debugging.
   // lk->cpu = mycpu();
   // getcallerpcs(&lk, lk->pcs);
@@ -40,7 +42,7 @@ void release(struct spinlock *lk) {
   if (!holding(lk))
     panic("release");
 
-  // TODO3
+  // TODO2
   // lk->pcs[0] = 0;
   // lk->cpu = 0;
 
@@ -64,15 +66,10 @@ int holding(struct spinlock *lock) {
   int r;
   pushcli();
   r = lock->locked;
+  // TODO for multicore
+  // r = lock->locked && lock->cpu == mycpu();
   popcli();
   return r;
-
-  // TODO1
-  // int r;
-  // pushcli();
-  // r = lock->locked && lock->cpu == mycpu();
-  // popcli();
-  // return r;
 }
 
 // Pushcli/popcli are like cli/sti except that they are matched:
@@ -80,26 +77,20 @@ int holding(struct spinlock *lock) {
 // are off, then pushcli, popcli leaves them off.
 
 void pushcli(void) {
+  int eflags;
+
+  eflags = readeflags();
   cli();
-
-  // TODO1
-  // int eflags;
-
-  // eflags = readeflags();
-  // cli();
-  // if(mycpu()->ncli == 0)
-  //   mycpu()->intena = eflags & FL_IF;
-  // mycpu()->ncli += 1;
+  if (mycpu()->ncli == 0)
+    mycpu()->intena = eflags & FL_IF;
+  mycpu()->ncli += 1;
 }
 
 void popcli(void) {
-  sti();
-
-  // TODO1
-  // if(readeflags()&FL_IF)
-  //   panic("popcli - interruptible");
-  // if(--mycpu()->ncli < 0)
-  //   panic("popcli");
-  // if(mycpu()->ncli == 0 && mycpu()->intena)
-  //   sti();
+  if (readeflags() & FL_IF)
+    panic("popcli - interruptible");
+  if (--mycpu()->ncli < 0)
+    panic("popcli");
+  if (mycpu()->ncli == 0 && mycpu()->intena)
+    sti();
 }

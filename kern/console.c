@@ -120,7 +120,7 @@ void panic(char *s) {
   //   cprintf(" %p", pcs[i]);
   panicked = 1; // freeze other CPU
   for (;;)
-    ;
+    __asm__ volatile("hlt");
 }
 
 #define BACKSPACE 0x100

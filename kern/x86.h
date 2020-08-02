@@ -36,4 +36,10 @@ static inline uint xchg(volatile uint *addr, uint newval) {
   return result;
 }
 
+static inline uint readeflags(void) {
+  ulong eflags;
+  __asm__ volatile("pushfq; pop %0" : "=r"(eflags));
+  return (uint)eflags;
+}
+
 #endif /* ifndef XV6_X86_64_X86_H */

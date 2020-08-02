@@ -13,5 +13,6 @@ int main(void) {
   cprintf("cprintf format test: %d, 0x%x, 0x%p, %s\n", 256, 256, main, "hello");
   panic("foo");
   for (;;) {
+    __asm__ volatile("hlt");
   }
 }

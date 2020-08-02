@@ -6,6 +6,8 @@ KERN_OBJS := \
 	$(OBJDIR)/$(KERN_DIR)/spinlock.o \
 	$(OBJDIR)/$(KERN_DIR)/console.o \
 	$(OBJDIR)/$(KERN_DIR)/string.o \
+	$(OBJDIR)/$(KERN_DIR)/mp.o \
+	$(OBJDIR)/$(KERN_DIR)/proc.o \
 
 KERN_CFLAGS := $(CFLAGS) -m64 -mcmodel=kernel
 KERN_LDFLAGS := $(LDFLAGS) -m elf_x86_64

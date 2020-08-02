@@ -3,6 +3,7 @@
 
 #include "types.h"
 
+struct cpu;
 struct spinlock;
 
 // console.c
@@ -12,6 +13,9 @@ void panic(char *) __attribute__((noreturn));
 // kalloc.c
 void kinit1(void *, void *);
 void kfree(char *);
+
+// proc.c
+struct cpu *mycpu(void);
 
 // spinlock.c
 void acquire(struct spinlock *);
