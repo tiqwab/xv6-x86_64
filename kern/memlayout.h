@@ -6,10 +6,12 @@
  * which are relevant to both the kernel and user-mode software.
  */
 
+#define EXTMEM 0x100000   // Start of extended memory
 #define PHYSTOP 0xE000000 // Top physical memory
 
 // Key addresses for address space layout (see kmap in vm.c for layout)
-#define KERNBASE 0xffffffff80000000 // First kernel text virtual address
+#define KERNBASE 0xffffffff80000000  // First kernel virtual address
+#define KERNLINK (KERNBASE + EXTMEM) // Address where kernel is linked
 
 // __ASSEMBLER__ is defined by gcc when processing assembly files
 #ifndef __ASSEMBLER__
@@ -32,11 +34,11 @@
  *                     |                              | RW/--
  *                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *                     :                              : RW/--
- *                     :      kernel text mapping     : RW/--
+ *                     :   remapped physical memory   : RW/--
  *                     :                              : RW/--
- *     KERNBASE ---->  |~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~| 0xffffffff80000000
- *                     :              .               :
- *                     :              .               :
+ *     KERNLINK ---->  :                              : 0xffffffff80100000
+ * (kernel entry point) :                              : RW/-- KERNBASE ---->
+ * |~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~| 0xffffffff80000000 :              . : : . :
  *                     :              .               :
  *  start of    ---->  +------------------------------+ 0xffff800000000000
  *  kernel space

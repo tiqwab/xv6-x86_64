@@ -10,7 +10,8 @@
 #include "x86.h"
 
 #define SECTSIZE 512
-#define KERNEL_START_PHYS_ADDR 0x10000
+// Physical address where kernel elf header is loaded
+#define KERNEL_ELF_PHYS_ADDR 0x10000
 // TODO: duplicated with KERNEL_START_SECTOR in Makefile
 #define KERNEL_START_SECTOR 32
 
@@ -24,7 +25,7 @@ void stage_2(void) {
   struct proghdr *ph, *eph;
   uchar *pa;
 
-  elf = (struct elfhdr *)KERNEL_START_PHYS_ADDR; // scratch space
+  elf = (struct elfhdr *)KERNEL_ELF_PHYS_ADDR; // scratch space
 
   // Read 1st page off disk
   readseg((uchar *)elf, 4096, 0);
