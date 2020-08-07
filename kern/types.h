@@ -13,4 +13,8 @@ typedef unsigned long long uint64_t;
 typedef unsigned long long uintptr_t;
 typedef unsigned long size_t;
 
+typedef uint64_t pte_t;
+
+#define NULL 0
+
 #endif /* XV6_X86_64_TYPES_H */

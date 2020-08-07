@@ -8,6 +8,7 @@ KERN_OBJS := \
 	$(OBJDIR)/$(KERN_DIR)/string.o \
 	$(OBJDIR)/$(KERN_DIR)/mp.o \
 	$(OBJDIR)/$(KERN_DIR)/proc.o \
+	$(OBJDIR)/$(KERN_DIR)/vm.o \
 
 KERN_CFLAGS := $(CFLAGS) -m64 -mcmodel=kernel
 KERN_LDFLAGS := $(LDFLAGS) -m elf_x86_64

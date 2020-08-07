@@ -11,8 +11,8 @@ int main(void) {
   kinit1(end, P2V(4 * 1024 * 1024)); // phys page allocator
   cprintf("\nhello from main\n");
   cprintf("cprintf format test: %d, 0x%x, 0x%p, %s\n", 256, 256, main, "hello");
-  panic("foo");
-  for (;;) {
+  kvmalloc(); // kernel page table
+  while (1) {
     __asm__ volatile("hlt");
   }
 }

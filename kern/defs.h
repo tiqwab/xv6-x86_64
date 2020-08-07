@@ -11,8 +11,9 @@ void cprintf(char *, ...);
 void panic(char *) __attribute__((noreturn));
 
 // kalloc.c
-void kinit1(void *, void *);
+char *kalloc(void);
 void kfree(char *);
+void kinit1(void *, void *);
 
 // proc.c
 struct cpu *mycpu(void);
@@ -29,5 +30,12 @@ void popcli(void);
 // string.c
 void *memset(void *, int, size_t);
 void *memmove(void *, const void *, size_t);
+
+// vm.c
+void freevm(pte_t *pgdir);
+void kvmalloc(void);
+
+// number of elements in fixed-size array
+#define NELEM(x) (sizeof(x) / sizeof((x)[0]))
 
 #endif /* ifndef XV6_X86_64_DEFS_H */
