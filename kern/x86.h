@@ -25,6 +25,10 @@ static inline void cli(void) { __asm__ volatile("cli"); }
 
 static inline void sti(void) { __asm__ volatile("sti"); }
 
+static inline void lcr3(uintptr_t val) {
+  __asm__ volatile("movq %0,%%cr3" : : "r"(val));
+}
+
 static inline uint xchg(volatile uint *addr, uint newval) {
   uint result;
 

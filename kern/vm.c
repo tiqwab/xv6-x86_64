@@ -2,6 +2,7 @@
 #include "memlayout.h"
 #include "mmu.h"
 #include "types.h"
+#include "x86.h"
 
 extern char data[]; // defined by kernel.ld
 pte_t *kpgdir;      // for use in scheduler()
@@ -164,7 +165,13 @@ pte_t *setupkvm(void) {
 void kvmalloc(void) {
   init_kmap();
   kpgdir = setupkvm();
-  // switchkvm();
+  switchkvm();
+}
+
+// Switch h/w page table register to the kernel-only page table,
+// for when no process is running.
+void switchkvm(void) {
+  lcr3(V2P(kpgdir)); // switch to the kernel page table
 }
 
 // Free a page table and all the physical memory pages

@@ -34,6 +34,7 @@ void *memmove(void *, const void *, size_t);
 // vm.c
 void freevm(pte_t *pgdir);
 void kvmalloc(void);
+void switchkvm(void);
 
 // number of elements in fixed-size array
 #define NELEM(x) (sizeof(x) / sizeof((x)[0]))
