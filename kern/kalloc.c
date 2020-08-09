@@ -28,6 +28,11 @@ void kinit1(void *vstart, void *vend) {
   freerange(vstart, vend);
 }
 
+void kinit2(void *vstart, void *vend) {
+  freerange(vstart, vend);
+  kmem.use_lock = 1;
+}
+
 void freerange(void *vstart, void *vend) {
   char *p;
   p = (char *)PGROUNDUP((uintptr_t)vstart);
