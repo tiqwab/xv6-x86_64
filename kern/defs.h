@@ -17,6 +17,7 @@ void kinit1(void *, void *);
 
 // proc.c
 struct cpu *mycpu(void);
+int cpuid(void);
 
 // spinlock.c
 void acquire(struct spinlock *);
@@ -34,6 +35,7 @@ void *memmove(void *, const void *, size_t);
 // vm.c
 void freevm(pte_t *pgdir);
 void kvmalloc(void);
+void seginit(void);
 void switchkvm(void);
 
 // number of elements in fixed-size array

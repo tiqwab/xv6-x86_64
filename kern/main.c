@@ -12,6 +12,11 @@ int main(void) {
   cprintf("\nhello from main\n");
   cprintf("cprintf format test: %d, 0x%x, 0x%p, %s\n", 256, 256, main, "hello");
   kvmalloc(); // kernel page table
+  // TODO for multicore
+  // mpinit(); // detect other processors
+  // TODO for interrupt
+  // lapicinit(); // interrupt controller
+  seginit(); // segment descriptors
   while (1) {
     __asm__ volatile("hlt");
   }

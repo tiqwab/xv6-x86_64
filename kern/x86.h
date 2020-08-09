@@ -21,6 +21,20 @@ static inline void stosb(void *addr, int data, int cnt) {
                    : "memory", "cc");
 }
 
+struct segdesc;
+
+static inline void lgdt(struct segdesc *p, uint16_t size) {
+  volatile uint16_t pd[5];
+
+  pd[0] = size - 1;
+  pd[1] = ((uintptr_t)p) & 0xffff;
+  pd[2] = (((uintptr_t)p) >> 16) & 0xffff;
+  pd[3] = (((uintptr_t)p) >> 32) & 0xffff;
+  pd[4] = (((uintptr_t)p) >> 48) & 0xffff;
+
+  __asm__ volatile("lgdt (%0)" : : "r"(pd));
+}
+
 static inline void cli(void) { __asm__ volatile("cli"); }
 
 static inline void sti(void) { __asm__ volatile("sti"); }
