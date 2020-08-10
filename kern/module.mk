@@ -19,8 +19,14 @@ KERNEL := $(KERN_DIR)/kernel
 
 -include $(OBJDIR)/$(KERN_DIR)/*.d
 
-$(OBJDIR)/$(KERNEL): $(KERN_OBJS) $(KERN_LINKER_SCRIPT)
-	$(LD) $(KERN_LDFLAGS) -T $(KERN_LINKER_SCRIPT) -o $@ $(KERN_OBJS)
+$(OBJDIR)/$(KERN_DIR)/initcode: $(KERN_DIR)/initcode.S
+	$(CC) $(CFLAGS) -m64 -fno-pic -nostdinc -I. -c -o $@.o $<
+	$(LD) $(LDFLAGS) -m elf_x86_64 -N -e start -Ttext 0 -o $@.out $@.o
+	$(OBJCOPY) -S -O binary $@.out $@
+	$(OBJDUMP) -S $@.o > $@.asm
+
+$(OBJDIR)/$(KERNEL): $(KERN_OBJS) $(KERN_LINKER_SCRIPT) $(OBJDIR)/$(KERN_DIR)/initcode
+	$(LD) $(KERN_LDFLAGS) -T $(KERN_LINKER_SCRIPT) -o $@ $(KERN_OBJS) -b binary $(OBJDIR)/$(KERN_DIR)/initcode
 	$(OBJDUMP) -S $@ > $@.asm
 
 $(OBJDIR)/$(KERN_DIR)/%.o: $(KERN_DIR)/%.c
