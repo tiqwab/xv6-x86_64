@@ -192,6 +192,19 @@ void switchkvm(void) {
   lcr3(V2P(kpgdir)); // switch to the kernel page table
 }
 
+// Load the initcode into address 0 of pgdir.
+// sz must be less than a page.
+void inituvm(pte_t *pgdir, char *init, size_t sz) {
+  char *mem;
+
+  if (sz >= PGSIZE)
+    panic("inituvm: more than a page");
+  mem = kalloc();
+  memset(mem, 0, PGSIZE);
+  mappages(pgdir, 0, PGSIZE, V2P(mem), PTE_W | PTE_U);
+  memmove(mem, init, sz);
+}
+
 // Free a page table and all the physical memory pages
 // in the user part.
 void freevm(pte_t *pgdir) { panic("should implement freevm"); }

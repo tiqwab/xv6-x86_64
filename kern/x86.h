@@ -60,4 +60,58 @@ static inline uint readeflags(void) {
   return (uint)eflags;
 }
 
+// Layout of the trap frame built on the stack by the
+// hardware and by trapasm.S, and passed to trap().
+//
+// in x86-64, trapframe is:
+// - always aligned in 16-bytes
+// - always contains ss and rsp
+// - err is still optional (some exception push it, but others not)
+struct trapframe {
+  // registers
+  uint64_t rax;
+  uint64_t rbx;
+  uint64_t rcx;
+  uint64_t rdx;
+  uint64_t rbp;
+  uint64_t rsi;
+  uint64_t rdi;
+  uint64_t r8;
+  uint64_t r9;
+  uint64_t r10;
+  uint64_t r11;
+  uint64_t r12;
+  uint64_t r13;
+  uint64_t r14;
+  uint64_t r15;
+
+  // rest of trap frame
+  uint16_t gs;
+  uint16_t padding1;
+  uint16_t fs;
+  uint16_t padding2;
+  uint16_t es;
+  uint16_t padding3;
+  uint16_t ds;
+  uint16_t padding4;
+
+  uint64_t trapno;
+
+  // below here defined by x86-64 hardware
+  uint64_t err;
+  uint64_t rip;
+  uint16_t cs;
+  uint16_t padding5;
+  uint32_t padding6;
+  uint64_t rflags;
+
+  // below here only when crossing rings, such as from user to kernel
+  uint64_t rsp;
+  uint16_t ss;
+  uint16_t padding7;
+  uint32_t padding8;
+};
+
+typedef struct trapframe trapframe_t __attribute__((aligned(16)));
+
 #endif /* ifndef XV6_X86_64_X86_H */
