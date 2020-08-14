@@ -44,47 +44,46 @@ struct cpu *mycpu(void) {
 // state required to run in the kernel.
 // Otherwise return 0.
 static struct proc *allocproc(void) {
-  panic("allocproc is not implemented yet");
-  //   struct proc *p;
-  //   char *sp;
-  //
-  //   acquire(&ptable.lock);
-  //
-  //   for(p = ptable.proc; p < &ptable.proc[NPROC]; p++)
-  //     if(p->state == UNUSED)
-  //       goto found;
-  //
-  //   release(&ptable.lock);
-  //   return NULL;
-  //
-  // found:
-  //   p->state = EMBRYO;
-  //   p->pid = nextpid++;
-  //
-  //   release(&ptable.lock);
-  //
-  //   // Allocate kernel stack.
-  //   if((p->kstack = kalloc()) == 0){
-  //     p->state = UNUSED;
-  //     return NULL;
-  //   }
-  //   sp = p->kstack + KSTACKSIZE;
-  //
-  //   // Leave room for trap frame.
-  //   sp -= sizeof *p->tf;
-  //   p->tf = (struct trapframe*) sp;
-  //
-  //   // Set up new context to start executing at forkret,
-  //   // which returns to trapret.
-  //   sp -= sizeof(uintptr_t);
-  //   *((uintptr_t *) sp) = (uintptr_t) trapret;
-  //
-  //   sp -= sizeof *p->context;
-  //   p->context = (struct context*)sp;
-  //   memset(p->context, 0, sizeof *p->context);
-  //   p->context->eip = (uint)forkret;
-  //
-  //   return p;
+  struct proc *p;
+  char *sp;
+
+  acquire(&ptable.lock);
+
+  for (p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+    if (p->state == UNUSED)
+      goto found;
+
+  release(&ptable.lock);
+  return NULL;
+
+found:
+  p->state = EMBRYO;
+  p->pid = nextpid++;
+
+  release(&ptable.lock);
+
+  // Allocate kernel stack.
+  if ((p->kstack = kalloc()) == 0) {
+    p->state = UNUSED;
+    return NULL;
+  }
+  sp = p->kstack + KSTACKSIZE;
+
+  // Leave room for trap frame.
+  sp -= sizeof *p->tf;
+  p->tf = (struct trapframe *)sp;
+
+  // Set up new context to start executing at forkret,
+  // which returns to trapret.
+  sp -= sizeof(uintptr_t);
+  *((uintptr_t *)sp) = (uintptr_t)trapret;
+
+  sp -= sizeof *p->context;
+  p->context = (struct context *)sp;
+  memset(p->context, 0, sizeof *p->context);
+  p->context->rip = (uint64_t)forkret;
+
+  return p;
 }
 
 // Set up first user process.
@@ -103,9 +102,7 @@ void userinit(void) {
   p->sz = PGSIZE;
   memset(p->tf, 0, sizeof(*p->tf));
   p->tf->cs = (SEG_UCODE << 3) | DPL_USER;
-  p->tf->ds = (SEG_UDATA << 3) | DPL_USER;
-  p->tf->es = p->tf->ds;
-  p->tf->ss = p->tf->ds;
+  p->tf->ss = (SEG_UDATA << 3) | DPL_USER;
   p->tf->rflags = FL_IF;
   p->tf->rsp = PGSIZE;
   p->tf->rip = 0; // beginning of initcode.S
@@ -123,4 +120,24 @@ void userinit(void) {
   p->state = RUNNABLE;
 
   release(&ptable.lock);
+}
+
+// A fork child's very first scheduling by scheduler()
+// will swtch here.  "Return" to user space.
+void forkret(void) {
+  static int first = 1;
+  // Still holding ptable.lock from scheduler.
+  release(&ptable.lock);
+
+  if (first) {
+    // Some initialization functions must be run in the context
+    // of a regular process (e.g., they call sleep), and thus cannot
+    // be run from main().
+    first = 0;
+    // TODO for fs
+    // iinit(ROOTDEV);
+    // initlog(ROOTDEV);
+  }
+
+  // Return to "caller", actually trapret (see allocproc).
 }

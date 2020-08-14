@@ -1,8 +1,6 @@
 #ifndef XV6_X86_64_MMU_H
 #define XV6_X86_64_MMU_H
 
-#include "types.h"
-
 // Eflags register
 #define FL_IF 0x00000200 // Interrupt Enable
 
@@ -15,6 +13,11 @@
 
 // cpu->gdt[NSEGS] holds the above segments.
 #define NSEGS 6
+
+// __ASSEMBLER__ is defined by gcc when processing assembly files
+#ifndef __ASSEMBLER__
+
+#include "types.h"
 
 // Segment Descriptor
 // in x86-64, only type, s, dpl, p, and l is effective (other fields are
@@ -42,6 +45,8 @@ struct segdesc {
     ((lim) >> 12) & 0xffff, (uint)(base)&0xffff, ((uint)(base) >> 16) & 0xff,  \
         type, 1, dpl, 1, (uint)(lim) >> 28, 0, 1, 0, 1, (uint)(base) >> 24     \
   }
+
+#endif /* __ASSEMBLER__ */
 
 #define DPL_USER 0x3 // User DPL
 

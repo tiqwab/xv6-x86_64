@@ -29,6 +29,7 @@ void kinit1(void *vstart, void *vend) {
 }
 
 void kinit2(void *vstart, void *vend) {
+  cprintf("[kinit2] vstart: 0x%p, vend: 0x%p\n", vstart, vend);
   freerange(vstart, vend);
   kmem.use_lock = 1;
 }
@@ -36,8 +37,10 @@ void kinit2(void *vstart, void *vend) {
 void freerange(void *vstart, void *vend) {
   char *p;
   p = (char *)PGROUNDUP((uintptr_t)vstart);
-  for (; p + PGSIZE <= (char *)vend; p += PGSIZE)
+  for (; p + PGSIZE <= (char *)vend; p += PGSIZE) {
+    // cprintf("kfree 0x%p\n", p);
     kfree(p);
+  }
 }
 
 // Free the page of physical memory pointed at by v,

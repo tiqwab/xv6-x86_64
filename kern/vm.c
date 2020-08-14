@@ -168,7 +168,7 @@ pte_t *setupkvm(void) {
   // if (P2V(PHYSTOP) > (void *)DEVSPACE)
   //   panic("PHYSTOP too high");
   for (k = kmap; k < &kmap[NELEM(kmap)]; k++) {
-    cprintf("%p\n", k);
+    cprintf("setupkvm for 0x%p\n", k->virt);
     if (mappages(pgdir, k->virt, k->phys_end - k->phys_start,
                  (uint)k->phys_start, k->perm) < 0) {
       freevm(pgdir);

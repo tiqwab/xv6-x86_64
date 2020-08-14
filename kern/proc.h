@@ -20,6 +20,28 @@ struct cpu {
 
 extern struct cpu cpus[NCPU];
 
+// Saved registers for kernel context switches.
+// Don't need to save all the segment registers (%cs, etc),
+// because they are constant across kernel contexts.
+// Don't need to caller-saved registers such as %rax, %rcx and %rdx,
+// because the x86-64 convention is that the caller has saved them.
+// Contexts are stored at the bottom of the stack they
+// describe; the stack pointer is the address of the context.
+// The layout of the context matches the layout of the stack in swtch.S
+// at the "Switch stacks" comment. Switch doesn't save eip explicitly,
+// but it is on the stack and allocproc() manipulates it.
+struct context {
+  uint64_t r15;
+  uint64_t r14;
+  uint64_t r13;
+  uint64_t r12;
+  uint64_t rdi;
+  uint64_t rsi;
+  uint64_t rbx;
+  uint64_t rbp;
+  uint64_t rip;
+};
+
 enum procstate { UNUSED, EMBRYO, SLEEPING, RUNNABLE, RUNNING, ZOMBIE };
 
 // Per-process state
@@ -30,8 +52,8 @@ struct proc {
   enum procstate state; // Process state
   int pid;              // Process ID
   // struct proc *parent;         // Parent process
-  trapframe_t *tf; // Trap frame for current syscall
-  // struct context *context;     // swtch() here to run process
+  trapframe_t *tf;         // Trap frame for current syscall
+  struct context *context; // swtch() here to run process
   // void *chan;                  // If non-zero, sleeping on chan
   // int killed;                  // If non-zero, have been killed
   // struct file *ofile[NOFILE];  // Open files

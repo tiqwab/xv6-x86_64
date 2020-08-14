@@ -86,14 +86,11 @@ struct trapframe {
   uint64_t r15;
 
   // rest of trap frame
-  uint16_t gs;
-  uint16_t padding1;
-  uint16_t fs;
-  uint16_t padding2;
-  uint16_t es;
-  uint16_t padding3;
-  uint16_t ds;
-  uint16_t padding4;
+  // remove segment registers because the value is always same (2 for kernel, 4
+  // for user) uint16_t gs; uint16_t padding_gs1; uint32_t padding_gs2; uint16_t
+  // fs; uint16_t padding_fs1; uint32_t padding_fs2; uint16_t es; uint16_t
+  // padding_es1; uint32_t padding_es2; uint16_t ds; uint16_t padding_ds1;
+  // uint32_t padding_ds2;
 
   uint64_t trapno;
 
@@ -101,15 +98,15 @@ struct trapframe {
   uint64_t err;
   uint64_t rip;
   uint16_t cs;
-  uint16_t padding5;
-  uint32_t padding6;
+  uint16_t padding_cs1;
+  uint32_t padding_cs2;
   uint64_t rflags;
 
   // below here only when crossing rings, such as from user to kernel
   uint64_t rsp;
   uint16_t ss;
-  uint16_t padding7;
-  uint32_t padding8;
+  uint16_t padding_ss1;
+  uint32_t padding_ss2;
 };
 
 typedef struct trapframe trapframe_t __attribute__((aligned(16)));

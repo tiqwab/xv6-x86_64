@@ -1,6 +1,7 @@
 #include "defs.h"
 #include "memlayout.h"
 #include "mmu.h"
+#include "x86.h"
 
 extern char end[]; // first address after kernel loaded from ELF file
 
@@ -30,8 +31,9 @@ int main(void) {
   // fileinit();      // file table
   // ideinit();       // disk
   // startothers();   // start other processors
-  kinit2(P2V(4 * 1024 * 1024), P2V(PHYSTOP)); // must come after startothers()
-  userinit();                                 // first user process
+  kinit2(P2V(4 * 1024 * 1024),
+         P2V(0x80 * 1024 * 1024)); // must come after startothers()
+  userinit();                      // first user process
   // mpmain();        // finish this processor's setup
 
   cprintf("initialization finished\n");
