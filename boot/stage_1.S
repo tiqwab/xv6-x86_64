@@ -98,16 +98,16 @@ load_rest_of_bootloader_from_disk:
   int $0x13
   jc rest_of_bootloader_load_failed
 
-print_test:
-  mov $0x13,%ah
-  mov $0x1,%al
-  mov $0x0,%bh
-  mov $0x7,%bl
-  mov $0x0010,%cx
-  mov $0x0,%dl
-  mov $0x0,%dh
-  lea (str),%bp
-  int $0x10
+# print_test:
+#   mov $0x13,%ah
+#   mov $0x1,%al
+#   mov $0x0,%bh
+#   mov $0x7,%bl
+#   mov $0x0010,%cx
+#   mov $0x0,%dl
+#   mov $0x0,%dh
+#   lea (str),%bp
+#   int $0x10
 
   # Switch from real to protected mode.  Use a bootstrap GDT that makes
   # virtual addresses map directly to physical addresses so that the
@@ -156,8 +156,8 @@ spin32:
   hlt
   jmp     spin32
 
-str:
-  .asciz "hello_xv6-x86_64"
+# str:
+#   .asciz "hello_xv6-x86_64"
 rest_of_bootloader_load_failed_str:
   .asciz "rest_of_bootloader_load failed!!"
 

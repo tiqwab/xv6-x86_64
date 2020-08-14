@@ -9,8 +9,7 @@ extern char end[]; // first address after kernel loaded from ELF file
 // Allocate a real stack and switch to it, first
 // doing some setup required for memory allocator to work.
 int main(void) {
-  kinit1(end, P2V(4 * 1024 * 1024)); // phys page allocator
-  cprintf("\nhello from main\n");
+  kinit1(end); // phys page allocator
   cprintf("cprintf format test: %d, 0x%x, 0x%p, %s\n", 256, 256, main, "hello");
   kvmalloc(); // kernel page table
   // TODO for multicore
@@ -31,9 +30,8 @@ int main(void) {
   // fileinit();      // file table
   // ideinit();       // disk
   // startothers();   // start other processors
-  kinit2(P2V(4 * 1024 * 1024),
-         P2V(0x80 * 1024 * 1024)); // must come after startothers()
-  userinit();                      // first user process
+  kinit2();   // must come after startothers()
+  userinit(); // first user process
   // mpmain();        // finish this processor's setup
 
   cprintf("initialization finished\n");

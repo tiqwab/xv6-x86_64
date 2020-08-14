@@ -13,8 +13,8 @@ void panic(char *) __attribute__((noreturn));
 // kalloc.c
 char *kalloc(void);
 void kfree(char *);
-void kinit1(void *, void *);
-void kinit2(void *vstart, void *vend);
+void kinit1(void *vstart);
+void kinit2();
 
 // proc.c
 struct cpu *mycpu(void);

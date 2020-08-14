@@ -8,6 +8,8 @@
 extern char data[]; // defined by kernel.ld
 pte_t *kpgdir;      // for use in scheduler()
 
+extern uintptr_t phys_top;
+
 // There is one page table per process, plus one that's used when
 // a CPU is not running any process (kpgdir). The kernel uses the
 // current process's page table during system calls and interrupts;
@@ -61,7 +63,7 @@ void init_kmap(void) {
   // kern data+memory
   kmap[2].virt = (void *)data;
   kmap[2].phys_start = V2P(data);
-  kmap[2].phys_end = PHYSTOP;
+  kmap[2].phys_end = phys_top;
   kmap[2].perm = PTE_W;
 
   // TODO for DEVSPACE
