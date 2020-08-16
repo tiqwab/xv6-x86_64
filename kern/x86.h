@@ -35,6 +35,10 @@ static inline void lgdt(struct segdesc *p, uint16_t size) {
   __asm__ volatile("lgdt (%0)" : : "r"(pd));
 }
 
+static inline void ltr(uint16_t sel) {
+  __asm__ volatile("ltr %0" : : "r"(sel));
+}
+
 static inline void cli(void) { __asm__ volatile("cli"); }
 
 static inline void sti(void) { __asm__ volatile("sti"); }

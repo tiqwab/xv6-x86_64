@@ -194,6 +194,41 @@ void switchkvm(void) {
   lcr3(V2P(kpgdir)); // switch to the kernel page table
 }
 
+// Switch TSS and h/w page table to correspond to process p.
+void switchuvm(struct proc *p) {
+  if (p == NULL)
+    panic("switchuvm: no process");
+  if (p->kstack == NULL)
+    panic("switchuvm: no kstack");
+  if (p->pgdir == NULL)
+    panic("switchuvm: no pgdir");
+
+  pushcli();
+  *((struct tssdesc *)(&mycpu()->gdt[SEG_TSS])) =
+      TSSDESC64(STS_T64A, &mycpu()->ts, sizeof(mycpu()->ts) - 1, 0);
+  mycpu()->ts.rsp0 = ((uintptr_t)p->kstack) + KSTACKSIZE;
+
+  // I'm not sure what value iomb should have if we don't want to allow user
+  // processes to use I/O port. It should have 0xffff according to:
+  // https://stackoverflow.com/questions/54876039/creating-a-proper-task-state-segment-tss-structure-with-and-without-an-io-bitm
+  // But rust-osdev set 0 for it.
+  // https://github.com/rust-osdev/x86_64/blob/master/src/structures/tss.rs
+  //
+  // TODO:
+  // For x86, 0 is OK for the purpose, so I think 0 is also OK for x86-64, but
+  // should check it later.
+  //
+  // The below comment comes from the original xv6 source.
+  // setting IOPL=0 in eflags *and* iomb beyond the tss segment limit
+  // forbids I/O instructions (e.g., inb and outb) from user space
+  // mycpu()->ts.iomb = (uint16_t) 0xFFFF;
+  mycpu()->ts.iomb = (uint16_t)0;
+
+  ltr(SEG_TSS << 3);
+  lcr3(V2P(p->pgdir)); // switch to process's address space
+  popcli();
+}
+
 // Load the initcode into address 0 of pgdir.
 // sz must be less than a page.
 void inituvm(pte_t *pgdir, char *init, size_t sz) {

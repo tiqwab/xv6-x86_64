@@ -9,10 +9,11 @@
 #define SEG_KDATA 2 // kernel data+stack
 #define SEG_UCODE 3 // user code
 #define SEG_UDATA 4 // user data+stack
-#define SEG_TSS 5   // this process's task state
+#define SEG_TSS 5   // this process's task state, this occupies 2 entries
 
 // cpu->gdt[NSEGS] holds the above segments.
-#define NSEGS 6
+// 7 means null, kcode, kdata, ucode, udata and tss (2 entries)
+#define NSEGS 7
 
 // __ASSEMBLER__ is defined by gcc when processing assembly files
 #ifndef __ASSEMBLER__
@@ -46,6 +47,38 @@ struct segdesc {
         type, 1, dpl, 1, (uint)(lim) >> 28, 0, 1, 0, 1, (uint)(base) >> 24     \
   }
 
+// TSS Descriptor
+// in x86-64, the size of TSS descriptor is 16 bytes, not 8.
+struct tssdesc {
+  // the below is low 8 bytes
+  uint32_t lim_15_0 : 16;  // Low bits of segment limit
+  uint32_t base_15_0 : 16; // Low bits of segment base address
+  uint32_t base_23_16 : 8; // Middle bits of segment base address
+  uint32_t type : 4;       // Segment type (see STS_ constants)
+  uint32_t s : 1;          // 0 = system, 1 = application
+  uint32_t dpl : 2;        // Descriptor Privilege Level
+  uint32_t p : 1;          // Present
+  uint32_t lim_19_16 : 4;  // High bits of segment limit
+  uint32_t avl : 1;        // Unused (available for software use)
+  uint32_t l : 1;          // 64-bit code segment (IA-32e mode only)
+  uint32_t db : 1; // 0 = 16-bit segment, 1 = 32-bit segment <- this must be
+                   // clear in IA-32e mode
+  uint32_t g : 1;  // Granularity: limit scaled by 4K when set
+  uint32_t base_31_24 : 8; // High bits of segment base address
+  // the below is high 8 bytes
+  uint32_t base_63_32;
+  uint32_t padding1;
+};
+
+#define TSSDESC64(type, base, lim, dpl)                                        \
+  (struct tssdesc) {                                                           \
+    (lim) & 0xffff, (uint32_t)((uint64_t)(base)&0xffff),                       \
+        (uint32_t)(((uint64_t)(base) >> 16) & 0xff), type, 0, dpl, 1,          \
+        (uint32_t)(lim) >> 16, 0, 0, 0, 0,                                     \
+        (uint32_t)(((uint64_t)(base) >> 24) & 0xff),                           \
+        (uint32_t)((uint64_t)(base) >> 32), 0                                  \
+  }
+
 #endif /* __ASSEMBLER__ */
 
 #define DPL_USER 0x3 // User DPL
@@ -54,6 +87,9 @@ struct segdesc {
 #define STA_X 0x8 // Executable segment
 #define STA_W 0x2 // Writeable (non-executable segments)
 #define STA_R 0x2 // Readable (executable segments)
+
+// System segment type bits
+#define STS_T64A 0x9 // Available 64-bit TSS
 
 // A virtual address 'la' has a five-part structure as follows:
 //
@@ -82,5 +118,31 @@ struct segdesc {
 
 // The page alighned physical address of the frame or the next page table
 #define PTE_ADDR(pte) (((((uintptr_t)(pte)) >> 12) & 0xffffffffffff) << 12)
+
+#ifndef __ASSEMBLER__
+
+#include "types.h"
+
+// 64-bit mode task state segment format
+// ref. Intel SDM vol.3 Figure 7-11
+struct taskstate {
+  uint32_t padding1;
+  uintptr_t rsp0;
+  uintptr_t rsp1;
+  uintptr_t rsp2;
+  uint64_t padding2;
+  uintptr_t ist1;
+  uintptr_t ist2;
+  uintptr_t ist3;
+  uintptr_t ist4;
+  uintptr_t ist5;
+  uintptr_t ist6;
+  uintptr_t ist7;
+  uint64_t padding3;
+  uint16_t padding4;
+  uint16_t iomb; // I/O map base address
+};
+
+#endif /* __ASSEMBLER__ */
 
 #endif /* XV6_X86_64_MMU_H */

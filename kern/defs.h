@@ -3,7 +3,9 @@
 
 #include "types.h"
 
+struct context;
 struct cpu;
+struct proc;
 struct spinlock;
 
 // console.c
@@ -19,7 +21,11 @@ void kinit2();
 // proc.c
 struct cpu *mycpu(void);
 int cpuid(void);
+void scheduler(void) __attribute__((noreturn));
 void userinit(void);
+
+// swtch.S
+void swtch(struct context **, struct context *);
 
 // spinlock.c
 void acquire(struct spinlock *);
@@ -42,6 +48,7 @@ void kvmalloc(void);
 void seginit(void);
 pte_t *setupkvm(void);
 void switchkvm(void);
+void switchuvm(struct proc *p);
 
 // number of elements in fixed-size array
 #define NELEM(x) (sizeof(x) / sizeof((x)[0]))

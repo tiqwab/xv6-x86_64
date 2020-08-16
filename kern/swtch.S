@@ -8,8 +8,8 @@
 
 .globl swtch
 swtch:
-  movq 8(%rsp), %rax
-  movq 16(%rsp), %rdx
+  movq %rdi, %rax
+  movq %rsi, %rdx
 
   # Save old callee-saved registers
   pushq %rbp

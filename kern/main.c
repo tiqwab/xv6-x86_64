@@ -1,8 +1,10 @@
 #include "defs.h"
 #include "memlayout.h"
 #include "mmu.h"
+#include "proc.h"
 #include "x86.h"
 
+static void mpmain(void) __attribute__((noreturn));
 extern char end[]; // first address after kernel loaded from ELF file
 
 // Bootstrap processor starts running C code here.
@@ -32,11 +34,16 @@ int main(void) {
   // startothers();   // start other processors
   kinit2();   // must come after startothers()
   userinit(); // first user process
-  // mpmain();        // finish this processor's setup
-
   cprintf("initialization finished\n");
 
-  while (1) {
-    __asm__ volatile("hlt");
-  }
+  mpmain(); // finish this processor's setup
+}
+
+// Common CPU setup code.
+static void mpmain(void) {
+  cprintf("cpu%d: starting %d\n", cpuid(), cpuid());
+  // TODO for interrupt
+  // idtinit();       // load idt register
+  xchg(&(mycpu()->started), 1); // tell startothers() we're up
+  scheduler();                  // start running processes
 }

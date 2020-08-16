@@ -55,5 +55,5 @@ trapret:
   pop %r14
   pop %r15
 
-  addl $0x10, %esp  # trapno and errcode
-  iret
+  add $0x10, %rsp  # trapno and errcode
+  iretq
