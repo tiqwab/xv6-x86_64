@@ -2,7 +2,8 @@
 
 set -eux
 
-CLANG_FORMAT_OPTIONS="-i -style=LLVM"
+# '-style=file' loads config from .clang-format
+CLANG_FORMAT_OPTIONS="-i -style=file"
 
 # header files
 find -name '*.h' -exec clang-format $CLANG_FORMAT_OPTIONS {} \;
