@@ -40,6 +40,18 @@ struct cpu *mycpu(void) {
   // panic("unknown apicid\n");
 }
 
+// Disable interrupts so that we are not rescheduled
+// while reading proc from the cpu structure
+struct proc *myproc(void) {
+  struct cpu *c;
+  struct proc *p;
+  pushcli();
+  c = mycpu();
+  p = c->proc;
+  popcli();
+  return p;
+}
+
 // Look in the process table for an UNUSED proc.
 // If found, change state to EMBRYO and initialize
 // state required to run in the kernel.

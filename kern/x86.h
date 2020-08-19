@@ -35,6 +35,20 @@ static inline void lgdt(struct segdesc *p, uint16_t size) {
   __asm__ volatile("lgdt (%0)" : : "r"(pd));
 }
 
+struct gatedesc;
+
+static inline void lidt(struct gatedesc *p, uint16_t size) {
+  volatile uint16_t pd[5];
+
+  pd[0] = size - 1;
+  pd[1] = ((uintptr_t)p) & 0xffff;
+  pd[2] = (((uintptr_t)p) >> 16) & 0xffff;
+  pd[3] = (((uintptr_t)p) >> 32) & 0xffff;
+  pd[4] = (((uintptr_t)p) >> 48) & 0xffff;
+
+  __asm__ volatile("lidt (%0)" : : "r"(pd));
+}
+
 static inline void ltr(uint16_t sel) {
   __asm__ volatile("ltr %0" : : "r"(sel));
 }
@@ -45,6 +59,12 @@ static inline void sti(void) { __asm__ volatile("sti"); }
 
 static inline void lcr3(uintptr_t val) {
   __asm__ volatile("movq %0,%%cr3" : : "r"(val));
+}
+
+static inline uintptr_t rcr2(void) {
+  uintptr_t val;
+  __asm__ volatile("movq %%cr2,%0" : "=r"(val));
+  return val;
 }
 
 static inline uint xchg(volatile uint *addr, uint newval) {

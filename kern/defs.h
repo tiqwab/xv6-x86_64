@@ -21,6 +21,7 @@ void kinit2();
 // proc.c
 struct cpu *mycpu(void);
 int cpuid(void);
+struct proc *myproc(void);
 void scheduler(void) __attribute__((noreturn));
 void userinit(void);
 
@@ -40,6 +41,13 @@ void popcli(void);
 void *memset(void *, int, size_t);
 void *memmove(void *, const void *, size_t);
 char *safestrcpy(char *s, const char *t, int n);
+
+// syscall.c
+void syscall(void);
+
+// trap.c
+void idtinit(void);
+void tvinit(void);
 
 // vm.c
 void freevm(pte_t *pgdir);

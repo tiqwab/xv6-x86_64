@@ -206,7 +206,10 @@ void switchuvm(struct proc *p) {
   pushcli();
   *((struct tssdesc *)(&mycpu()->gdt[SEG_TSS])) =
       TSSDESC64(STS_T64A, &mycpu()->ts, sizeof(mycpu()->ts) - 1, 0);
-  mycpu()->ts.rsp0 = ((uintptr_t)p->kstack) + KSTACKSIZE;
+  mycpu()->ts.rsp0_31_0 =
+      (uint32_t)((((uintptr_t)p->kstack) + KSTACKSIZE) & 0xffffffff);
+  mycpu()->ts.rsp0_63_32 =
+      (uint32_t)(((((uintptr_t)p->kstack) + KSTACKSIZE) >> 32) & 0xffffffff);
 
   // I'm not sure what value iomb should have if we don't want to allow user
   // processes to use I/O port. It should have 0xffff according to:

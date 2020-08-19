@@ -27,7 +27,7 @@ int main(void) {
   // consoleinit();   // console hardware
   // uartinit();      // serial port
   // pinit();         // process table
-  // tvinit();        // trap vectors
+  tvinit(); // trap vectors
   // binit();         // buffer cache
   // fileinit();      // file table
   // ideinit();       // disk
@@ -42,8 +42,7 @@ int main(void) {
 // Common CPU setup code.
 static void mpmain(void) {
   cprintf("cpu%d: starting %d\n", cpuid(), cpuid());
-  // TODO for interrupt
-  // idtinit();       // load idt register
+  idtinit();                    // load idt register
   xchg(&(mycpu()->started), 1); // tell startothers() we're up
   scheduler();                  // start running processes
 }

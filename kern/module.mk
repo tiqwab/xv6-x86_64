@@ -12,6 +12,9 @@ KERN_OBJS := \
 	$(OBJDIR)/$(KERN_DIR)/swtch.o \
 	$(OBJDIR)/$(KERN_DIR)/trapasm.o \
 	$(OBJDIR)/$(KERN_DIR)/kclock.o \
+	$(OBJDIR)/$(KERN_DIR)/trap.o \
+	$(OBJDIR)/$(KERN_DIR)/syscall.o \
+	$(OBJDIR)/$(KERN_DIR)/vectors.o \
 
 KERN_CFLAGS := $(CFLAGS) -m64 -mcmodel=kernel
 KERN_LDFLAGS := $(LDFLAGS) -m elf_x86_64
@@ -21,6 +24,9 @@ KERN_LINKER_SCRIPT := $(KERN_DIR)/kernel.ld
 KERNEL := $(KERN_DIR)/kernel
 
 -include $(OBJDIR)/$(KERN_DIR)/*.d
+
+$(KERN_DIR)/vectors.S: $(KERN_DIR)/vectors.sh
+	./$< > $@
 
 $(OBJDIR)/$(KERN_DIR)/initcode: $(KERN_DIR)/initcode.S
 	$(CC) $(CFLAGS) -m64 -fno-pic -nostdinc -I. -c -o $@.o $<

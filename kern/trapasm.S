@@ -26,9 +26,8 @@ alltraps:
   mov %ax, %es
 
   # Call trap(tf), where tf=%esp
-  push %rsp
-  # call trap # TODO for interrupt
-  add $8, %rsp
+  mov %rsp, %rdi
+  call trap
 
   # Return falls through to trapret...
 .globl trapret

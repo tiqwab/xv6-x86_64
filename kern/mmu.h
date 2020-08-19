@@ -90,6 +90,8 @@ struct tssdesc {
 
 // System segment type bits
 #define STS_T64A 0x9 // Available 64-bit TSS
+#define STS_IG64 0xE // 64-bit Interrupt Gate
+#define STS_TG64 0xF // 64-bit Trap Gate
 
 // A virtual address 'la' has a five-part structure as follows:
 //
@@ -127,21 +129,75 @@ struct tssdesc {
 // ref. Intel SDM vol.3 Figure 7-11
 struct taskstate {
   uint32_t padding1;
-  uintptr_t rsp0;
-  uintptr_t rsp1;
-  uintptr_t rsp2;
-  uint64_t padding2;
-  uintptr_t ist1;
-  uintptr_t ist2;
-  uintptr_t ist3;
-  uintptr_t ist4;
-  uintptr_t ist5;
-  uintptr_t ist6;
-  uintptr_t ist7;
-  uint64_t padding3;
-  uint16_t padding4;
+  uint32_t rsp0_31_0;
+  uint32_t rsp0_63_32;
+  uint32_t rsp1_31_0;
+  uint32_t rsp1_63_32;
+  uint32_t rsp2_31_0;
+  uint32_t rsp2_63_32;
+  uint32_t padding2;
+  uint32_t padding3;
+  uint32_t ist1_31_0;
+  uint32_t ist1_63_32;
+  uint32_t ist2_31_0;
+  uint32_t ist2_63_32;
+  uint32_t ist3_31_0;
+  uint32_t ist3_63_32;
+  uint32_t ist4_31_0;
+  uint32_t ist4_63_32;
+  uint32_t ist5_31_0;
+  uint32_t ist5_63_32;
+  uint32_t ist6_31_0;
+  uint32_t ist6_63_32;
+  uint32_t ist7_31_0;
+  uint32_t ist7_63_32;
+  uint32_t padding4;
+  uint32_t padding5;
+  uint16_t padding6;
   uint16_t iomb; // I/O map base address
 };
+
+// 64-bit IDT gate descriptors for interrupts and traps
+// The size is 16 bytes in x86-64, although it was 8 bytes in x86.
+// ref. Intel SDM vol.3 Figure 6-7
+struct gatedesc {
+  uint32_t off_15_0 : 16;  // low 16 bits of offset in segment
+  uint32_t cs : 16;        // code segment selector
+  uint32_t ist : 3;        // interrupt stack table index
+  uint32_t args : 2;       // # args, 0 for interrupt/trap gates
+  uint32_t rsv1 : 3;       // reserved(should be zero I guess)
+  uint32_t type : 4;       // type(STS_{IG32,TG32})
+  uint32_t s : 1;          // must be 0 (system)
+  uint32_t dpl : 2;        // descriptor(meaning new) privilege level
+  uint32_t p : 1;          // Present
+  uint32_t off_31_16 : 16; // middle bits of offset in segment
+  uint32_t off_63_32;      // high bits of offset in segment
+  uint32_t padding1;
+};
+
+// Set up a normal interrupt/trap gate descriptor.
+// - istrap: 1 for a trap (= exception) gate, 0 for an interrupt gate.
+//   interrupt gate clears FL_IF, trap gate leaves FL_IF alone
+// - sel: Code segment selector for interrupt/trap handler
+// - off: Offset in code segment for interrupt/trap handler
+// - dpl: Descriptor Privilege Level -
+//        the privilege level required for software to invoke
+//        this interrupt/trap gate explicitly using an int instruction.
+#define SETGATE(gate, istrap, sel, off, d)                                     \
+  {                                                                            \
+    (gate).off_15_0 = (uint32_t)((off)&0xffff);                                \
+    (gate).cs = (sel);                                                         \
+    (gate).ist = 0;                                                            \
+    (gate).args = 0;                                                           \
+    (gate).rsv1 = 0;                                                           \
+    (gate).type = (istrap) ? STS_TG64 : STS_IG64;                              \
+    (gate).s = 0;                                                              \
+    (gate).dpl = (d);                                                          \
+    (gate).p = 1;                                                              \
+    (gate).off_31_16 = (uint32_t)((((off) >> 16) & 0xffff));                   \
+    (gate).off_63_32 = (uint32_t)(((off) >> 32));                              \
+    (gate).padding1 = 0;                                                       \
+  }
 
 #endif /* __ASSEMBLER__ */
 
