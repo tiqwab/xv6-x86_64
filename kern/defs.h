@@ -21,6 +21,9 @@ void kfree(char *);
 void kinit1(void *vstart);
 void kinit2();
 
+// picirq.c
+void picinit(void);
+
 // proc.c
 struct cpu *mycpu(void);
 int cpuid(void);

@@ -19,8 +19,7 @@ int main(void) {
   // TODO for interrupt
   // lapicinit(); // interrupt controller
   seginit(); // segment descriptors
-  // TODO for interrupt
-  // picinit();       // disable pic
+  picinit(); // disable pic
   // TODO for interrupt
   // ioapicinit();    // another interrupt controller
 
