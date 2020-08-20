@@ -21,6 +21,9 @@ void kfree(char *);
 void kinit1(void *vstart);
 void kinit2();
 
+// mp.c
+void mpinit(void);
+
 // picirq.c
 void picinit(void);
 
@@ -44,6 +47,7 @@ void pushcli(void);
 void popcli(void);
 
 // string.c
+int memcmp(const void *v1, const void *v2, size_t n);
 void *memset(void *, int, size_t);
 void *memmove(void *, const void *, size_t);
 char *safestrcpy(char *s, const char *t, int n);
