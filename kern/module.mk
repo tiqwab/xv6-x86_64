@@ -15,6 +15,8 @@ KERN_OBJS := \
 	$(OBJDIR)/$(KERN_DIR)/trap.o \
 	$(OBJDIR)/$(KERN_DIR)/syscall.o \
 	$(OBJDIR)/$(KERN_DIR)/vectors.o \
+	$(OBJDIR)/$(KERN_DIR)/lapic.o \
+	$(OBJDIR)/$(KERN_DIR)/uart.o \
 
 KERN_CFLAGS := $(CFLAGS) -m64 -mcmodel=kernel
 KERN_LDFLAGS := $(LDFLAGS) -m elf_x86_64

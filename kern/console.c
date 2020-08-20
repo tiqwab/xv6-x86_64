@@ -7,7 +7,6 @@
 // ref. http://oswiki.osask.jp/?VGA
 // ref. https://os.phil-opp.com/vga-text-mode/
 
-// TODO 1: uart
 // TODO 2: add useful info to panic
 
 static void consputc(int);
@@ -167,10 +166,12 @@ void consputc(int c) {
       ;
   }
 
-  // TODO1
   if (c == BACKSPACE) {
-    // uartputc('\b'); uartputc(' '); uartputc('\b');
-  } else
-    // uartputc(c);
-    cgaputc(c);
+    uartputc('\b');
+    uartputc(' ');
+    uartputc('\b');
+  } else {
+    uartputc(c);
+  }
+  cgaputc(c);
 }

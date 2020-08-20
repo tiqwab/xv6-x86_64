@@ -12,6 +12,9 @@ struct spinlock;
 void cprintf(char *, ...);
 void panic(char *) __attribute__((noreturn));
 
+// lapic.c
+void microdelay(int us);
+
 // kalloc.c
 char *kalloc(void);
 void kfree(char *);
@@ -48,6 +51,10 @@ void syscall(void);
 // trap.c
 void idtinit(void);
 void tvinit(void);
+
+// uart.c
+void uartinit(void);
+void uartputc(int);
 
 // vm.c
 void freevm(pte_t *pgdir);
