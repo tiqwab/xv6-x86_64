@@ -5,6 +5,7 @@
 
 struct context;
 struct cpu;
+struct ioapic;
 struct proc;
 struct spinlock;
 
@@ -12,7 +13,11 @@ struct spinlock;
 void cprintf(char *, ...);
 void panic(char *) __attribute__((noreturn));
 
+// ioapic.c
+extern volatile struct ioapic *ioapic;
+
 // lapic.c
+extern volatile uint32_t *lapic;
 void microdelay(int us);
 
 // kalloc.c

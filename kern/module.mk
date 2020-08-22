@@ -18,6 +18,7 @@ KERN_OBJS := \
 	$(OBJDIR)/$(KERN_DIR)/lapic.o \
 	$(OBJDIR)/$(KERN_DIR)/uart.o \
 	$(OBJDIR)/$(KERN_DIR)/picirq.o \
+	$(OBJDIR)/$(KERN_DIR)/ioapic.o \
 
 KERN_CFLAGS := $(CFLAGS) -m64 -mcmodel=kernel
 KERN_LDFLAGS := $(LDFLAGS) -m elf_x86_64

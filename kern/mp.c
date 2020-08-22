@@ -9,6 +9,8 @@
 #include "proc.h"
 
 struct cpu cpus[NCPU];
+int ncpu;
+uint8_t ioapicid;
 
 static uint8_t sum(uint8_t *addr, int len) {
   int i, sum;
@@ -81,13 +83,70 @@ void mpinit(void) {
   uchar *p, *e;
   int ismp;
   struct mp *mp;
-  struct mpconf *conf;
+  struct mpconf *mp_conf;
+  struct mpproc *mp_proc;
+  struct mpioapic *mp_ioapic;
 
-  if ((conf = mpconfig(&mp)) == 0) {
+  if ((mp_conf = mpconfig(&mp)) == 0) {
     panic("Expect to run on an SMP");
   }
-
   ismp = 1;
+  lapic = (uint32_t *)(uint64_t)mp_conf->lapicaddr;
 
-  cprintf("mp: 0x%p, mpconf: 0x%p\n", mp, conf);
+  for (p = (uchar *)(mp_conf + 1), e = (uchar *)mp_conf + mp_conf->length;
+       p < e;) {
+    switch (*p) {
+    case MPPROC:
+      mp_proc = (struct mpproc *)p;
+      if (ncpu < NCPU) {
+        cpus[ncpu].apicid = mp_proc->apicid; // apicid may differ from ncpu
+        ncpu++;
+      }
+      p += sizeof(struct mpproc);
+      continue;
+    case MPIOAPIC:
+      mp_ioapic = (struct mpioapic *)p;
+      ioapicid = mp_ioapic->apicno;
+      ioapic = (struct ioapic *)(uintptr_t)mp_ioapic->addr;
+      p += sizeof(struct mpioapic);
+      continue;
+    case MPBUS:
+    case MPIOINTR:
+    case MPLINTR:
+      p += 8;
+      continue;
+    default:
+      ismp = 0;
+      break;
+    }
+  }
+
+  cprintf("mp: 0x%p, mpconf: 0x%p, lapic: 0x%p, ioapic: 0x%p\n", mp, mp_conf,
+          lapic, ioapic);
+  cprintf("ncpu = %d\n", ncpu);
+
+  if (!ismp) {
+    panic("Didn't find a suitable machine");
+  }
+
+  if (mp->imcrp) {
+    // MPspec 3.6.2.1 PIC Mode
+    // the hardware for PIC Mode bypasses the APIC components by using an
+    // interrupt mode configuration register (IMCR).
+    // ...
+    // Before entring Symmetric I/O Mode, either the BIOS or the operating
+    // system must switch out of PIC Mode by changing the IMCR.
+    // ...
+    // The IMCR is supported by two read/writable or write-only I/O ports, 22h
+    // and 23h, which receive address and data respectively. To access the IMCR,
+    // write a value of 70h to I/O port 22h, which selects the IMCR. Then write
+    // the data to I/O port 23h. The power-on default value is zero, which
+    // connects the NMI and 8259 INTR lines directly to the BSP. Writing a value
+    // of 01h forces the NMI and 8259 INTR signals to pass through the APIC.
+    //
+    // mp->imcrp == 0 when the OS is running on QEMU, so it runs as Virtual Wire
+    // Mode not PIC Mode.
+    outb(0x22, 0x70);          // Select IMCR
+    outb(0x23, inb(0x23) | 1); // Mask external interrupts
+  }
 }

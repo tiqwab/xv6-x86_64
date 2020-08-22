@@ -14,7 +14,6 @@ int main(void) {
   kinit1(end); // phys page allocator
   cprintf("cprintf format test: %d, 0x%x, 0x%p, %s\n", 256, 256, main, "hello");
   kvmalloc(); // kernel page table
-  // TODO for multicore
   mpinit(); // detect other processors
   // TODO for interrupt
   // lapicinit(); // interrupt controller

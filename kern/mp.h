@@ -30,3 +30,31 @@ struct mpconf {
   uint8_t xchecksum;   // extended table checksum
   uint8_t reserved;
 };
+
+// MPspec 4.3.1 Processor Entries
+struct mpproc {
+  uint8_t type;      // entry type (0)
+  uint8_t apicid;    // local APIC id
+  uint8_t version;   // local APIC verison
+  uint8_t flags;     // CPU flags
+#define MPBOOT 0x02  // This proc is the bootstrap processor.
+  char signature[4]; // CPU signature
+  uint32_t feature;  // feature flags from CPUID instruction
+  uint8_t reserved[8];
+};
+
+// MPspec 4.3.3 I/O APIC Entries
+struct mpioapic {
+  uint8_t type;    // entry type (2)
+  uint8_t apicno;  // I/O APIC id
+  uint8_t version; // I/O APIC version
+  uint8_t flags;   // I/O APIC flags
+  uint32_t addr;   // I/O APIC address
+};
+
+// Table entry types
+#define MPPROC 0x00   // One per processor
+#define MPBUS 0x01    // One per bus
+#define MPIOAPIC 0x02 // One per I/O APIC
+#define MPIOINTR 0x03 // One per bus interrupt source
+#define MPLINTR 0x04  // One per system interrupt source

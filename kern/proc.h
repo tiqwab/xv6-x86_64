@@ -9,7 +9,7 @@
 // Per-CPU state
 // scheduler contains rsp before swtch.
 struct cpu {
-  // uchar apicid;                // Local APIC ID
+  uchar apicid;              // Local APIC ID
   struct context *scheduler; // swtch() here to enter scheduler
   struct taskstate ts;       // Used by x86 to find stack for interrupt
   struct segdesc gdt[NSEGS]; // x86 global descriptor table
@@ -20,6 +20,7 @@ struct cpu {
 };
 
 extern struct cpu cpus[NCPU];
+extern int ncpu;
 
 // Saved registers for kernel context switches.
 // Don't need to save all the segment registers (%cs, etc),
