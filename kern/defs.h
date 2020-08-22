@@ -18,6 +18,7 @@ extern volatile struct ioapic *ioapic;
 
 // lapic.c
 extern volatile uint32_t *lapic;
+void lapicinit(void);
 void microdelay(int us);
 
 // kalloc.c

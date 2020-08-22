@@ -6,7 +6,11 @@
  * which are relevant to both the kernel and user-mode software.
  */
 
-#define EXTMEM 0x100000 // Start of extended memory
+// Start of extended memory
+#define EXTMEM 0x100000
+// address for other devices are at high addresses such as ioapic and lapic
+#define DEVSPACE_PHYS 0xfe000000
+#define DEVSPACE_P2V(a) ((void *)(((uint64_t)(a)) + 0xffffffff00000000))
 
 // Key addresses for address space layout (see kmap in vm.c for layout)
 #define KERNBASE 0xffffffff80000000  // First kernel virtual address
@@ -31,13 +35,15 @@
  *
  *    256 TB -------->  +------------------------------+
  *                      |                              | RW/--
- *     phys_top ----->  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- *                      :                              : RW/--
- *                      :   remapped physical memory   : RW/--
- *                      :                              : RW/--
- *     KERNLINK ---->   :                              : 0xffffffff80100000
- * (kernel entry point) :                              : RW/--
- *     KERNBASE ---->   |~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~| 0xffffffff80000000
+ *     DEVSPACE ----->  +------------------------------+ 0xfffffffffe000000
+ *                      :                              :
+ *     phys_top ----->  +------------------------------+
+ *                      |                              | RW/--
+ *                      |   remapped physical memory   | RW/--
+ *                      |                              | RW/--
+ *     KERNLINK ---->   |                              | 0xffffffff80100000
+ * (kernel entry point) |                              | RW/--
+ *     KERNBASE ---->   +------------------------------+ 0xffffffff80000000
  *                      :              .               :
  *  start of    ---->   +------------------------------+ 0xffff800000000000
  *  kernel space

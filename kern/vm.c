@@ -25,7 +25,7 @@ extern uintptr_t phys_top;
 //                for the kernel's instructions and r/o data
 //   data..KERNBASE+PHYSTOP: mapped to V2P(data)..PHYSTOP,
 //                                  rw data + free physical memory
-//   0xfe000000..0: mapped direct (devices such as ioapic)
+//   0xfe000000..0: mapped direct (devices such as ioapic and lapic)
 //
 // The kernel allocates physical memory for its heap and for user memory
 // between V2P(end) and the end of physical memory (PHYSTOP)
@@ -33,13 +33,12 @@ extern uintptr_t phys_top;
 
 // This table defines the kernel's mappings, which are present in
 // every process's page table.
-// TODO for DEVSPACE (kmap[3] -> kmap[4])
 static struct kmap {
   void *virt;
-  uint phys_start;
-  uint phys_end;
+  uintptr_t phys_start;
+  uintptr_t phys_end;
   int perm;
-} kmap[3];
+} kmap[4];
 
 // Initialize kmap.
 // We couldn't initilize it at load time...:
@@ -66,8 +65,10 @@ void init_kmap(void) {
   kmap[2].phys_end = phys_top;
   kmap[2].perm = PTE_W;
 
-  // TODO for DEVSPACE
-  // kmap[3] = {(void *)DEVSPACE, DEVSPACE, 0, PTE_W},          // more devices
+  kmap[3].virt = DEVSPACE_P2V(DEVSPACE_PHYS);
+  kmap[3].phys_start = DEVSPACE_PHYS;
+  kmap[3].phys_end = 0x100000000;
+  kmap[3].perm = PTE_W;
 }
 
 // Set up CPU's kernel segment descriptors.
@@ -166,9 +167,9 @@ pte_t *setupkvm(void) {
   if ((pgdir = (pte_t *)kalloc()) == 0)
     return 0;
   memset(pgdir, 0, PGSIZE);
-  // TODO for DEVSPACE
-  // if (P2V(PHYSTOP) > (void *)DEVSPACE)
-  //   panic("PHYSTOP too high");
+  if (phys_top > DEVSPACE_PHYS) {
+    panic("PHYSTOP too high");
+  }
   for (k = kmap; k < &kmap[NELEM(kmap)]; k++) {
     cprintf("setupkvm for 0x%p\n", k->virt);
     if (mappages(pgdir, k->virt, k->phys_end - k->phys_start,

@@ -91,7 +91,7 @@ void mpinit(void) {
     panic("Expect to run on an SMP");
   }
   ismp = 1;
-  lapic = (uint32_t *)(uint64_t)mp_conf->lapicaddr;
+  lapic = (uint32_t *)DEVSPACE_P2V((uintptr_t)mp_conf->lapicaddr);
 
   for (p = (uchar *)(mp_conf + 1), e = (uchar *)mp_conf + mp_conf->length;
        p < e;) {
@@ -107,7 +107,7 @@ void mpinit(void) {
     case MPIOAPIC:
       mp_ioapic = (struct mpioapic *)p;
       ioapicid = mp_ioapic->apicno;
-      ioapic = (struct ioapic *)(uintptr_t)mp_ioapic->addr;
+      ioapic = (struct ioapic *)DEVSPACE_P2V((uintptr_t)mp_ioapic->addr);
       p += sizeof(struct mpioapic);
       continue;
     case MPBUS:
