@@ -37,16 +37,16 @@ void trap(struct trapframe *tf) {
   }
 
   switch (tf->trapno) {
-    // TODO for timer
-    // case T_IRQ0 + IRQ_TIMER:
-    //   if(cpuid() == 0){
-    //     acquire(&tickslock);
-    //     ticks++;
-    //     wakeup(&ticks);
-    //     release(&tickslock);
-    //   }
-    //   lapiceoi();
-    //   break;
+  case T_IRQ0 + IRQ_TIMER:
+    // TODO for preemption
+    // if(cpuid() == 0){
+    //   acquire(&tickslock);
+    //   ticks++;
+    //   wakeup(&ticks);
+    //   release(&tickslock);
+    // }
+    lapiceoi();
+    break;
 
     // TODO for ide
     // case T_IRQ0 + IRQ_IDE:

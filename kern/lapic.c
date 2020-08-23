@@ -54,7 +54,11 @@ static void reset_esr(void) {
 }
 
 // Ack any outstanding interrupts.
-static void eoi(void) { lapicw(EOI, 0); }
+void lapiceoi(void) {
+  if (lapic) {
+    lapicw(EOI, 0);
+  }
+}
 
 void lapicinit(void) {
   if (!lapic) {
@@ -99,7 +103,7 @@ void lapicinit(void) {
   reset_esr();
 
   // Ack any outstanding interrupts.
-  eoi();
+  lapiceoi();
 
   // Send an Init Level De-Assert to synchronise arbitration ID's.
   lapicw(ICRHI, 0);
