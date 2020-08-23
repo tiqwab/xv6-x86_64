@@ -10,7 +10,6 @@
 
 struct cpu cpus[NCPU];
 int ncpu;
-uint8_t ioapicid;
 
 static uint8_t sum(uint8_t *addr, int len) {
   int i, sum;

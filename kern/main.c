@@ -13,14 +13,12 @@ extern char end[]; // first address after kernel loaded from ELF file
 int main(void) {
   kinit1(end); // phys page allocator
   cprintf("cprintf format test: %d, 0x%x, 0x%p, %s\n", 256, 256, main, "hello");
-  kvmalloc();  // kernel page table
-  mpinit();    // detect other processors
-  lapicinit(); // interrupt controller
-  seginit();   // segment descriptors
-  picinit();   // disable pic
-  // TODO for interrupt
-  // ioapicinit();    // another interrupt controller
-
+  kvmalloc();   // kernel page table
+  mpinit();     // detect other processors
+  lapicinit();  // interrupt controller
+  seginit();    // segment descriptors
+  picinit();    // disable pic
+  ioapicinit(); // another interrupt controller
   // consoleinit();   // console hardware
   uartinit(); // serial port
   // pinit();         // process table

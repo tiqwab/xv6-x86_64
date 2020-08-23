@@ -15,6 +15,8 @@ void panic(char *) __attribute__((noreturn));
 
 // ioapic.c
 extern volatile struct ioapic *ioapic;
+extern uint8_t ioapicid;
+void ioapicinit(void);
 
 // lapic.c
 extern volatile uint32_t *lapic;
