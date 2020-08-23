@@ -112,6 +112,12 @@ void lapicinit(void) {
   lapicw(TPR, 0);
 }
 
+int lapicid(void) {
+  if (!lapic)
+    return 0;
+  return lapic[ID] >> 24;
+}
+
 // Stupid I/O delay routine necessitated by historical PC design flaws
 void microdelay(int us) {
   inb(0x84);

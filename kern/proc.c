@@ -23,21 +23,20 @@ int cpuid() { return mycpu() - cpus; }
 // Must be called with interrupts disabled to avoid the caller being
 // rescheduled between reading lapicid and running through the loop.
 struct cpu *mycpu(void) {
+  int apicid, i;
+
   if (readeflags() & FL_IF)
     panic("mycpu called with interrupts enabled\n");
   return &cpus[0];
 
-  // TODO for multicore
-  // int apicid, i;
-  //
-  // apicid = lapicid();
-  // // APIC IDs are not guaranteed to be contiguous. Maybe we should have
-  // // a reverse map, or reserve a register to store &cpus[i].
-  // for (i = 0; i < ncpu; ++i) {
-  //   if (cpus[i].apicid == apicid)
-  //     return &cpus[i];
-  // }
-  // panic("unknown apicid\n");
+  apicid = lapicid();
+  // APIC IDs are not guaranteed to be contiguous. Maybe we should have
+  // a reverse map, or reserve a register to store &cpus[i].
+  for (i = 0; i < ncpu; ++i) {
+    if (cpus[i].apicid == apicid)
+      return &cpus[i];
+  }
+  panic("unknown apicid\n");
 }
 
 // Disable interrupts so that we are not rescheduled
@@ -116,9 +115,7 @@ void userinit(void) {
   memset(p->tf, 0, sizeof(*p->tf));
   p->tf->cs = (SEG_UCODE << 3) | DPL_USER;
   p->tf->ss = (SEG_UDATA << 3) | DPL_USER;
-  // TODO for interrupt
-  // p->tf->rflags = FL_IF;
-  p->tf->rflags = 0;
+  p->tf->rflags = FL_IF;
   p->tf->rsp = PGSIZE;
   p->tf->rip = 0; // beginning of initcode.S
 

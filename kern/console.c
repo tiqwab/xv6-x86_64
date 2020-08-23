@@ -42,7 +42,7 @@ static void printint(long xx, int base, int sign) {
 }
 
 // Print to the console. only understands %d, %x, %p, %s.
-// FIXME: Accept up to 4 arguments for now.
+// FIXME: Accept up to 5 arguments for now.
 void cprintf(char *fmt, ...) {
   int i, c, locking;
   void **argp;
@@ -55,11 +55,12 @@ void cprintf(char *fmt, ...) {
   if (fmt == 0)
     panic("null fmt");
 
-  void *args[4] = {0, 0, 0, 0};
+  void *args[5] = {0, 0, 0, 0, 0};
   __asm__ volatile("mov %%rsi,%0" : "=a"(args[0]) : :);
   __asm__ volatile("mov %%rdx,%0" : "=a"(args[1]) : :);
   __asm__ volatile("mov %%rcx,%0" : "=a"(args[2]) : :);
   __asm__ volatile("mov %%r8,%0" : "=a"(args[3]) : :);
+  __asm__ volatile("mov %%r9,%0" : "=a"(args[4]) : :);
   argp = args;
 
   for (i = 0; (c = fmt[i] & 0xff) != 0; i++) {
