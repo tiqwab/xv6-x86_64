@@ -20,6 +20,7 @@ KERN_OBJS := \
 	$(OBJDIR)/$(KERN_DIR)/picirq.o \
 	$(OBJDIR)/$(KERN_DIR)/ioapic.o \
 	$(OBJDIR)/$(KERN_DIR)/kbd.o \
+	$(OBJDIR)/$(KERN_DIR)/sysproc.o \
 
 KERN_CFLAGS := $(CFLAGS) -m64 -mcmodel=kernel
 KERN_LDFLAGS := $(LDFLAGS) -m elf_x86_64

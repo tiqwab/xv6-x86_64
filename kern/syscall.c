@@ -1,14 +1,18 @@
 #include "syscall.h"
 #include "defs.h"
 #include "proc.h"
+#include "types.h"
 
 int64_t sys_hello(void) {
   cprintf("hello from syscall\n");
   return 0;
 }
 
+extern int64_t sys_getpid(void);
+
 static int64_t (*syscalls[])(void) = {
-    [SYS_hello] sys_hello,
+    [SYS_hello] = sys_hello,
+    [SYS_getpid] = sys_getpid,
 };
 
 void syscall(void) {

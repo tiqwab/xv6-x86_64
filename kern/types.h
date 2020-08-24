@@ -19,6 +19,7 @@ typedef int int32_t;
 typedef long long int64_t;
 
 typedef uint64_t pte_t;
+typedef uint32_t pid_t;
 
 #define NULL 0
 

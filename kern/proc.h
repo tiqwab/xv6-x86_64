@@ -52,7 +52,7 @@ struct proc {
   pte_t *pgdir;         // Page table
   char *kstack;         // Bottom of kernel stack for this process
   enum procstate state; // Process state
-  int pid;              // Process ID
+  pid_t pid;            // Process ID
   // struct proc *parent;         // Parent process
   trapframe_t *tf;         // Trap frame for current syscall
   struct context *context; // swtch() here to run process
