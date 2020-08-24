@@ -1,8 +1,8 @@
-// This file comes from JOS.
-// ref. https://wiki.osdev.org/Detecting_Memory_(x86)#CMOS
-
 #ifndef XV6_X86_64_KCLOCK_H
 #define XV6_X86_64_KCLOCK_H
+
+// This file comes from JOS.
+// ref. https://wiki.osdev.org/Detecting_Memory_(x86)#CMOS
 
 #include "types.h"
 

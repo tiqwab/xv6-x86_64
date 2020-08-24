@@ -1,3 +1,6 @@
+#ifndef XV6_X86_64_MP_H
+#define XV6_X86_64_MP_H
+
 // ref. Intel Multiprocessor Specification (MPspec)
 // https://pdos.csail.mit.edu/6.828/2014/readings/ia32/MPspec.pdf
 
@@ -58,3 +61,5 @@ struct mpioapic {
 #define MPIOAPIC 0x02 // One per I/O APIC
 #define MPIOINTR 0x03 // One per bus interrupt source
 #define MPLINTR 0x04  // One per system interrupt source
+
+#endif /* ifndef XV6_X86_64_MP_H */

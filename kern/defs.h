@@ -10,13 +10,19 @@ struct proc;
 struct spinlock;
 
 // console.c
+void consoleinit(void);
+void consoleintr(int (*)(void));
 void cprintf(char *, ...);
 void panic(char *) __attribute__((noreturn));
 
 // ioapic.c
 extern volatile struct ioapic *ioapic;
 extern uint8_t ioapicid;
+void ioapicenable(int irq, int cpunum);
 void ioapicinit(void);
+
+// kbd.c
+void kbdintr(void);
 
 // lapic.c
 extern volatile uint32_t *lapic;

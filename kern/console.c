@@ -1,6 +1,7 @@
 #include "defs.h"
 #include "memlayout.h"
 #include "spinlock.h"
+#include "trap.h"
 #include "types.h"
 #include "x86.h"
 
@@ -136,16 +137,19 @@ static void cgaputc(int c) {
   outb(CRTPORT, 15);
   pos |= inb(CRTPORT + 1);
 
-  if (c == '\n')
+  if (c == '\n') {
     pos += 80 - pos % 80;
-  else if (c == BACKSPACE) {
-    if (pos > 0)
+  } else if (c == BACKSPACE) {
+    if (pos > 0) {
       --pos;
-  } else
+    }
+  } else {
     crt[pos++] = (c & 0xff) | 0x0700; // black on white
+  }
 
-  if (pos < 0 || pos > 25 * 80)
+  if (pos < 0 || pos > 25 * 80) {
     panic("pos under/overflow");
+  }
 
   if ((pos / 80) >= 24) { // Scroll up.
     memmove(crt, crt + 80, sizeof(crt[0]) * 23 * 80);
@@ -175,4 +179,88 @@ void consputc(int c) {
     uartputc(c);
   }
   cgaputc(c);
+}
+
+#define INPUT_BUF 128
+
+struct {
+  char buf[INPUT_BUF];
+  uint r; // Read index
+  uint w; // Write index
+  uint e; // Edit index
+} input;
+
+#define C(x) ((x) - '@') // Control-x
+
+void consoleintr(int (*getc)(void)) {
+  int c;
+
+  acquire(&cons.lock);
+  while ((c = getc()) >= 0) {
+    switch (c) {
+    case C('H'):
+    case '\x7f': // Backspace
+      consputc(BACKSPACE);
+      break;
+    default:
+      if (c != 0) {
+        consputc(c);
+      }
+      break;
+    }
+  }
+  release(&cons.lock);
+
+  // TODO for consoleread
+  // int c, doprocdump = 0;
+
+  // acquire(&cons.lock);
+  // while ((c = getc()) >= 0) {
+  //   switch (c) {
+  //   case C('P'): // Process listing.
+  //     // procdump() locks cons.lock indirectly; invoke later
+  //     doprocdump = 1;
+  //     break;
+  //   case C('U'): // Kill line.
+  //     while (input.e != input.w &&
+  //            input.buf[(input.e - 1) % INPUT_BUF] != '\n') {
+  //       input.e--;
+  //       consputc(BACKSPACE);
+  //     }
+  //     break;
+  //   case C('H'):
+  //   case '\x7f': // Backspace
+  //     if (input.e != input.w) {
+  //       input.e--;
+  //       consputc(BACKSPACE);
+  //     }
+  //     break;
+  //   default:
+  //     if (c != 0 && input.e - input.r < INPUT_BUF) {
+  //       c = (c == '\r') ? '\n' : c;
+  //       input.buf[input.e++ % INPUT_BUF] = c;
+  //       consputc(c);
+  //       if (c == '\n' || c == C('D') || input.e == input.r + INPUT_BUF) {
+  //         input.w = input.e;
+  //         wakeup(&input.r);
+  //       }
+  //     }
+  //     break;
+  //   }
+  // }
+  // release(&cons.lock);
+  // if (doprocdump) {
+  //   procdump(); // now call procdump() wo. cons.lock held
+  // }
+}
+
+void consoleinit(void) {
+  initlock(&cons.lock, "console");
+
+  // TODO for fs
+  // devsw[CONSOLE].write = consolewrite;
+  // devsw[CONSOLE].read = consoleread;
+  cons.locking = 1;
+
+  ioapicenable(IRQ_KBD, 0);
 }
