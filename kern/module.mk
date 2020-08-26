@@ -22,6 +22,11 @@ KERN_OBJS := \
 	$(OBJDIR)/$(KERN_DIR)/kbd.o \
 	$(OBJDIR)/$(KERN_DIR)/sysproc.o \
 
+KERN_BINARY_OBJS := \
+	$(OBJDIR)/$(KERN_DIR)/initcode \
+	$(OBJDIR)/$(KERN_DIR)/preemptiontest1 \
+	$(OBJDIR)/$(KERN_DIR)/preemptiontest2 \
+
 KERN_CFLAGS := $(CFLAGS) -m64 -mcmodel=kernel
 KERN_LDFLAGS := $(LDFLAGS) -m elf_x86_64
 
@@ -40,8 +45,22 @@ $(OBJDIR)/$(KERN_DIR)/initcode: $(KERN_DIR)/initcode.S
 	$(OBJCOPY) -S -O binary $@.out $@
 	$(OBJDUMP) -S $@.o > $@.asm
 
-$(OBJDIR)/$(KERNEL): $(KERN_OBJS) $(KERN_LINKER_SCRIPT) $(OBJDIR)/$(KERN_DIR)/initcode
-	$(LD) $(KERN_LDFLAGS) -T $(KERN_LINKER_SCRIPT) -o $@ $(KERN_OBJS) -b binary $(OBJDIR)/$(KERN_DIR)/initcode
+#TODO remove later
+$(OBJDIR)/$(KERN_DIR)/preemptiontest1: $(KERN_DIR)/preemptiontest1.S
+	$(CC) $(CFLAGS) -m64 -fno-pic -nostdinc -I. -c -o $@.o $<
+	$(LD) $(LDFLAGS) -m elf_x86_64 -N -e start -Ttext 0 -o $@.out $@.o
+	$(OBJCOPY) -S -O binary $@.out $@
+	$(OBJDUMP) -S $@.o > $@.asm
+
+#TODO remove later
+$(OBJDIR)/$(KERN_DIR)/preemptiontest2: $(KERN_DIR)/preemptiontest2.S
+	$(CC) $(CFLAGS) -m64 -fno-pic -nostdinc -I. -c -o $@.o $<
+	$(LD) $(LDFLAGS) -m elf_x86_64 -N -e start -Ttext 0 -o $@.out $@.o
+	$(OBJCOPY) -S -O binary $@.out $@
+	$(OBJDUMP) -S $@.o > $@.asm
+
+$(OBJDIR)/$(KERNEL): $(KERN_OBJS) $(KERN_LINKER_SCRIPT) $(KERN_BINARY_OBJS)
+	$(LD) $(KERN_LDFLAGS) -T $(KERN_LINKER_SCRIPT) -o $@ $(KERN_OBJS) -b binary $(KERN_BINARY_OBJS)
 	$(OBJDUMP) -S $@ > $@.asm
 
 $(OBJDIR)/$(KERN_DIR)/%.o: $(KERN_DIR)/%.c
