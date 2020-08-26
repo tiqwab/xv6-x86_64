@@ -49,13 +49,8 @@ void cprintf(char *fmt, ...) {
   void **argp;
   char *s;
 
-  locking = cons.locking;
-  if (locking)
-    acquire(&cons.lock);
-
-  if (fmt == 0)
-    panic("null fmt");
-
+  // have to do copy them to args at first because these values might be
+  // overwrited
   void *args[5] = {0, 0, 0, 0, 0};
   __asm__ volatile("mov %%rsi,%0" : "=a"(args[0]) : :);
   __asm__ volatile("mov %%rdx,%0" : "=a"(args[1]) : :);
@@ -63,6 +58,15 @@ void cprintf(char *fmt, ...) {
   __asm__ volatile("mov %%r8,%0" : "=a"(args[3]) : :);
   __asm__ volatile("mov %%r9,%0" : "=a"(args[4]) : :);
   argp = args;
+
+  locking = cons.locking;
+  if (locking) {
+    acquire(&cons.lock);
+  }
+
+  if (fmt == 0) {
+    panic("null fmt");
+  }
 
   for (i = 0; (c = fmt[i] & 0xff) != 0; i++) {
     if (c != '%') {
