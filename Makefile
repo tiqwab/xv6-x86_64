@@ -37,11 +37,14 @@ GDBPORT	:= 12345
 CPUS ?= 1
 IMAGE := xv6.img
 
+UOBJS :=
+
 .PHONY: clean default format
 
 default: $(OBJDIR)/$(IMAGE)
 
 include boot/module.mk
+include user/module.mk
 include kern/module.mk
 
 # Disc sector start no where kernel image is loaded
