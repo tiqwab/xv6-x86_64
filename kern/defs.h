@@ -9,6 +9,9 @@ struct ioapic;
 struct proc;
 struct spinlock;
 
+// args.c
+void prepare_args(void *args[]);
+
 // console.c
 void consoleinit(void);
 void consoleintr(int (*)(void));

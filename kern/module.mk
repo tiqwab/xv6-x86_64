@@ -21,6 +21,7 @@ KERN_OBJS := \
 	$(OBJDIR)/$(KERN_DIR)/ioapic.o \
 	$(OBJDIR)/$(KERN_DIR)/kbd.o \
 	$(OBJDIR)/$(KERN_DIR)/sysproc.o \
+	$(OBJDIR)/$(KERN_DIR)/args.o \
 
 KERN_BINARY_OBJS := \
 	$(OBJDIR)/$(KERN_DIR)/initcode \

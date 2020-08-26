@@ -41,7 +41,32 @@ int fetchstr(uintptr_t addr, char **pp) {
 
 // Fetch the nth 64-bit system call argument.
 int arg(int n, uint64_t *ip) {
-  return fetchint((myproc()->tf->rsp) + 8 + 8 * n, ip);
+  uint64_t v;
+
+  switch (n) {
+  case 0:
+    v = myproc()->tf->rdi;
+    break;
+  case 1:
+    v = myproc()->tf->rsi;
+    break;
+  case 2:
+    v = myproc()->tf->rdx;
+    break;
+  case 3:
+    v = myproc()->tf->rcx;
+    break;
+  case 4:
+    v = myproc()->tf->r8;
+    break;
+  default:
+    cprintf("args should be equal to or smaller than 5 for now.");
+    return -1;
+  }
+
+  *ip = v;
+  return 0;
+  // return fetchint((myproc()->tf->rsp) + 8 + 8 * n, ip);
 }
 
 // Fetch the nth word-sized system call argument as a string pointer.
@@ -78,7 +103,7 @@ static int64_t (*syscalls[])(void) = {
     [SYS_getpid] = sys_getpid,
 };
 
-// Note that the syscall expects all arguments are push on stack, not registers.
+// FIXME: Accept up to 5 arguments for now.
 void syscall(void) {
   size_t num;
   struct proc *curproc = myproc();

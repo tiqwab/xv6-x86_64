@@ -7,11 +7,10 @@ start:
   mov $1,%rax
   call syscall
   # print message
-  lea msg(%rip),%rdx
-  push %rdx
+  lea msg(%rip),%rax
+  mov %rax,%rdi
   mov $2,%rax
   call syscall
-  pop %rdx
   # syscall getpid
   mov $11,%rax
   call syscall
