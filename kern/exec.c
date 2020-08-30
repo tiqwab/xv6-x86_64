@@ -36,7 +36,11 @@ int exec(char *path, char **argv) {
   // }
   // Check ELF header
   // TODO remove later (after fs)
-  if (strncmp(path, "preemptiontest1", 15) == 0) {
+  if (strncmp(path, "/init", 15) == 0) {
+    extern char _binary_obj_user_init_start[];
+    p_elf = (struct elfhdr *)_binary_obj_user_init_start;
+    elf = *p_elf;
+  } else if (strncmp(path, "preemptiontest1", 15) == 0) {
     extern char _binary_obj_user_preemptiontest1_start[];
     p_elf = (struct elfhdr *)_binary_obj_user_preemptiontest1_start;
     elf = *p_elf;

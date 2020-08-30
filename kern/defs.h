@@ -50,12 +50,20 @@ void mpinit(void);
 void picinit(void);
 
 // proc.c
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wbuiltin-declaration-mismatch"
+void exit(void);
+#pragma GCC diagnostic pop
 pid_t fork(void);
 struct cpu *mycpu(void);
 int cpuid(void);
 struct proc *myproc(void);
+void sched(void);
 void scheduler(void) __attribute__((noreturn));
+void sleep(void *chan, struct spinlock *lk);
 void userinit(void);
+pid_t wait(void);
 void yield(void);
 
 // swtch.S

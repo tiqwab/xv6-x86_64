@@ -3,7 +3,9 @@
 char *msg = "I am preemptiontest2\n";
 
 int main(void) {
-  while (1) {
+  int pid;
+  for (int i = 0; i < 100; i++) {
     print(msg);
   }
+  exit();
 }
