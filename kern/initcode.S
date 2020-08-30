@@ -15,8 +15,9 @@ start:
   mov $11,%rax
   call syscall
 
-loop:
-  jmp loop
+  lea path(%rip),%rdi
+  mov $7,%rax
+  call syscall
 
 syscall:
   int $0x30
@@ -24,3 +25,5 @@ syscall:
 
 msg:
   .asciz "hello by print system call\n"
+path:
+  .asciz "preemptiontest1"

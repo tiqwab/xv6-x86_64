@@ -15,15 +15,13 @@ USER_LDFLAGS := $(LDFLAGS) -m elf_x86_64 -N -e main -Ttext 0
 $(OBJDIR)/$(USER_DIR)/preemptiontest1: $(USER_DIR)/preemptiontest1.c $(ULIBS)
 	@mkdir -p $(@D)
 	$(CC) $(USER_CFLAGS) -c -o $@.o $<
-	$(LD) $(USER_LDFLAGS) -o $@.out $@.o $(ULIBS)
-	$(OBJCOPY) -S -O binary $@.out $@
+	$(LD) $(USER_LDFLAGS) -o $@ $@.o $(ULIBS)
 	$(OBJDUMP) -S $@.o > $@.asm
 
 $(OBJDIR)/$(USER_DIR)/preemptiontest2: $(USER_DIR)/preemptiontest2.c $(ULIBS)
 	@mkdir -p $(@D)
 	$(CC) $(USER_CFLAGS) -c -o $@.o $<
-	$(LD) $(USER_LDFLAGS) -o $@.out $@.o $(ULIBS)
-	$(OBJCOPY) -S -O binary $@.out $@
+	$(LD) $(USER_LDFLAGS) -o $@ $@.o $(ULIBS)
 	$(OBJDUMP) -S $@.o > $@.asm
 
 $(OBJDIR)/$(USER_DIR)/%.o: $(USER_DIR)/%.c

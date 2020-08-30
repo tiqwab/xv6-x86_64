@@ -1,6 +1,7 @@
 # TODO: duplicated with kern/syscall.h
 #define SYS_hello 1
 #define SYS_print 2
+#define SYS_exec 7
 #define SYS_getpid 11
 
 #define T_SYSCALL 0x30
@@ -14,4 +15,5 @@
 
 SYSCALL(hello)
 SYSCALL(print)
+SYSCALL(exec)
 SYSCALL(getpid)

@@ -22,6 +22,8 @@ KERN_OBJS := \
 	$(OBJDIR)/$(KERN_DIR)/kbd.o \
 	$(OBJDIR)/$(KERN_DIR)/sysproc.o \
 	$(OBJDIR)/$(KERN_DIR)/args.o \
+	$(OBJDIR)/$(KERN_DIR)/exec.o \
+	$(OBJDIR)/$(KERN_DIR)/sysfile.o \
 
 KERN_BINARY_OBJS := \
 	$(OBJDIR)/$(KERN_DIR)/initcode \

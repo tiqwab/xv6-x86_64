@@ -18,6 +18,9 @@ void consoleintr(int (*)(void));
 void cprintf(char *, ...);
 void panic(char *) __attribute__((noreturn));
 
+// exec.c
+int exec(char *, char **);
+
 // ioapic.c
 extern volatile struct ioapic *ioapic;
 extern uint8_t ioapicid;
@@ -70,8 +73,11 @@ int memcmp(const void *v1, const void *v2, size_t n);
 void *memset(void *, int, size_t);
 void *memmove(void *, const void *, size_t);
 char *safestrcpy(char *s, const char *t, int n);
+int strncmp(const char *p, const char *q, size_t n);
 
 // syscall.c
+int arg(int n, uint64_t *ip);
+int argstr(int n, char **pp);
 void syscall(void);
 
 // trap.c
@@ -83,9 +89,13 @@ void uartinit(void);
 void uartputc(int);
 
 // vm.c
-void freevm(pte_t *pgdir);
+int allocuvm(pte_t *pgdir, size_t oldsz, size_t newsz);
+void clearpteu(pte_t *pgdir, char *uva);
+int deallocuvm(pte_t *pgdir, size_t oldsz, size_t newsz);
+void freevm(pte_t *pgdir, uintptr_t utop);
 void inituvm(pte_t *pgdir, char *init, size_t sz);
 void kvmalloc(void);
+int loaduvm(pte_t *pgdir, char *addr, char *p_elf, size_t offset, size_t sz);
 void seginit(void);
 pte_t *setupkvm(void);
 void switchkvm(void);

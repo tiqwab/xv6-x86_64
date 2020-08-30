@@ -174,7 +174,7 @@ pte_t *setupkvm(void) {
     cprintf("setupkvm for 0x%p\n", k->virt);
     if (mappages(pgdir, k->virt, k->phys_end - k->phys_start,
                  (uint)k->phys_start, k->perm) < 0) {
-      freevm(pgdir);
+      freevm(pgdir, 0);
       return 0;
     }
   }
@@ -246,6 +246,147 @@ void inituvm(pte_t *pgdir, char *init, size_t sz) {
   memmove(mem, init, sz);
 }
 
+// TODO for fs
+// Load a program segment into pgdir.  addr must be page-aligned
+// and the pages from addr to addr+sz must already be mapped.
+// int loaduvm(pde_t *pgdir, char *addr, struct inode *ip, uint offset, uint sz)
+// {
+//   uint i, pa, n;
+//   pte_t *pte;
+//
+//   if((uint) addr % PGSIZE != 0)
+//     panic("loaduvm: addr must be page aligned");
+//   for(i = 0; i < sz; i += PGSIZE){
+//     if((pte = walkpgdir(pgdir, addr+i, 0)) == 0)
+//       panic("loaduvm: address should exist");
+//     pa = PTE_ADDR(*pte);
+//     if(sz - i < PGSIZE)
+//       n = sz - i;
+//     else
+//       n = PGSIZE;
+//     if(readi(ip, P2V(pa), offset+i, n) != n)
+//       return -1;
+//   }
+//   return 0;
+// }
+// TODO remove later after fs
+int loaduvm(pte_t *pgdir, char *addr, char *p_elf, size_t offset, size_t sz) {
+  uintptr_t pa;
+  pte_t *pte;
+
+  if ((uintptr_t)addr % PGSIZE != 0) {
+    panic("loaduvm: addr must be page aligned");
+  }
+  for (size_t i = 0; i < sz; i += PGSIZE) {
+    if ((pte = walkpgdir(pgdir, addr + i, 0)) == 0) {
+      panic("loaduvm: address should exist");
+    }
+    pa = PTE_ADDR(*pte);
+    for (size_t j = 0; j < PGSIZE; j++) {
+      *((char *)(P2V(pa + j))) = *(p_elf + offset + i + j);
+    }
+  }
+  return 0;
+}
+
+// Allocate page tables and physical memory to grow process from oldsz to
+// newsz, which need not be page aligned.  Returns new size or 0 on error.
+int allocuvm(pte_t *pgdir, size_t oldsz, size_t newsz) {
+  char *mem;
+  uintptr_t a;
+
+  if (newsz >= KERNBASE)
+    return 0;
+  if (newsz < oldsz)
+    return oldsz;
+
+  a = PGROUNDUP(oldsz);
+  for (; a < newsz; a += PGSIZE) {
+    mem = kalloc();
+    if (mem == 0) {
+      cprintf("allocuvm out of memory\n");
+      deallocuvm(pgdir, newsz, oldsz);
+      return 0;
+    }
+    memset(mem, 0, PGSIZE);
+    if (mappages(pgdir, (char *)a, PGSIZE, V2P(mem), PTE_W | PTE_U) < 0) {
+      cprintf("allocuvm out of memory (2)\n");
+      deallocuvm(pgdir, newsz, oldsz);
+      kfree(mem);
+      return 0;
+    }
+  }
+  return newsz;
+}
+
+// Deallocate user pages to bring the process size from oldsz to
+// newsz.  oldsz and newsz need not be page-aligned, nor does newsz
+// need to be less than oldsz.  oldsz can be larger than the actual
+// process size.  Returns the new process size.
+//
+// FIXME: this doesn't deallocate page tables itself.
+int deallocuvm(pte_t *pgdir, size_t oldsz, size_t newsz) {
+  pte_t *pte;
+  uintptr_t a, pa;
+
+  if (newsz >= oldsz) {
+    return oldsz;
+  }
+
+  a = PGROUNDUP(newsz);
+  for (; a < oldsz; a += PGSIZE) {
+    pte = walkpgdir(pgdir, (char *)a, 0);
+    if (!pte) {
+      // cannot skip whole table for now
+      continue;
+    }
+    if (*pte & PTE_P) {
+      pa = PTE_ADDR(*pte);
+      if (pa == 0) {
+        panic("deallocuvm");
+      }
+      char *v = P2V(pa);
+      kfree(v);
+      *pte = 0;
+    }
+  }
+
+  return newsz;
+}
+
+// This only free memory used for page tables because user pages are freed by
+// deallocuvm.
+void do_freevm(pte_t *table, int level) {
+  for (int i = 0; i < NPTENTRIES; i++) {
+    pte_t *ent = table + i;
+    if (*ent & PTE_P) {
+      if (level > 1) {
+        pte_t *next_table = (pte_t *)P2V(PTE_ADDR(*ent));
+        do_freevm(next_table, level - 1);
+      }
+    }
+  }
+  kfree((char *)table);
+}
+
 // Free a page table and all the physical memory pages
 // in the user part.
-void freevm(pte_t *pgdir) { panic("should implement freevm"); }
+void freevm(pte_t *pgdir, uintptr_t utop) {
+  if (pgdir == 0) {
+    panic("freevm: no pgdir");
+  }
+  deallocuvm(pgdir, utop, 0);
+  do_freevm(pgdir, 4);
+}
+
+// Clear PTE_U on a page. Used to create an inaccessible
+// page beneath the user stack.
+void clearpteu(pte_t *pgdir, char *uva) {
+  pte_t *pte;
+
+  pte = walkpgdir(pgdir, uva, 0);
+  if (pte == 0) {
+    panic("clearpteu");
+  }
+  *pte &= ~PTE_U;
+}
