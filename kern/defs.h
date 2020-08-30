@@ -56,6 +56,7 @@ int cpuid(void);
 struct proc *myproc(void);
 void scheduler(void) __attribute__((noreturn));
 void userinit(void);
+void yield(void);
 
 // swtch.S
 void swtch(struct context **, struct context *);

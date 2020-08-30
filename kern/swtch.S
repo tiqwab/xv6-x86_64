@@ -26,10 +26,10 @@ swtch:
   movq %rdx, %rsp
 
   # Load new callee-saved registers
-  popq %r12
-  popq %r13
-  popq %r14
   popq %r15
+  popq %r14
+  popq %r13
+  popq %r12
   popq %rdi
   popq %rsi
   popq %rbx
