@@ -52,11 +52,7 @@ void cprintf(char *fmt, ...) {
   // have to do copy them to args at first because these values might be
   // overwrited
   void *args[5] = {0, 0, 0, 0, 0};
-  __asm__ volatile("mov %%rsi,%0" : "=a"(args[0]) : :);
-  __asm__ volatile("mov %%rdx,%0" : "=a"(args[1]) : :);
-  __asm__ volatile("mov %%rcx,%0" : "=a"(args[2]) : :);
-  __asm__ volatile("mov %%r8,%0" : "=a"(args[3]) : :);
-  __asm__ volatile("mov %%r9,%0" : "=a"(args[4]) : :);
+  prepare_args(args);
   argp = args;
 
   locking = cons.locking;

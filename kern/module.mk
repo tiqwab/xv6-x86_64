@@ -21,6 +21,15 @@ KERN_OBJS := \
 	$(OBJDIR)/$(KERN_DIR)/ioapic.o \
 	$(OBJDIR)/$(KERN_DIR)/kbd.o \
 	$(OBJDIR)/$(KERN_DIR)/sysproc.o \
+	$(OBJDIR)/$(KERN_DIR)/args.o \
+	$(OBJDIR)/$(KERN_DIR)/exec.o \
+	$(OBJDIR)/$(KERN_DIR)/sysfile.o \
+
+KERN_BINARY_OBJS := \
+	$(OBJDIR)/$(KERN_DIR)/initcode \
+
+# TODO: remove later (after fs)
+KERN_BINARY_OBJS += $(UOBJS)
 
 KERN_CFLAGS := $(CFLAGS) -m64 -mcmodel=kernel
 KERN_LDFLAGS := $(LDFLAGS) -m elf_x86_64
@@ -40,8 +49,9 @@ $(OBJDIR)/$(KERN_DIR)/initcode: $(KERN_DIR)/initcode.S
 	$(OBJCOPY) -S -O binary $@.out $@
 	$(OBJDUMP) -S $@.o > $@.asm
 
-$(OBJDIR)/$(KERNEL): $(KERN_OBJS) $(KERN_LINKER_SCRIPT) $(OBJDIR)/$(KERN_DIR)/initcode
-	$(LD) $(KERN_LDFLAGS) -T $(KERN_LINKER_SCRIPT) -o $@ $(KERN_OBJS) -b binary $(OBJDIR)/$(KERN_DIR)/initcode
+# TODO: remote UBOJS later (after fs)
+$(OBJDIR)/$(KERNEL): $(KERN_OBJS) $(KERN_LINKER_SCRIPT) $(KERN_BINARY_OBJS) $(UBOJS)
+	$(LD) $(KERN_LDFLAGS) -T $(KERN_LINKER_SCRIPT) -o $@ $(KERN_OBJS) -b binary $(KERN_BINARY_OBJS)
 	$(OBJDUMP) -S $@ > $@.asm
 
 $(OBJDIR)/$(KERN_DIR)/%.o: $(KERN_DIR)/%.c

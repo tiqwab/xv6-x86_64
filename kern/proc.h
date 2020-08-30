@@ -48,12 +48,12 @@ enum procstate { UNUSED, EMBRYO, SLEEPING, RUNNABLE, RUNNING, ZOMBIE };
 
 // Per-process state
 struct proc {
-  size_t sz;            // Size of process memory (bytes)
-  pte_t *pgdir;         // Page table
-  char *kstack;         // Bottom of kernel stack for this process
-  enum procstate state; // Process state
-  pid_t pid;            // Process ID
-  // struct proc *parent;         // Parent process
+  size_t sz;               // Size of process memory (bytes)
+  pte_t *pgdir;            // Page table
+  char *kstack;            // Bottom of kernel stack for this process
+  enum procstate state;    // Process state
+  pid_t pid;               // Process ID
+  struct proc *parent;     // Parent process
   trapframe_t *tf;         // Trap frame for current syscall
   struct context *context; // swtch() here to run process
   // void *chan;                  // If non-zero, sleeping on chan

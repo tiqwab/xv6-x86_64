@@ -78,7 +78,7 @@ void trap(struct trapframe *tf) {
   default:
     if (myproc() == NULL || (tf->cs & 3) == 0) {
       // In kernel, it must be our mistake.
-      cprintf("unexpected trap %d from cpu %d eip %x (cr2=0x%x)\n", tf->trapno,
+      cprintf("unexpected trap %d from cpu %d rip %x (cr2=0x%x)\n", tf->trapno,
               cpuid(), tf->rip, rcr2());
       panic("trap");
     }
@@ -96,12 +96,12 @@ void trap(struct trapframe *tf) {
   // if(myproc() && myproc()->killed && (tf->cs&3) == DPL_USER)
   //   exit();
 
-  // TODO for preemption
   // Force process to give up CPU on clock tick.
   // If interrupts were on while locks held, would need to check nlock.
-  // if(myproc() && myproc()->state == RUNNING &&
-  //    tf->trapno == T_IRQ0+IRQ_TIMER)
-  //   yield();
+  if (myproc() && myproc()->state == RUNNING &&
+      tf->trapno == T_IRQ0 + IRQ_TIMER) {
+    yield();
+  }
 
   // TODO for preemption
   // Check if the process has been killed since we yielded

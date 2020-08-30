@@ -1,23 +1,23 @@
 .globl start
 start:
   # check for syscall
-  mov $1,%rax
+  mov $32,%rax
   call syscall
   # syscall again
-  mov $1,%rax
+  mov $32,%rax
   call syscall
   # print message
-  lea msg(%rip),%rdx
-  push %rdx
-  mov $2,%rax
+  lea msg(%rip),%rax
+  mov %rax,%rdi
+  mov $33,%rax
   call syscall
-  pop %rdx
   # syscall getpid
   mov $11,%rax
   call syscall
 
-loop:
-  jmp loop
+  lea path(%rip),%rdi
+  mov $7,%rax
+  call syscall
 
 syscall:
   int $0x30
@@ -25,3 +25,5 @@ syscall:
 
 msg:
   .asciz "hello by print system call\n"
+path:
+  .asciz "preemptiontest1"

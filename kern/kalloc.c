@@ -82,19 +82,23 @@ void freerange(void *vstart, void *vend) {
 void kfree(char *v) {
   struct run *r;
 
-  if ((uintptr_t)v % PGSIZE || v < end || V2P(v) >= phys_top)
+  if ((uintptr_t)v % PGSIZE || v < end || V2P(v) >= phys_top) {
+    cprintf("kfree: failed for 0x%p\n", v);
     panic("kfree");
+  }
 
   // Fill with junk to catch dangling refs.
   memset(v, 1, PGSIZE);
 
-  if (kmem.use_lock)
+  if (kmem.use_lock) {
     acquire(&kmem.lock);
+  }
   r = (struct run *)v;
   r->next = kmem.freelist;
   kmem.freelist = r;
-  if (kmem.use_lock)
+  if (kmem.use_lock) {
     release(&kmem.lock);
+  }
 }
 
 // Allocate one 4096-byte page of physical memory.

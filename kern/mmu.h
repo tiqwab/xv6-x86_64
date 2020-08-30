@@ -107,7 +107,8 @@ struct tssdesc {
 #define PTX2(va) ((((uintptr_t)va) >> 12 >> 9) & 0777)
 #define PTX1(va) ((((uintptr_t)va) >> 12) & 0777)
 
-#define PGSIZE 4096 // bytes mapped by a page
+#define NPTENTRIES 512 // PTES per page table
+#define PGSIZE 4096    // bytes mapped by a page
 
 #define PGROUNDUP(sz) (((sz) + PGSIZE - 1) & ~(PGSIZE - 1))
 #define PGROUNDDOWN(a) (((a)) & ~(PGSIZE - 1))
@@ -119,6 +120,7 @@ struct tssdesc {
 #define PTE_PS 0x080 // Page Size
 
 // The page alighned physical address of the frame or the next page table
+#define PTE_FLAGS(pte) ((uintptr_t)(pte)&0xFFF)
 #define PTE_ADDR(pte) (((((uintptr_t)(pte)) >> 12) & 0xffffffffffff) << 12)
 
 #ifndef __ASSEMBLER__

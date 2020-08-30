@@ -134,15 +134,60 @@ void userinit(void) {
   release(&ptable.lock);
 }
 
+// Create a new process copying p as the parent.
+// Sets up stack to return as if from system call.
+// Caller must set state of returned proc to RUNNABLE.
+pid_t fork(void) {
+  int i, pid;
+  struct proc *np;
+  struct proc *curproc = myproc();
+
+  // Allocate process.
+  if ((np = allocproc()) == 0) {
+    return -1;
+  }
+
+  // Copy process state from proc.
+  if ((np->pgdir = copyuvm(curproc->pgdir, curproc->sz)) == 0) {
+    kfree(np->kstack);
+    np->kstack = 0;
+    np->state = UNUSED;
+    return -1;
+  }
+  np->sz = curproc->sz;
+  np->parent = curproc;
+  *np->tf = *curproc->tf;
+
+  // Clear %eax so that fork returns 0 in the child.
+  np->tf->rax = 0;
+
+  // TODO for fs
+  // for(i = 0; i < NOFILE; i++)
+  //   if(curproc->ofile[i])
+  //     np->ofile[i] = filedup(curproc->ofile[i]);
+  // np->cwd = idup(curproc->cwd);
+
+  safestrcpy(np->name, curproc->name, sizeof(curproc->name));
+
+  pid = np->pid;
+
+  acquire(&ptable.lock);
+
+  np->state = RUNNABLE;
+
+  release(&ptable.lock);
+
+  return pid;
+}
+
 void scheduler(void) {
   struct proc *p;
   struct cpu *c = mycpu();
   c->proc = 0;
 
   for (;;) {
-    // TODO for interrupt
     // Enable interrupts on this processor.
-    // sti();
+    sti();
 
     // Loop over process table looking for process to run.
     acquire(&ptable.lock);
@@ -166,6 +211,42 @@ void scheduler(void) {
     }
     release(&ptable.lock);
   }
+}
+
+// Enter scheduler.  Must hold only ptable.lock
+// and have changed proc->state. Saves and restores
+// intena because intena is a property of this
+// kernel thread, not this CPU. It should
+// be proc->intena and proc->ncli, but that would
+// break in the few places where a lock is held but
+// there's no process.
+void sched(void) {
+  int intena;
+  struct proc *p = myproc();
+
+  if (!holding(&ptable.lock)) {
+    panic("sched ptable.lock");
+  }
+  if (mycpu()->ncli != 1) {
+    panic("sched locks");
+  }
+  if (p->state == RUNNING) {
+    panic("sched running");
+  }
+  if (readeflags() & FL_IF) {
+    panic("sched interruptible");
+  }
+  intena = mycpu()->intena;
+  swtch(&p->context, mycpu()->scheduler);
+  mycpu()->intena = intena;
+}
+
+// Give up the CPU for one scheduling round.
+void yield(void) {
+  acquire(&ptable.lock);
+  myproc()->state = RUNNABLE;
+  sched();
+  release(&ptable.lock);
 }
 
 // A fork child's very first scheduling by scheduler()
