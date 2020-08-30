@@ -6,10 +6,13 @@ UOBJS += \
 		 $(OBJDIR)/$(USER_DIR)/init \
 
 ULIBS := \
-	$(OBJDIR)/$(USER_DIR)/usys.o
+	$(OBJDIR)/$(USER_DIR)/usys.o \
+	$(OBJDIR)/$(USER_DIR)/entry.o \
+
+USER_LINKER_SCRIPT := $(USER_DIR)/user.ld
 
 USER_CFLAGS := $(CFLAGS) -m64 -fno-pic -nostdinc -I.
-USER_LDFLAGS := $(LDFLAGS) -m elf_x86_64 -N -e main -Ttext 0
+USER_LDFLAGS := $(LDFLAGS) -T $(USER_LINKER_SCRIPT)
 
 -include $(OBJDIR)/$(USER_DIR)/*.d
 

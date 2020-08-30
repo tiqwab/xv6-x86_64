@@ -68,7 +68,7 @@ int exec(char *path, char **argv) {
     //   goto bad;
     // }
     // TODO remove later (after fs)
-    p_ph = (struct proghdr *)(((char *)p_elf) + p_elf->phoff);
+    p_ph = (struct proghdr *)(((char *)p_elf) + off);
     ph = *p_ph;
 
     if (ph.type != ELF_PROG_LOAD) {
@@ -110,7 +110,7 @@ int exec(char *path, char **argv) {
   clearpteu(pgdir, (char *)(sz - 2 * PGSIZE));
   sp = sz;
 
-  // TODO: handle arguments
+  // TODO: handle exec arguments
   // Push argument strings, prepare rest of stack in ustack.
   // for(argc = 0; argv[argc]; argc++) {
   //   if(argc >= MAXARG)
