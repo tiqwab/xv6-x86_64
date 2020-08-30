@@ -50,6 +50,7 @@ void mpinit(void);
 void picinit(void);
 
 // proc.c
+pid_t fork(void);
 struct cpu *mycpu(void);
 int cpuid(void);
 struct proc *myproc(void);
@@ -91,6 +92,7 @@ void uartputc(int);
 // vm.c
 int allocuvm(pte_t *pgdir, size_t oldsz, size_t newsz);
 void clearpteu(pte_t *pgdir, char *uva);
+pte_t *copyuvm(pte_t *, size_t);
 int deallocuvm(pte_t *pgdir, size_t oldsz, size_t newsz);
 void freevm(pte_t *pgdir, uintptr_t utop);
 void inituvm(pte_t *pgdir, char *init, size_t sz);

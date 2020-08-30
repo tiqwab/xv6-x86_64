@@ -120,6 +120,7 @@ struct tssdesc {
 #define PTE_PS 0x080 // Page Size
 
 // The page alighned physical address of the frame or the next page table
+#define PTE_FLAGS(pte) ((uintptr_t)(pte)&0xFFF)
 #define PTE_ADDR(pte) (((((uintptr_t)(pte)) >> 12) & 0xffffffffffff) << 12)
 
 #ifndef __ASSEMBLER__

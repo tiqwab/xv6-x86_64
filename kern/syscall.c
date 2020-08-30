@@ -95,14 +95,13 @@ int64_t sys_print(void) {
   return 0;
 }
 
+extern int64_t sys_fork(void);
 extern int64_t sys_exec(void);
 extern int64_t sys_getpid(void);
 
 static int64_t (*syscalls[])(void) = {
-    [SYS_hello] = sys_hello,
-    [SYS_print] = sys_print,
-    [SYS_exec] = sys_exec,
-    [SYS_getpid] = sys_getpid,
+    [SYS_fork] = sys_fork,   [SYS_exec] = sys_exec,   [SYS_getpid] = sys_getpid,
+    [SYS_hello] = sys_hello, [SYS_print] = sys_print,
 };
 
 // FIXME: Accept up to 5 arguments for now.

@@ -1,15 +1,15 @@
 .globl start
 start:
   # check for syscall
-  mov $1,%rax
+  mov $32,%rax
   call syscall
   # syscall again
-  mov $1,%rax
+  mov $32,%rax
   call syscall
   # print message
   lea msg(%rip),%rax
   mov %rax,%rdi
-  mov $2,%rax
+  mov $33,%rax
   call syscall
   # syscall getpid
   mov $11,%rax
