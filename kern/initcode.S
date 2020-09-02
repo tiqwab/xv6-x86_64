@@ -1,29 +1,29 @@
+# Initial process execs /init.
+# This code runs in user space.
+
+#include "syscall.h"
+#include "trap.h"
+
 .globl start
 start:
-  # check for syscall
-  mov $32,%rax
-  call syscall
-  # syscall again
-  mov $32,%rax
-  call syscall
-  # print message
-  lea msg(%rip),%rax
+# exec("/init", argv);
+  lea init(%rip),%rax
   mov %rax,%rdi
-  mov $33,%rax
-  call syscall
-  # syscall getpid
-  mov $11,%rax
-  call syscall
+  lea argv(%rip),%rax
+  mov %rax,%rsi
+  mov $SYS_exec, %rax
+  int $T_SYSCALL
 
-  lea path(%rip),%rdi
-  mov $7,%rax
-  call syscall
+# for(;;) exit();
+exit:
+  mov $SYS_exit, %rax
+  int $T_SYSCALL
+  jmp exit
 
-syscall:
-  int $0x30
-  ret
+init:
+  .string "/init\0"
 
-msg:
-  .asciz "hello by print system call\n"
-path:
-  .asciz "preemptiontest1"
+.p2align 3
+argv:
+  .long init
+  .long 0

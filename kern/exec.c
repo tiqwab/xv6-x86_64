@@ -36,7 +36,11 @@ int exec(char *path, char **argv) {
   // }
   // Check ELF header
   // TODO remove later (after fs)
-  if (strncmp(path, "preemptiontest1", 15) == 0) {
+  if (strncmp(path, "/init", 15) == 0) {
+    extern char _binary_obj_user_init_start[];
+    p_elf = (struct elfhdr *)_binary_obj_user_init_start;
+    elf = *p_elf;
+  } else if (strncmp(path, "preemptiontest1", 15) == 0) {
     extern char _binary_obj_user_preemptiontest1_start[];
     p_elf = (struct elfhdr *)_binary_obj_user_preemptiontest1_start;
     elf = *p_elf;
@@ -64,7 +68,7 @@ int exec(char *path, char **argv) {
     //   goto bad;
     // }
     // TODO remove later (after fs)
-    p_ph = (struct proghdr *)(((char *)p_elf) + p_elf->phoff);
+    p_ph = (struct proghdr *)(((char *)p_elf) + off);
     ph = *p_ph;
 
     if (ph.type != ELF_PROG_LOAD) {
@@ -106,7 +110,7 @@ int exec(char *path, char **argv) {
   clearpteu(pgdir, (char *)(sz - 2 * PGSIZE));
   sp = sz;
 
-  // TODO: handle arguments
+  // TODO: handle exec arguments
   // Push argument strings, prepare rest of stack in ustack.
   // for(argc = 0; argv[argc]; argc++) {
   //   if(argc >= MAXARG)
