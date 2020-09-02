@@ -42,7 +42,7 @@ static void printint(long xx, int base, int sign) {
     consputc(buf[i]);
 }
 
-// Print to the console. only understands %d, %x, %p, %s.
+// Print to the console. only understands %c, %d, %x, %p, %s.
 // FIXME: Accept up to 5 arguments for now.
 void cprintf(char *fmt, ...) {
   int i, c, locking;
@@ -73,12 +73,17 @@ void cprintf(char *fmt, ...) {
     if (c == 0)
       break;
     switch (c) {
+    case 'c':
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpointer-to-int-cast"
+      consputc((char)*argp++);
+#pragma GCC diagnostic pop
+      break;
     case 'd':
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpointer-to-int-cast"
       // it has to cast as int or accept value sign extended
       printint((long)(int)*argp++, 10, 1);
-#pragma GCC diagnostic pop
 #pragma GCC diagnostic pop
       break;
     case 'x':

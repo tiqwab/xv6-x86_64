@@ -29,6 +29,12 @@ int exec(char *path, char **argv);
 int getpid(void);
 
 int hello(void);
-int print(char *msg);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wbuiltin-declaration-mismatch"
+int putc(char c);
+#pragma GCC diagnostic pop
+
+// library
+int printf(const char *fmt, ...);
 
 #endif /* ifndef XV6_x86_64_USER_H */

@@ -6,7 +6,7 @@
 #define SYS_getpid 11
 
 #define SYS_hello 32
-#define SYS_print 33
+#define SYS_putc 34
 
 #define T_SYSCALL 0x30
 
@@ -23,4 +23,4 @@ SYSCALL(wait)
 SYSCALL(exec)
 SYSCALL(getpid)
 SYSCALL(hello)
-SYSCALL(print)
+SYSCALL(putc)

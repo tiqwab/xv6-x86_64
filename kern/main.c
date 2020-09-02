@@ -12,7 +12,9 @@ extern char end[]; // first address after kernel loaded from ELF file
 // doing some setup required for memory allocator to work.
 int main(void) {
   kinit1(end); // phys page allocator
-  cprintf("cprintf format test: %d, 0x%x, 0x%p, %s\n", 256, 256, main, "hello");
+  cprintf("cprintf format test1: %d, 0x%x, 0x%p, %s\n", 256, 256, main,
+          "hello");
+  cprintf("cprintf format test2: %c %c %c\n", 'a', 'b', 'c');
   kvmalloc();    // kernel page table
   mpinit();      // detect other processors
   lapicinit();   // interrupt controller

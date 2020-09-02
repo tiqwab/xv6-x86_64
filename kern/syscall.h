@@ -10,6 +10,6 @@
 #define SYS_getpid 11
 
 #define SYS_hello 32
-#define SYS_print 33
+#define SYS_putc 34
 
 #endif /* ifndef XV6_X86_64_SYSCALL_H */

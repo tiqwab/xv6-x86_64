@@ -5,25 +5,25 @@ int main(void) {
 
   pid1 = fork();
   if (pid1 < 0) {
-    print("init: 1st fork failed\n");
+    printf("init: 1st fork failed\n");
     exit();
   }
   if (pid1 == 0) {
     // child
     exec("preemptiontest1", NULL);
-    print("init: failed to exec preemptiontest1\n");
+    printf("init: failed to exec preemptiontest1\n");
     exit();
   }
 
   pid2 = fork();
   if (pid2 < 0) {
-    print("init: 2nd fork failed\n");
+    printf("init: 2nd fork failed\n");
     exit();
   }
   if (pid2 == 0) {
     // child
     exec("preemptiontest2", NULL);
-    print("init: failed to exec preemptiontest2\n");
+    printf("init: failed to exec preemptiontest2\n");
     exit();
   }
 
@@ -39,9 +39,9 @@ int main(void) {
   }
 
   if (ok1 && ok2) {
-    print("init: success\n");
+    printf("init: success\n");
   } else {
-    print("init: fail\n");
+    printf("init: fail\n");
   }
 
   for (;;) {
