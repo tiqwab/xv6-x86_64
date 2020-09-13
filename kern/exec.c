@@ -13,6 +13,8 @@ int exec(char *path, char **argv) {
   pte_t *pgdir = NULL, *oldpgdir;
   struct proc *curproc = myproc();
   size_t old_sz = curproc->sz;
+  int argc;
+  uint64_t ustack[3 + MAXARG + 1];
 
   // TODO remote later (after fs)
   struct elfhdr *p_elf;
@@ -110,25 +112,27 @@ int exec(char *path, char **argv) {
   clearpteu(pgdir, (char *)(sz - 2 * PGSIZE));
   sp = sz;
 
-  // TODO: handle exec arguments
   // Push argument strings, prepare rest of stack in ustack.
-  // for(argc = 0; argv[argc]; argc++) {
-  //   if(argc >= MAXARG)
-  //     goto bad;
-  //   sp = (sp - (strlen(argv[argc]) + 1)) & ~3;
-  //   if(copyout(pgdir, sp, argv[argc], strlen(argv[argc]) + 1) < 0)
-  //     goto bad;
-  //   ustack[3+argc] = sp;
-  // }
-  // ustack[3+argc] = 0;
+  for (argc = 0; argv[argc]; argc++) {
+    if (argc >= MAXARG) {
+      goto bad;
+    }
+    sp = (sp - (strlen(argv[argc]) + 1)) & ~(sizeof(uintptr_t) - 1);
+    if (copyout(pgdir, sp, argv[argc], strlen(argv[argc]) + 1) < 0) {
+      goto bad;
+    }
+    ustack[3 + argc] = sp;
+  }
+  ustack[3 + argc] = 0;
 
-  // ustack[0] = 0xffffffff;  // fake return PC
-  // ustack[1] = argc;
-  // ustack[2] = sp - (argc+1)*4;  // argv pointer
+  ustack[0] = 0xffffffffffffffff; // fake return PC
+  ustack[1] = argc;
+  ustack[2] = sp - (argc + 1) * sizeof(uintptr_t); // argv pointer
 
-  // sp -= (3+argc+1) * 4;
-  // if(copyout(pgdir, sp, ustack, (3+argc+1)*4) < 0)
-  //   goto bad;
+  sp -= (3 + argc + 1) * sizeof(uintptr_t);
+  if (copyout(pgdir, sp, ustack, (3 + argc + 1) * sizeof(uintptr_t)) < 0) {
+    goto bad;
+  }
 
   // Save program name for debugging.
   char *last, *s;

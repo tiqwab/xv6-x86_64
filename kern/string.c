@@ -64,3 +64,12 @@ char *safestrcpy(char *s, const char *t, int n) {
   *s = 0;
   return os;
 }
+
+size_t strlen(const char *s) {
+  size_t len = 0;
+  while (*s != 0) {
+    len++;
+    s++;
+  }
+  return len;
+}

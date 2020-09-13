@@ -83,11 +83,14 @@ int memcmp(const void *v1, const void *v2, size_t n);
 void *memset(void *, int, size_t);
 void *memmove(void *, const void *, size_t);
 char *safestrcpy(char *s, const char *t, int n);
+size_t strlen(const char *s);
 int strncmp(const char *p, const char *q, size_t n);
 
 // syscall.c
 int arg(int n, uint64_t *ip);
 int argstr(int n, char **pp);
+int fetchint(uintptr_t addr, uint64_t *ip);
+int fetchstr(uintptr_t addr, char **pp);
 void syscall(void);
 
 // trap.c
@@ -101,6 +104,7 @@ void uartputc(int);
 // vm.c
 int allocuvm(pte_t *pgdir, size_t oldsz, size_t newsz);
 void clearpteu(pte_t *pgdir, char *uva);
+int copyout(pte_t *pgdir, uintptr_t va, void *p, size_t len);
 pte_t *copyuvm(pte_t *, size_t);
 int deallocuvm(pte_t *pgdir, size_t oldsz, size_t newsz);
 void freevm(pte_t *pgdir, uintptr_t utop);

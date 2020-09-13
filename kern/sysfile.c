@@ -13,22 +13,21 @@ int64_t sys_exec(void) {
 
   memset(argv, 0, sizeof(argv));
 
-  // TODO: handle arguments
-  // for(i=0;; i++){
-  //   if(i >= NELEM(argv)) {
-  //     return -1;
-  //   }
-  //   if(fetchint(uargv+4*i, (int*)&uarg) < 0) {
-  //     return -1;
-  //   }
-  //   if(uarg == 0){
-  //     argv[i] = 0;
-  //     break;
-  //   }
-  //   if(fetchstr(uarg, &argv[i]) < 0) {
-  //     return -1;
-  //   }
-  // }
+  for (i = 0;; i++) {
+    if (i >= MAXARG) {
+      return -1;
+    }
+    if (fetchint(uargv + sizeof(uintptr_t) * i, (uint64_t *)&uarg) < 0) {
+      return -1;
+    }
+    if (uarg == 0) {
+      argv[i] = 0;
+      break;
+    }
+    if (fetchstr(uarg, &argv[i]) < 0) {
+      return -1;
+    }
+  }
 
   return exec(path, argv);
 }

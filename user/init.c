@@ -10,7 +10,8 @@ int main(void) {
   }
   if (pid1 == 0) {
     // child
-    exec("preemptiontest1", NULL);
+    char *argv[] = {"preemptiontest1", "second arg", NULL};
+    exec(argv[0], argv);
     printf("init: failed to exec preemptiontest1\n");
     exit();
   }
@@ -22,7 +23,8 @@ int main(void) {
   }
   if (pid2 == 0) {
     // child
-    exec("preemptiontest2", NULL);
+    char *argv[] = {"preemptiontest2", NULL};
+    exec(argv[0], argv);
     printf("init: failed to exec preemptiontest2\n");
     exit();
   }

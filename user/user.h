@@ -25,6 +25,7 @@ int fork(void);
 void exit(void);
 #pragma GCC diagnostic pop
 int wait(void);
+// the last entry of argv should be NULL
 int exec(char *path, char **argv);
 int getpid(void);
 

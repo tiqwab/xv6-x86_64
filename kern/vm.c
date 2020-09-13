@@ -427,3 +427,40 @@ void clearpteu(pte_t *pgdir, char *uva) {
   }
   *pte &= ~PTE_U;
 }
+
+// Map user virtual address to kernel address.
+char *uva2ka(pte_t *pgdir, char *uva) {
+  pte_t *pte;
+
+  pte = walkpgdir(pgdir, uva, 0);
+  if ((*pte & PTE_P) == 0)
+    return 0;
+  if ((*pte & PTE_U) == 0)
+    return 0;
+  return (char *)P2V(PTE_ADDR(*pte));
+}
+
+// Copy len bytes from p to user address va in page table pgdir.
+// Most useful when pgdir is not the current page table.
+// uva2ka ensures this only works for PTE_U pages.
+int copyout(pte_t *pgdir, uintptr_t va, void *p, size_t len) {
+  char *buf, *pa0;
+  size_t n;
+  uintptr_t va0;
+
+  buf = (char *)p;
+  while (len > 0) {
+    va0 = (uintptr_t)PGROUNDDOWN(va);
+    pa0 = uva2ka(pgdir, (char *)va0);
+    if (pa0 == 0)
+      return -1;
+    n = PGSIZE - (va - va0);
+    if (n > len)
+      n = len;
+    memmove(pa0 + (va - va0), buf, n);
+    len -= n;
+    buf += n;
+    va = va0 + PGSIZE;
+  }
+  return 0;
+}
