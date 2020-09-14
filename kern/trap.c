@@ -10,6 +10,7 @@
 struct gatedesc idt[256];
 extern uintptr_t vectors[]; // in vectors.S: array of 256 entry pointers
 struct spinlock tickslock;
+uint ticks;
 
 void tvinit(void) {
   int i;
@@ -25,26 +26,25 @@ void idtinit(void) { lidt(idt, sizeof(idt)); }
 
 void trap(struct trapframe *tf) {
   if (tf->trapno == T_SYSCALL) {
-    // TODO for exit
-    // if(myproc()->killed)
-    //   exit();
+    if (myproc()->killed) {
+      exit();
+    }
     myproc()->tf = tf;
     syscall();
-    // TODO for exit
-    // if(myproc()->killed)
-    //   exit();
+    if (myproc()->killed) {
+      exit();
+    }
     return;
   }
 
   switch (tf->trapno) {
   case T_IRQ0 + IRQ_TIMER:
-    // TODO for preemption
-    // if(cpuid() == 0){
-    //   acquire(&tickslock);
-    //   ticks++;
-    //   wakeup(&ticks);
-    //   release(&tickslock);
-    // }
+    if (cpuid() == 0) {
+      acquire(&tickslock);
+      ticks++;
+      wakeup(&ticks);
+      release(&tickslock);
+    }
     lapiceoi();
     break;
 
@@ -89,12 +89,12 @@ void trap(struct trapframe *tf) {
     myproc()->killed = 1;
   }
 
-  // TODO for preemption
   // Force process exit if it has been killed and is in user space.
   // (If it is still executing in the kernel, let it keep running
   // until it gets to the regular system call return.)
-  // if(myproc() && myproc()->killed && (tf->cs&3) == DPL_USER)
-  //   exit();
+  if (myproc() && myproc()->killed && (tf->cs & 3) == DPL_USER) {
+    exit();
+  }
 
   // Force process to give up CPU on clock tick.
   // If interrupts were on while locks held, would need to check nlock.
@@ -103,8 +103,8 @@ void trap(struct trapframe *tf) {
     yield();
   }
 
-  // TODO for preemption
   // Check if the process has been killed since we yielded
-  // if(myproc() && myproc()->killed && (tf->cs&3) == DPL_USER)
-  //   exit();
+  if (myproc() && myproc()->killed && (tf->cs & 3) == DPL_USER) {
+    exit();
+  }
 }

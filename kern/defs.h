@@ -64,6 +64,7 @@ void scheduler(void) __attribute__((noreturn));
 void sleep(void *chan, struct spinlock *lk);
 void userinit(void);
 pid_t wait(void);
+void wakeup(void *chan);
 void yield(void);
 
 // swtch.S
