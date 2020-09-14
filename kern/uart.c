@@ -1,6 +1,7 @@
 // ref. https://wiki.osdev.org/Serial_Ports
 
 #include "defs.h"
+#include "trap.h"
 #include "x86.h"
 
 #define COM1 0x3f8
@@ -19,8 +20,7 @@ void uartinit(void) {
   outb(COM1 + 1, 0);
   outb(COM1 + 3, 0x03); // Lock divisor, 8 data bits.
   outb(COM1 + 4, 0);
-  // TODO for interrupt
-  // outb(COM1+1, 0x01);    // Enable receive interrupts.
+  outb(COM1 + 1, 0x01); // Enable receive interrupts.
 
   // If status is 0xFF, no serial port.
   if (inb(COM1 + 5) == 0xFF) {
@@ -28,12 +28,11 @@ void uartinit(void) {
   }
   uart = 1;
 
-  // TODO for interrupt
   // Acknowledge pre-existing interrupt conditions;
   // enable interrupts.
-  // inb(COM1+2);
-  // inb(COM1+0);
-  // ioapicenable(IRQ_COM1, 0);
+  inb(COM1 + 2);
+  inb(COM1 + 0);
+  ioapicenable(IRQ_COM1, 0);
 
   // Announce that we're here.
   for (p = "xv6...\n"; *p; p++) {
@@ -52,3 +51,15 @@ void uartputc(int c) {
   }
   outb(COM1 + 0, c);
 }
+
+static int uartgetc(void) {
+  if (!uart) {
+    return -1;
+  }
+  if (!(inb(COM1 + 5) & 0x01)) {
+    return -1;
+  }
+  return inb(COM1 + 0);
+}
+
+void uartintr(void) { consoleintr(uartgetc); }

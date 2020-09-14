@@ -100,6 +100,7 @@ void tvinit(void);
 
 // uart.c
 void uartinit(void);
+void uartintr(void);
 void uartputc(int);
 
 // vm.c

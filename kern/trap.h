@@ -9,6 +9,7 @@
 
 #define IRQ_TIMER 0
 #define IRQ_KBD 1
+#define IRQ_COM1 4
 #define IRQ_ERROR 19
 #define IRQ_SPURIOUS 31
 

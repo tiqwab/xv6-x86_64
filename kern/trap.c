@@ -62,11 +62,10 @@ void trap(struct trapframe *tf) {
     lapiceoi();
     break;
 
-    // TODO for uart
-    // case T_IRQ0 + IRQ_COM1:
-    //   uartintr();
-    //   lapiceoi();
-    //   break;
+  case T_IRQ0 + IRQ_COM1:
+    uartintr();
+    lapiceoi();
+    break;
 
     // case T_IRQ0 + 7:
     // case T_IRQ0 + IRQ_SPURIOUS:
