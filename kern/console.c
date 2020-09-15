@@ -198,65 +198,47 @@ struct {
 #define C(x) ((x) - '@') // Control-x
 
 void consoleintr(int (*getc)(void)) {
-  int c;
+  int c, doprocdump = 0;
 
   acquire(&cons.lock);
   while ((c = getc()) >= 0) {
     switch (c) {
+    case C('P'): // Process listing.
+      // procdump() locks cons.lock indirectly; invoke later
+      doprocdump = 1;
+      break;
+    case C('U'): // Kill line.
+      while (input.e != input.w &&
+             input.buf[(input.e - 1) % INPUT_BUF] != '\n') {
+        input.e--;
+        consputc(BACKSPACE);
+      }
+      break;
     case C('H'):
     case '\x7f': // Backspace
-      consputc(BACKSPACE);
+      if (input.e != input.w) {
+        input.e--;
+        consputc(BACKSPACE);
+      }
       break;
     default:
-      if (c != 0) {
+      if (c != 0 && input.e - input.r < INPUT_BUF) {
+        c = (c == '\r') ? '\n' : c;
+        input.buf[input.e++ % INPUT_BUF] = c;
         consputc(c);
+        if (c == '\n' || c == C('D') || input.e == input.r + INPUT_BUF) {
+          input.w = input.e;
+          wakeup(&input.r);
+        }
       }
       break;
     }
   }
   release(&cons.lock);
-
-  // TODO for consoleread
-  // int c, doprocdump = 0;
-
-  // acquire(&cons.lock);
-  // while ((c = getc()) >= 0) {
-  //   switch (c) {
-  //   case C('P'): // Process listing.
-  //     // procdump() locks cons.lock indirectly; invoke later
-  //     doprocdump = 1;
-  //     break;
-  //   case C('U'): // Kill line.
-  //     while (input.e != input.w &&
-  //            input.buf[(input.e - 1) % INPUT_BUF] != '\n') {
-  //       input.e--;
-  //       consputc(BACKSPACE);
-  //     }
-  //     break;
-  //   case C('H'):
-  //   case '\x7f': // Backspace
-  //     if (input.e != input.w) {
-  //       input.e--;
-  //       consputc(BACKSPACE);
-  //     }
-  //     break;
-  //   default:
-  //     if (c != 0 && input.e - input.r < INPUT_BUF) {
-  //       c = (c == '\r') ? '\n' : c;
-  //       input.buf[input.e++ % INPUT_BUF] = c;
-  //       consputc(c);
-  //       if (c == '\n' || c == C('D') || input.e == input.r + INPUT_BUF) {
-  //         input.w = input.e;
-  //         wakeup(&input.r);
-  //       }
-  //     }
-  //     break;
-  //   }
-  // }
-  // release(&cons.lock);
-  // if (doprocdump) {
-  //   procdump(); // now call procdump() wo. cons.lock held
-  // }
+  if (doprocdump) {
+    // TODO for procdump
+    // procdump(); // now call procdump() wo. cons.lock held
+  }
 }
 
 void consoleinit(void) {
