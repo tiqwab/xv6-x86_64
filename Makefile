@@ -37,13 +37,15 @@ endif
 
 GDBPORT	:= 12345
 CPUS ?= 1
-IMAGE := xv6.img
 
+XV6_IMG := $(OBJDIR)/xv6.img
+FS_IMG := $(OBJDIR)/fs.img
+IMAGES := $(XV6_IMG) $(FS_IMG)
 UOBJS :=
 
-.PHONY: clean default format
+default: $(IMAGES)
 
-default: $(OBJDIR)/$(IMAGE)
+.PHONY: clean default format
 
 include boot/module.mk
 include user/module.mk
@@ -53,7 +55,7 @@ include kern/module.mk
 # TODO: duplicated with KERNEL_START_SECTOR in boot/stage_2.c
 KERNEL_START_SECTOR := 32
 
-$(OBJDIR)/$(IMAGE): format $(OBJDIR)/$(BOOT_BLOCK) $(OBJDIR)/$(KERNEL)
+$(XV6_IMG): format $(OBJDIR)/$(BOOT_BLOCK) $(OBJDIR)/$(KERNEL)
 	dd if=/dev/zero of=$@ count=10000
 	dd if=$(OBJDIR)/$(BOOT_BLOCK) of=$@ conv=notrunc
 	dd if=$(OBJDIR)/$(KERNEL) of=$@ seek=$(KERNEL_START_SECTOR) conv=notrunc
@@ -67,7 +69,8 @@ $(OBJDIR)/$(IMAGE): format $(OBJDIR)/$(BOOT_BLOCK) $(OBJDIR)/$(KERNEL)
 # Enter QEMU monitor by 'Ctrl+a then c' if -serial mon:stdio is specified
 # ref. https://kashyapc.wordpress.com/2016/02/11/qemu-command-line-behavior-of-serial-stdio-vs-serial-monstdio/
 QEMUOPTS := $(QEMUOPTS)
-QEMUOPTS += -drive file=$(OBJDIR)/$(IMAGE),index=0,media=disk,format=raw \
+QEMUOPTS += -drive file=$(XV6_IMG),index=0,media=disk,format=raw \
+			-drive file=$(FS_IMG),index=1,media=disk,format=raw \
 			-serial mon:stdio -gdb tcp::$(GDBPORT) -smp $(CPUS)
 QEMUOPTS += $(shell if $(QEMU) -nographic -help | grep -q '^-D '; then echo '-D qemu.log'; fi)
 
@@ -78,10 +81,10 @@ gdb:
 	$(GDB) -n -x .gdbinit
 
 # qemu: $(IMAGES) pre-qemu
-qemu: $(OBJDIR)/$(IMAGE)
+qemu: $(IMAGES)
 	$(QEMU) $(QEMUOPTS)
 
-qemu-gdb: $(OBJDIR)/$(IMAGE) .gdbinit
+qemu-gdb: $(IMAGES) .gdbinit
 	$(QEMU) $(QEMUOPTS) -S
 
 format:
