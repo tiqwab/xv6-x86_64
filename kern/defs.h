@@ -16,6 +16,9 @@ void prepare_args(void *args[]);
 
 // bio.c
 void binit(void);
+struct buf *bread(uint dev, uint blockno);
+void bwrite(struct buf *b);
+void brelse(struct buf *b);
 
 // console.c
 void consoleinit(void);

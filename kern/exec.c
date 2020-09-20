@@ -50,6 +50,10 @@ int exec(char *path, char **argv) {
     extern char _binary_obj_user_preemptiontest2_start[];
     p_elf = (struct elfhdr *)_binary_obj_user_preemptiontest2_start;
     elf = *p_elf;
+  } else if (strncmp(path, "fstest", 6) == 0) {
+    extern char _binary_obj_user_fstest_start[];
+    p_elf = (struct elfhdr *)_binary_obj_user_fstest_start;
+    elf = *p_elf;
   } else {
     goto bad;
   }

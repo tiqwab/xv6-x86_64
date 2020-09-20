@@ -1,7 +1,7 @@
 #include "user.h"
 
 int main(void) {
-  pid_t pid1, pid2;
+  pid_t pid1, pid2, pid3;
 
   pid1 = fork();
   if (pid1 < 0) {
@@ -41,10 +41,26 @@ int main(void) {
   }
 
   if (ok1 && ok2) {
-    printf("init: success\n");
+    printf("init: preemptiontest success\n");
   } else {
-    printf("init: fail\n");
+    printf("init: preemptiontest fail\n");
   }
+
+  printf("fstest started\n");
+  pid3 = fork();
+  if (pid3 < 0) {
+    printf("init: 3rd fork failed\n");
+    exit();
+  }
+  if (pid3 == 0) {
+    // child
+    char *argv[] = {"fstest", NULL};
+    exec(argv[0], argv);
+    printf("init: failed to exec fstest\n");
+    exit();
+  }
+  wait();
+  printf("fstest finished\n");
 
   for (;;) {
   }

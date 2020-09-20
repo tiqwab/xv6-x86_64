@@ -11,5 +11,6 @@
 
 #define SYS_hello 32
 #define SYS_putc 34
+#define SYS_fstest 35
 
 #endif /* ifndef XV6_X86_64_SYSCALL_H */

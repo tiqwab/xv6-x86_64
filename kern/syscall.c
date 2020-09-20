@@ -1,4 +1,5 @@
 #include "syscall.h"
+#include "buf.h"
 #include "defs.h"
 #include "proc.h"
 #include "types.h"
@@ -80,11 +81,13 @@ int argstr(int n, char **pp) {
   return fetchstr(addr, pp);
 }
 
+// TODO: remove later
 int64_t sys_hello(void) {
   cprintf("hello from syscall\n");
   return 0;
 }
 
+// TODO: remove later
 int64_t sys_putc(void) {
   uint64_t c;
   if (arg(0, &c) < 0) {
@@ -95,16 +98,31 @@ int64_t sys_putc(void) {
   return 0;
 }
 
+// TODO: remove after fs
+int64_t sys_fstest(void) {
+  struct buf *b1 = bread(1, 0);
+  struct buf *b2 = bread(1, 60);
+  for (int i = 0; i < BSIZE; i++) {
+    b1->data[i] = b2->data[i];
+  }
+  bwrite(b1);
+  brelse(b2);
+  brelse(b1);
+  return 0;
+}
+
 extern int64_t sys_fork(void);
 extern int64_t sys_exit(void);
 extern int64_t sys_wait(void);
 extern int64_t sys_exec(void);
 extern int64_t sys_getpid(void);
 
+extern int64_t sys_fstest(void);
+
 static int64_t (*syscalls[])(void) = {
     [SYS_fork] = sys_fork, [SYS_exit] = sys_exit,     [SYS_wait] = sys_wait,
     [SYS_exec] = sys_exec, [SYS_getpid] = sys_getpid, [SYS_hello] = sys_hello,
-    [SYS_putc] = sys_putc,
+    [SYS_putc] = sys_putc, [SYS_fstest] = sys_fstest,
 };
 
 // FIXME: Accept up to 5 arguments for now.

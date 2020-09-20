@@ -7,6 +7,7 @@
 
 #define SYS_hello 32
 #define SYS_putc 34
+#define SYS_fstest 35
 
 #define T_SYSCALL 0x30
 
@@ -22,5 +23,7 @@ SYSCALL(exit)
 SYSCALL(wait)
 SYSCALL(exec)
 SYSCALL(getpid)
+
 SYSCALL(hello)
 SYSCALL(putc)
+SYSCALL(fstest)

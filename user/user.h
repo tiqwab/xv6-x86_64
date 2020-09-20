@@ -34,6 +34,7 @@ int hello(void);
 #pragma GCC diagnostic ignored "-Wbuiltin-declaration-mismatch"
 int putc(char c);
 #pragma GCC diagnostic pop
+int fstest(void);
 
 // library
 int printf(const char *fmt, ...);
