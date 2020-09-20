@@ -24,6 +24,9 @@ KERN_OBJS := \
 	$(OBJDIR)/$(KERN_DIR)/args.o \
 	$(OBJDIR)/$(KERN_DIR)/exec.o \
 	$(OBJDIR)/$(KERN_DIR)/sysfile.o \
+	$(OBJDIR)/$(KERN_DIR)/bio.o \
+	$(OBJDIR)/$(KERN_DIR)/sleeplock.o \
+	$(OBJDIR)/$(KERN_DIR)/ide.o \
 
 KERN_BINARY_OBJS := \
 	$(OBJDIR)/$(KERN_DIR)/initcode \

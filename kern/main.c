@@ -25,9 +25,9 @@ int main(void) {
   uartinit();    // serial port
   // pinit();         // process table
   tvinit(); // trap vectors
-  // binit();         // buffer cache
+  binit();  // buffer cache
   // fileinit();      // file table
-  // ideinit();       // disk
+  ideinit(); // disk
   // startothers();   // start other processors
   kinit2();   // must come after startothers()
   userinit(); // first user process

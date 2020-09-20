@@ -48,14 +48,13 @@ void trap(struct trapframe *tf) {
     lapiceoi();
     break;
 
-    // TODO for ide
-    // case T_IRQ0 + IRQ_IDE:
-    //   ideintr();
-    //   lapiceoi();
-    //   break;
-    // case T_IRQ0 + IRQ_IDE+1:
-    //   // Bochs generates spurious IDE1 interrupts.
-    //   break;
+  case T_IRQ0 + IRQ_IDE:
+    ideintr();
+    lapiceoi();
+    break;
+  case T_IRQ0 + IRQ_IDE + 1:
+    // Bochs generates spurious IDE1 interrupts.
+    break;
 
   case T_IRQ0 + IRQ_KBD:
     kbdintr();

@@ -3,14 +3,19 @@
 
 #include "types.h"
 
+struct buf;
 struct context;
 struct cpu;
 struct ioapic;
 struct proc;
+struct sleeplock;
 struct spinlock;
 
 // args.c
 void prepare_args(void *args[]);
+
+// bio.c
+void binit(void);
 
 // console.c
 void consoleinit(void);
@@ -20,6 +25,11 @@ void panic(char *) __attribute__((noreturn));
 
 // exec.c
 int exec(char *, char **);
+
+// ide.c
+void ideinit(void);
+void ideintr(void);
+void iderw(struct buf *b);
 
 // ioapic.c
 extern volatile struct ioapic *ioapic;
@@ -66,6 +76,12 @@ void userinit(void);
 pid_t wait(void);
 void wakeup(void *chan);
 void yield(void);
+
+// sleeplock.c
+void acquiresleep(struct sleeplock *);
+void releasesleep(struct sleeplock *);
+int holdingsleep(struct sleeplock *);
+void initsleeplock(struct sleeplock *, char *);
 
 // swtch.S
 void swtch(struct context **, struct context *);
