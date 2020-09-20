@@ -373,7 +373,7 @@ void forkret(void) {
     first = 0;
     // TODO for fs
     // iinit(ROOTDEV);
-    // initlog(ROOTDEV);
+    initlog(ROOTDEV);
   }
 
   // Return to "caller", actually trapret (see allocproc).

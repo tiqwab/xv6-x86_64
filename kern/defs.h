@@ -10,6 +10,7 @@ struct ioapic;
 struct proc;
 struct sleeplock;
 struct spinlock;
+struct superblock;
 
 // args.c
 void prepare_args(void *args[]);
@@ -28,6 +29,9 @@ void panic(char *) __attribute__((noreturn));
 
 // exec.c
 int exec(char *, char **);
+
+// fs.c
+void readsb(int dev, struct superblock *sb);
 
 // ide.c
 void ideinit(void);
@@ -49,6 +53,12 @@ void lapiceoi(void);
 int lapicid(void);
 void lapicinit(void);
 void microdelay(int us);
+
+// log.c
+void initlog(int dev);
+void log_write(struct buf *);
+void begin_op();
+void end_op();
 
 // kalloc.c
 char *kalloc(void);
