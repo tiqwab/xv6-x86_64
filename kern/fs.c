@@ -3,6 +3,9 @@
 #include "defs.h"
 #include "file.h"
 #include "param.h"
+#include "stat.h"
+
+#define min(a, b) ((a) < (b) ? (a) : (b))
 
 static void itrunc(struct inode *);
 
@@ -389,4 +392,78 @@ static uint bmap(struct inode *ip, uint bn) {
   }
 
   panic("bmap: out of range");
+}
+
+// Copy stat information from inode.
+// Caller must hold ip->lock.
+void stati(struct inode *ip, struct stat *st) {
+  st->dev = ip->dev;
+  st->ino = ip->inum;
+  st->type = ip->type;
+  st->nlink = ip->nlink;
+  st->size = ip->size;
+}
+
+// Read data from inode.
+// Caller must hold ip->lock.
+int readi(struct inode *ip, char *dst, uint off, uint n) {
+  uint tot, m;
+  struct buf *bp;
+
+  if (ip->type == T_DEV) {
+    if (ip->major < 0 || ip->major >= NDEV || !devsw[ip->major].read) {
+      return -1;
+    }
+    return devsw[ip->major].read(ip, dst, n);
+  }
+
+  if (off > ip->size || off + n < off) {
+    return -1;
+  }
+  if (off + n > ip->size) {
+    n = ip->size - off;
+  }
+
+  for (tot = 0; tot < n; tot += m, off += m, dst += m) {
+    bp = bread(ip->dev, bmap(ip, off / BSIZE));
+    m = min(n - tot, BSIZE - off % BSIZE);
+    memmove(dst, bp->data + off % BSIZE, m);
+    brelse(bp);
+  }
+  return n;
+}
+
+// Write data to inode.
+// Caller must hold ip->lock.
+int writei(struct inode *ip, char *src, uint off, uint n) {
+  uint tot, m;
+  struct buf *bp;
+
+  if (ip->type == T_DEV) {
+    if (ip->major < 0 || ip->major >= NDEV || !devsw[ip->major].write) {
+      return -1;
+    }
+    return devsw[ip->major].write(ip, src, n);
+  }
+
+  if (off > ip->size || off + n < off) {
+    return -1;
+  }
+  if (off + n > MAXFILE * BSIZE) {
+    return -1;
+  }
+
+  for (tot = 0; tot < n; tot += m, off += m, src += m) {
+    bp = bread(ip->dev, bmap(ip, off / BSIZE));
+    m = min(n - tot, BSIZE - off % BSIZE);
+    memmove(bp->data + off % BSIZE, src, m);
+    log_write(bp);
+    brelse(bp);
+  }
+
+  if (n > 0 && off > ip->size) {
+    ip->size = off;
+    iupdate(ip);
+  }
+  return n;
 }

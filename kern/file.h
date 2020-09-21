@@ -21,4 +21,15 @@ struct inode {
   uint addrs[NDIRECT + 1];
 };
 
+// table mapping major device number to
+// device functions
+struct devsw {
+  int (*read)(struct inode *, char *, int);
+  int (*write)(struct inode *, char *, int);
+};
+
+extern struct devsw devsw[];
+
+#define CONSOLE 1
+
 #endif /* ifndef XV6_X86_64_FILE_H */
