@@ -122,8 +122,7 @@ void userinit(void) {
   p->tf->rip = 0; // beginning of initcode.S
 
   safestrcpy(p->name, "initcode", sizeof(p->name));
-  // TODO for fs
-  // p->cwd = namei("/");
+  p->cwd = namei("/");
 
   // this assignment to p->state lets other cores
   // run this process. the acquire forces the above
@@ -167,7 +166,7 @@ pid_t fork(void) {
   // for(i = 0; i < NOFILE; i++)
   //   if(curproc->ofile[i])
   //     np->ofile[i] = filedup(curproc->ofile[i]);
-  // np->cwd = idup(curproc->cwd);
+  np->cwd = idup(curproc->cwd);
 
   safestrcpy(np->name, curproc->name, sizeof(curproc->name));
 
@@ -205,11 +204,10 @@ void exit(void) {
   //   }
   // }
 
-  // TODO for fs
-  // begin_op();
-  // iput(curproc->cwd);
-  // end_op();
-  // curproc->cwd = 0;
+  begin_op();
+  iput(curproc->cwd);
+  end_op();
+  curproc->cwd = 0;
 
   acquire(&ptable.lock);
 

@@ -6,10 +6,12 @@
 struct buf;
 struct context;
 struct cpu;
+struct inode;
 struct ioapic;
 struct proc;
 struct sleeplock;
 struct spinlock;
+struct stat;
 struct superblock;
 
 // args.c
@@ -31,8 +33,23 @@ void panic(char *) __attribute__((noreturn));
 int exec(char *, char **);
 
 // fs.c
-void iinit(int dev);
 void readsb(int dev, struct superblock *sb);
+int dirlink(struct inode *, char *, uint);
+struct inode *dirlookup(struct inode *, char *, uint *);
+struct inode *ialloc(uint, short);
+struct inode *idup(struct inode *);
+void iinit(int dev);
+void ilock(struct inode *);
+void iput(struct inode *);
+void iunlock(struct inode *);
+void iunlockput(struct inode *);
+void iupdate(struct inode *);
+int namecmp(const char *, const char *);
+struct inode *namei(char *);
+struct inode *nameiparent(char *, char *);
+int readi(struct inode *, char *, uint, uint);
+void stati(struct inode *, struct stat *);
+int writei(struct inode *, char *, uint, uint);
 
 // ide.c
 void ideinit(void);
