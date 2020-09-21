@@ -52,6 +52,19 @@ int strncmp(const char *p, const char *q, size_t n) {
   return (uchar)*p - (uchar)*q;
 }
 
+char *strncpy(char *s, const char *t, size_t n) {
+  char *os;
+
+  os = s;
+  while (n-- > 0 && (*s++ = *t++) != 0) {
+    ;
+  }
+  while (n-- > 0) {
+    *s++ = 0;
+  }
+  return os;
+}
+
 // Like strncpy but guaranteed to NUL-terminate.
 char *safestrcpy(char *s, const char *t, int n) {
   char *os;
