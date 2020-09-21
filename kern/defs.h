@@ -31,6 +31,7 @@ void panic(char *) __attribute__((noreturn));
 int exec(char *, char **);
 
 // fs.c
+void iinit(int dev);
 void readsb(int dev, struct superblock *sb);
 
 // ide.c
