@@ -67,7 +67,16 @@ int arg(int n, uint64_t *ip) {
 
   *ip = v;
   return 0;
-  // return fetchint((myproc()->tf->rsp) + 8 + 8 * n, ip);
+}
+
+// Fetch the nth 32-bit system call argument.
+int argint(int n, int *ip) {
+  uint64_t v;
+  if (arg(n, &v) < 0) {
+    return -1;
+  }
+  *ip = (int64_t)v;
+  return 0;
 }
 
 // Fetch the nth word-sized system call argument as a string pointer.
@@ -116,13 +125,16 @@ extern int64_t sys_exit(void);
 extern int64_t sys_wait(void);
 extern int64_t sys_exec(void);
 extern int64_t sys_getpid(void);
+extern int64_t sys_open(void);
+extern int64_t sys_close(void);
 
 extern int64_t sys_fstest(void);
 
 static int64_t (*syscalls[])(void) = {
-    [SYS_fork] = sys_fork, [SYS_exit] = sys_exit,     [SYS_wait] = sys_wait,
-    [SYS_exec] = sys_exec, [SYS_getpid] = sys_getpid, [SYS_hello] = sys_hello,
-    [SYS_putc] = sys_putc, [SYS_fstest] = sys_fstest,
+    [SYS_fork] = sys_fork,   [SYS_exit] = sys_exit,     [SYS_wait] = sys_wait,
+    [SYS_exec] = sys_exec,   [SYS_getpid] = sys_getpid, [SYS_hello] = sys_hello,
+    [SYS_putc] = sys_putc,   [SYS_fstest] = sys_fstest, [SYS_open] = sys_open,
+    [SYS_close] = sys_close,
 };
 
 // FIXME: Accept up to 5 arguments for now.

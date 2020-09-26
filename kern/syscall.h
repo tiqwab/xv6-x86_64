@@ -8,6 +8,8 @@
 #define SYS_wait 3
 #define SYS_exec 7
 #define SYS_getpid 11
+#define SYS_open 15
+#define SYS_close 21
 
 #define SYS_hello 32
 #define SYS_putc 34

@@ -28,6 +28,8 @@ int wait(void);
 // the last entry of argv should be NULL
 int exec(char *path, char **argv);
 int getpid(void);
+int open(const char *pathname, int flags);
+int close(int fd);
 
 int hello(void);
 #pragma GCC diagnostic push
@@ -35,6 +37,12 @@ int hello(void);
 int putc(char c);
 #pragma GCC diagnostic pop
 int fstest(void);
+
+// TODO: duplicated with kern/fcntl.h
+#define O_RDONLY 0x000
+#define O_WRONLY 0x001
+#define O_RDWR 0x002
+#define O_CREATE 0x200
 
 // library
 int printf(const char *fmt, ...);

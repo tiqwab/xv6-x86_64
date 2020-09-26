@@ -33,7 +33,13 @@ void panic(char *) __attribute__((noreturn));
 int exec(char *, char **);
 
 // file.c
+struct file *filealloc(void);
+void fileclose(struct file *);
+struct file *filedup(struct file *);
 void fileinit(void);
+int fileread(struct file *, char *, int n);
+int filestat(struct file *, struct stat *);
+int filewrite(struct file *, char *, int n);
 
 // fs.c
 void readsb(int dev, struct superblock *sb);
@@ -140,6 +146,7 @@ int strncmp(const char *p, const char *q, size_t n);
 
 // syscall.c
 int arg(int n, uint64_t *ip);
+int argint(int n, int *ip);
 int argstr(int n, char **pp);
 int fetchint(uintptr_t addr, uint64_t *ip);
 int fetchstr(uintptr_t addr, char **pp);
