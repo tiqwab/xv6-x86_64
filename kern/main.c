@@ -24,10 +24,10 @@ int main(void) {
   consoleinit(); // console hardware
   uartinit();    // serial port
   // pinit();         // process table
-  tvinit(); // trap vectors
-  binit();  // buffer cache
-  // fileinit();      // file table
-  ideinit(); // disk
+  tvinit();   // trap vectors
+  binit();    // buffer cache
+  fileinit(); // file table
+  ideinit();  // disk
   // startothers();   // start other processors
   kinit2();   // must come after startothers()
   userinit(); // first user process

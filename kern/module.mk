@@ -30,6 +30,7 @@ KERN_OBJS := \
 	$(OBJDIR)/$(KERN_DIR)/fs.o \
 	$(OBJDIR)/$(KERN_DIR)/log.o \
 	$(OBJDIR)/$(KERN_DIR)/file.o \
+	$(OBJDIR)/$(KERN_DIR)/pipe.o \
 
 KERN_BINARY_OBJS := \
 	$(OBJDIR)/$(KERN_DIR)/initcode \

@@ -5,6 +5,16 @@
 #include "sleeplock.h"
 #include "types.h"
 
+struct file {
+  enum { FD_NONE, FD_PIPE, FD_INODE } type;
+  int ref; // reference count
+  char readable;
+  char writable;
+  struct pipe *pipe;
+  struct inode *ip;
+  uint off;
+};
+
 // in-memory copy of an inode
 struct inode {
   uint dev;              // Device number

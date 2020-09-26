@@ -32,6 +32,9 @@ void panic(char *) __attribute__((noreturn));
 // exec.c
 int exec(char *, char **);
 
+// file.c
+void fileinit(void);
+
 // fs.c
 void readsb(int dev, struct superblock *sb);
 int dirlink(struct inode *, char *, uint);
