@@ -147,6 +147,7 @@ int strncmp(const char *p, const char *q, size_t n);
 // syscall.c
 int arg(int n, uint64_t *ip);
 int argint(int n, int *ip);
+int argptr(int n, char **pp, int size);
 int argstr(int n, char **pp);
 int fetchint(uintptr_t addr, uint64_t *ip);
 int fetchstr(uintptr_t addr, char **pp);

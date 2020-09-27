@@ -10,6 +10,7 @@ ULIBS := \
 	$(OBJDIR)/$(USER_DIR)/usys.o \
 	$(OBJDIR)/$(USER_DIR)/entry.o \
 	$(OBJDIR)/$(USER_DIR)/printf.o \
+	$(OBJDIR)/$(USER_DIR)/strlen.o \
 
 USER_LINKER_SCRIPT := $(USER_DIR)/user.ld
 

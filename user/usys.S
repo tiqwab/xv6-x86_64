@@ -2,9 +2,11 @@
 #define SYS_fork 1
 #define SYS_exit    2
 #define SYS_wait    3
+#define SYS_read 5
 #define SYS_exec 7
 #define SYS_getpid 11
 #define SYS_open 15
+#define SYS_write 16
 #define SYS_close 21
 
 #define SYS_hello 32
@@ -23,9 +25,11 @@
 SYSCALL(fork)
 SYSCALL(exit)
 SYSCALL(wait)
+SYSCALL(read)
 SYSCALL(exec)
 SYSCALL(getpid)
 SYSCALL(open)
+SYSCALL(write)
 SYSCALL(close)
 
 SYSCALL(hello)

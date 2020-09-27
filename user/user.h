@@ -10,6 +10,7 @@ typedef unsigned int uint32_t;
 typedef unsigned long long uint64_t;
 typedef unsigned long long uintptr_t;
 typedef unsigned long size_t;
+typedef long ssize_t;
 
 typedef char int8_t;
 typedef short int16_t;
@@ -25,10 +26,12 @@ int fork(void);
 void exit(void);
 #pragma GCC diagnostic pop
 int wait(void);
+ssize_t read(int fd, void *buf, size_t count);
 // the last entry of argv should be NULL
 int exec(char *path, char **argv);
 int getpid(void);
 int open(const char *pathname, int flags);
+ssize_t write(int fd, const void *buf, size_t count);
 int close(int fd);
 
 int hello(void);
@@ -46,5 +49,6 @@ int fstest(void);
 
 // library
 int printf(const char *fmt, ...);
+size_t strlen(const char *s);
 
 #endif /* ifndef XV6_x86_64_USER_H */

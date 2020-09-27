@@ -79,6 +79,23 @@ int argint(int n, int *ip) {
   return 0;
 }
 
+// Fetch the nth word-sized system call argument as a pointer
+// to a block of memory of size bytes.  Check that the pointer
+// lies within the process address space.
+int argptr(int n, char **pp, int size) {
+  uintptr_t i;
+  struct proc *curproc = myproc();
+
+  if (arg(n, &i) < 0) {
+    return -1;
+  }
+  if (size < 0 || i >= curproc->sz || i + size > curproc->sz) {
+    return -1;
+  }
+  *pp = (char *)i;
+  return 0;
+}
+
 // Fetch the nth word-sized system call argument as a string pointer.
 // Check that the pointer is valid and the string is nul-terminated.
 // (There is no shared writable memory, so the string can't change
@@ -123,18 +140,20 @@ int64_t sys_fstest(void) {
 extern int64_t sys_fork(void);
 extern int64_t sys_exit(void);
 extern int64_t sys_wait(void);
+extern int64_t sys_read(void);
 extern int64_t sys_exec(void);
 extern int64_t sys_getpid(void);
 extern int64_t sys_open(void);
+extern int64_t sys_write(void);
 extern int64_t sys_close(void);
 
 extern int64_t sys_fstest(void);
 
 static int64_t (*syscalls[])(void) = {
-    [SYS_fork] = sys_fork,   [SYS_exit] = sys_exit,     [SYS_wait] = sys_wait,
-    [SYS_exec] = sys_exec,   [SYS_getpid] = sys_getpid, [SYS_hello] = sys_hello,
-    [SYS_putc] = sys_putc,   [SYS_fstest] = sys_fstest, [SYS_open] = sys_open,
-    [SYS_close] = sys_close,
+    [SYS_fork] = sys_fork,   [SYS_exit] = sys_exit,   [SYS_wait] = sys_wait,
+    [SYS_read] = sys_read,   [SYS_exec] = sys_exec,   [SYS_getpid] = sys_getpid,
+    [SYS_hello] = sys_hello, [SYS_putc] = sys_putc,   [SYS_fstest] = sys_fstest,
+    [SYS_open] = sys_open,   [SYS_write] = sys_write, [SYS_close] = sys_close,
 };
 
 // FIXME: Accept up to 5 arguments for now.

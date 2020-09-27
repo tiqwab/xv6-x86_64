@@ -42,6 +42,26 @@ static int fdalloc(struct file *f) {
   return -1;
 }
 
+int sys_read(void) {
+  struct file *f;
+  int n;
+  char *p;
+
+  if (argfd(0, 0, &f) < 0 || argint(2, &n) < 0 || argptr(1, &p, n) < 0)
+    return -1;
+  return fileread(f, p, n);
+}
+
+int sys_write(void) {
+  struct file *f;
+  int n;
+  char *p;
+
+  if (argfd(0, 0, &f) < 0 || argint(2, &n) < 0 || argptr(1, &p, n) < 0)
+    return -1;
+  return filewrite(f, p, n);
+}
+
 int64_t sys_close(void) {
   int fd;
   struct file *f;
