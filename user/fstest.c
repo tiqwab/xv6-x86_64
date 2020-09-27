@@ -5,12 +5,18 @@ int main(int argc, char *argv[]) {
 
   int fd;
   ssize_t n;
-  char *file_name = "/foo";
+  char *dir_name = "foo";
+  char *file_name = "bar.txt";
   char *message = "hello from write";
   char buf[128];
 
-  if ((fd = open("/foo", O_CREATE | O_RDWR)) < 0) {
-    printf("failed to open %s\n", file_name);
+  if (mkdir(dir_name) < 0) {
+    printf("failed to mkdir %s\n", dir_name);
+    return 1;
+  }
+
+  if ((fd = open("/foo/bar.txt", O_CREATE | O_RDWR)) < 0) {
+    printf("failed to open %s\n", "/foo/bar.txt");
     return 1;
   }
 

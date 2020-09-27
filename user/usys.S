@@ -7,6 +7,7 @@
 #define SYS_getpid 11
 #define SYS_open 15
 #define SYS_write 16
+#define SYS_mkdir 20
 #define SYS_close 21
 
 #define SYS_hello 32
@@ -30,6 +31,7 @@ SYSCALL(exec)
 SYSCALL(getpid)
 SYSCALL(open)
 SYSCALL(write)
+SYSCALL(mkdir)
 SYSCALL(close)
 
 SYSCALL(hello)

@@ -32,6 +32,10 @@ int exec(char *path, char **argv);
 int getpid(void);
 int open(const char *pathname, int flags);
 ssize_t write(int fd, const void *buf, size_t count);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wbuiltin-declaration-mismatch"
+int mkdir(const char *pathname);
+#pragma GCC diagnostic pop
 int close(int fd);
 
 int hello(void);
