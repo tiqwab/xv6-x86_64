@@ -42,6 +42,18 @@ static int fdalloc(struct file *f) {
   return -1;
 }
 
+int sys_dup(void) {
+  struct file *f;
+  int fd;
+
+  if (argfd(0, 0, &f) < 0)
+    return -1;
+  if ((fd = fdalloc(f)) < 0)
+    return -1;
+  filedup(f);
+  return fd;
+}
+
 int sys_read(void) {
   struct file *f;
   int n;

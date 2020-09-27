@@ -33,6 +33,7 @@ ssize_t read(int fd, void *buf, size_t count);
 // the last entry of argv should be NULL
 int exec(char *path, char **argv);
 int chdir(const char *path);
+int dup(int oldfd);
 int getpid(void);
 int open(const char *pathname, int flags);
 ssize_t write(int fd, const void *buf, size_t count);

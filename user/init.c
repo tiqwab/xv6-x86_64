@@ -7,9 +7,8 @@ int main(void) {
     mknod("console", 1, 1);
     open("console", O_RDWR);
   }
-  // TODO for fs
-  // dup(0);  // stdout
-  // dup(0);  // stderr
+  dup(0); // stdout
+  dup(0); // stderr
 
   pid1 = fork();
   if (pid1 < 0) {
