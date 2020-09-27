@@ -8,6 +8,7 @@
 #define SYS_getpid 11
 #define SYS_open 15
 #define SYS_write 16
+#define SYS_mknod 17
 #define SYS_unlink 18
 #define SYS_link 19
 #define SYS_mkdir 20
@@ -35,6 +36,7 @@ SYSCALL(chdir)
 SYSCALL(getpid)
 SYSCALL(open)
 SYSCALL(write)
+SYSCALL(mknod)
 SYSCALL(unlink)
 SYSCALL(link)
 SYSCALL(mkdir)

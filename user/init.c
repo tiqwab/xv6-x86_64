@@ -3,6 +3,14 @@
 int main(void) {
   pid_t pid1, pid2, pid3;
 
+  if (open("console", O_RDWR) < 0) {
+    mknod("console", 1, 1);
+    open("console", O_RDWR);
+  }
+  // TODO for fs
+  // dup(0);  // stdout
+  // dup(0);  // stderr
+
   pid1 = fork();
   if (pid1 < 0) {
     printf("init: 1st fork failed\n");

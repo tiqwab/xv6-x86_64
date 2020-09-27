@@ -146,6 +146,7 @@ extern int64_t sys_chdir(void);
 extern int64_t sys_getpid(void);
 extern int64_t sys_open(void);
 extern int64_t sys_write(void);
+extern int64_t sys_mknod(void);
 extern int64_t sys_unlink(void);
 extern int64_t sys_link(void);
 extern int64_t sys_mkdir(void);
@@ -154,11 +155,14 @@ extern int64_t sys_close(void);
 extern int64_t sys_fstest(void);
 
 static int64_t (*syscalls[])(void) = {
-    [SYS_fork] = sys_fork,     [SYS_exit] = sys_exit,   [SYS_wait] = sys_wait,
-    [SYS_read] = sys_read,     [SYS_exec] = sys_exec,   [SYS_chdir] = sys_chdir,
-    [SYS_getpid] = sys_getpid, [SYS_hello] = sys_hello, [SYS_putc] = sys_putc,
-    [SYS_fstest] = sys_fstest, [SYS_open] = sys_open,   [SYS_write] = sys_write,
-    [SYS_unlink] = sys_unlink, [SYS_link] = sys_link,   [SYS_mkdir] = sys_mkdir,
+    [SYS_fork] = sys_fork,     [SYS_exit] = sys_exit,
+    [SYS_wait] = sys_wait,     [SYS_read] = sys_read,
+    [SYS_exec] = sys_exec,     [SYS_chdir] = sys_chdir,
+    [SYS_getpid] = sys_getpid, [SYS_hello] = sys_hello,
+    [SYS_putc] = sys_putc,     [SYS_fstest] = sys_fstest,
+    [SYS_open] = sys_open,     [SYS_write] = sys_write,
+    [SYS_mknod] = sys_mknod,   [SYS_unlink] = sys_unlink,
+    [SYS_link] = sys_link,     [SYS_mkdir] = sys_mkdir,
     [SYS_close] = sys_close,
 };
 

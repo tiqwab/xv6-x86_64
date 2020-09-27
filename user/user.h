@@ -19,12 +19,15 @@ typedef long long int64_t;
 
 typedef int32_t pid_t;
 
+// wrap functions which exist in stds, but have different signatures.
+#define STD_WRAP(f)                                                            \
+  _Pragma("GCC diagnostic push")                                               \
+      _Pragma("GCC diagnostic ignored \"-Wbuiltin-declaration-mismatch\"") f;  \
+  _Pragma("GCC diagnostic pop")
+
 // system calls
 int fork(void);
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wbuiltin-declaration-mismatch"
-void exit(void);
-#pragma GCC diagnostic pop
+STD_WRAP(void exit(void))
 int wait(void);
 ssize_t read(int fd, void *buf, size_t count);
 // the last entry of argv should be NULL
@@ -33,19 +36,14 @@ int chdir(const char *path);
 int getpid(void);
 int open(const char *pathname, int flags);
 ssize_t write(int fd, const void *buf, size_t count);
+STD_WRAP(int mknod(const char *pathname, int major, int minor))
 int unlink(const char *pathname);
 int link(const char *oldpath, const char *newpath);
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wbuiltin-declaration-mismatch"
-int mkdir(const char *pathname);
-#pragma GCC diagnostic pop
+STD_WRAP(int mkdir(const char *pathname))
 int close(int fd);
 
 int hello(void);
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wbuiltin-declaration-mismatch"
-int putc(char c);
-#pragma GCC diagnostic pop
+STD_WRAP(int putc(char c))
 int fstest(void);
 
 // TODO: duplicated with kern/fcntl.h
