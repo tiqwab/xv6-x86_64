@@ -32,7 +32,12 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
-  if ((fd2 = open("/foo/baz.txt", O_RDONLY)) < 0) {
+  if (chdir("foo") < 0) {
+    printf("failed to chdir to %s\n", "foo");
+    return 1;
+  }
+
+  if ((fd2 = open("baz.txt", O_RDONLY)) < 0) {
     printf("failed to open %s\n", "/foo/baz.txt");
     return 1;
   }

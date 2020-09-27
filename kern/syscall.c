@@ -142,6 +142,7 @@ extern int64_t sys_exit(void);
 extern int64_t sys_wait(void);
 extern int64_t sys_read(void);
 extern int64_t sys_exec(void);
+extern int64_t sys_chdir(void);
 extern int64_t sys_getpid(void);
 extern int64_t sys_open(void);
 extern int64_t sys_write(void);
@@ -153,11 +154,12 @@ extern int64_t sys_close(void);
 extern int64_t sys_fstest(void);
 
 static int64_t (*syscalls[])(void) = {
-    [SYS_fork] = sys_fork,   [SYS_exit] = sys_exit,   [SYS_wait] = sys_wait,
-    [SYS_read] = sys_read,   [SYS_exec] = sys_exec,   [SYS_getpid] = sys_getpid,
-    [SYS_hello] = sys_hello, [SYS_putc] = sys_putc,   [SYS_fstest] = sys_fstest,
-    [SYS_open] = sys_open,   [SYS_write] = sys_write, [SYS_unlink] = sys_unlink,
-    [SYS_link] = sys_link,   [SYS_mkdir] = sys_mkdir, [SYS_close] = sys_close,
+    [SYS_fork] = sys_fork,     [SYS_exit] = sys_exit,   [SYS_wait] = sys_wait,
+    [SYS_read] = sys_read,     [SYS_exec] = sys_exec,   [SYS_chdir] = sys_chdir,
+    [SYS_getpid] = sys_getpid, [SYS_hello] = sys_hello, [SYS_putc] = sys_putc,
+    [SYS_fstest] = sys_fstest, [SYS_open] = sys_open,   [SYS_write] = sys_write,
+    [SYS_unlink] = sys_unlink, [SYS_link] = sys_link,   [SYS_mkdir] = sys_mkdir,
+    [SYS_close] = sys_close,
 };
 
 // FIXME: Accept up to 5 arguments for now.
