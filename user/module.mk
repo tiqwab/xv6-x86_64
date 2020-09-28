@@ -11,6 +11,7 @@ ULIBS := \
 	$(OBJDIR)/$(USER_DIR)/entry.o \
 	$(OBJDIR)/$(USER_DIR)/printf.o \
 	$(OBJDIR)/$(USER_DIR)/strlen.o \
+	$(OBJDIR)/$(USER_DIR)/memset.o \
 
 USER_LINKER_SCRIPT := $(USER_DIR)/user.ld
 

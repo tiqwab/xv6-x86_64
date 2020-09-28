@@ -1,5 +1,7 @@
 #include "defs.h"
+#include "file.h"
 #include "memlayout.h"
+#include "proc.h"
 #include "spinlock.h"
 #include "trap.h"
 #include "types.h"
@@ -119,8 +121,7 @@ void panic(char *s) {
   cli();
   cons.locking = 0;
   // use lapiccpunum so that we can call panic from mycpu()
-  // cprintf("lapicid %d: panic: ", lapicid());
-  cprintf("kernel panic! lapicid %d: panic: %s\n", -1, s);
+  cprintf("kernel panic! lapicid %d: panic: %s\n", lapicid(), s);
   // getcallerpcs(&s, pcs);
   // for(i=0; i<10; i++)
   //   cprintf(" %p", pcs[i]);
@@ -241,12 +242,60 @@ void consoleintr(int (*getc)(void)) {
   }
 }
 
+int consoleread(struct inode *ip, char *dst, int n) {
+  int target;
+  int c;
+
+  iunlock(ip);
+  target = n;
+  acquire(&cons.lock);
+  while (n > 0) {
+    while (input.r == input.w) {
+      if (myproc()->killed) {
+        release(&cons.lock);
+        ilock(ip);
+        return -1;
+      }
+      sleep(&input.r, &cons.lock);
+    }
+    c = input.buf[input.r++ % INPUT_BUF];
+    if (c == C('D')) { // EOF
+      if (n < target) {
+        // Save ^D for next time, to make sure
+        // caller gets a 0-byte result.
+        input.r--;
+      }
+      break;
+    }
+    *dst++ = c;
+    --n;
+    if (c == '\n')
+      break;
+  }
+  release(&cons.lock);
+  ilock(ip);
+
+  return target - n;
+}
+
+int consolewrite(struct inode *ip, char *buf, int n) {
+  int i;
+
+  iunlock(ip);
+  acquire(&cons.lock);
+  for (i = 0; i < n; i++)
+    consputc(buf[i] & 0xff);
+  release(&cons.lock);
+  ilock(ip);
+
+  return n;
+}
+
 void consoleinit(void) {
   initlock(&cons.lock, "console");
 
-  // TODO for fs
-  // devsw[CONSOLE].write = consolewrite;
-  // devsw[CONSOLE].read = consoleread;
+  devsw[CONSOLE].write = consolewrite;
+  devsw[CONSOLE].read = consoleread;
   cons.locking = 1;
 
   ioapicenable(IRQ_KBD, 0);

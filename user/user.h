@@ -56,5 +56,6 @@ int fstest(void);
 // library
 int printf(const char *fmt, ...);
 size_t strlen(const char *s);
+void *memset(void *s, int c, size_t n);
 
 #endif /* ifndef XV6_x86_64_USER_H */

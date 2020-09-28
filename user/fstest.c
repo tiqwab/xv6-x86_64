@@ -51,5 +51,20 @@ int main(int argc, char *argv[]) {
   close(fd2);
   close(fd1);
 
+  // check stdin, stdout, and stderr
+  memset(buf, 0, sizeof(buf));
+  if ((n = read(0, buf, 128)) < 0) {
+    printf("failed to read from stdin\n");
+    return 1;
+  }
+  if (write(1, buf, n) < 0) {
+    printf("failed to write to stdout\n");
+    return 1;
+  }
+  if (write(2, buf, n) < 0) {
+    printf("failed to write to stderr\n");
+    return 1;
+  }
+
   return 0;
 }
