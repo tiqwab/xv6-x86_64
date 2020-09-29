@@ -8,6 +8,7 @@ struct context;
 struct cpu;
 struct inode;
 struct ioapic;
+struct pipe;
 struct proc;
 struct sleeplock;
 struct spinlock;
@@ -99,8 +100,13 @@ void mpinit(void);
 // picirq.c
 void picinit(void);
 
-// proc.c
+// pipe.c
+int pipealloc(struct file **, struct file **);
+void pipeclose(struct pipe *, int);
+int piperead(struct pipe *, char *, int);
+int pipewrite(struct pipe *, char *, int);
 
+// proc.c
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wbuiltin-declaration-mismatch"
 void exit(void);

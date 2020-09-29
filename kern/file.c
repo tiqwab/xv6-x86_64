@@ -56,9 +56,7 @@ void fileclose(struct file *f) {
   release(&ftable.lock);
 
   if (ff.type == FD_PIPE) {
-    // TODO for pipe
-    // pipeclose(ff.pipe, ff.writable);
-    panic("should implement pipeclose");
+    pipeclose(ff.pipe, ff.writable);
   } else if (ff.type == FD_INODE) {
     begin_op();
     iput(ff.ip);
@@ -85,9 +83,7 @@ int fileread(struct file *f, char *addr, int n) {
     return -1;
   }
   if (f->type == FD_PIPE) {
-    // TODO for pipe
-    // return piperead(f->pipe, addr, n);
-    panic("should implement piperead");
+    return piperead(f->pipe, addr, n);
   }
   if (f->type == FD_INODE) {
     ilock(f->ip);
@@ -108,9 +104,7 @@ int filewrite(struct file *f, char *addr, int n) {
     return -1;
   }
   if (f->type == FD_PIPE) {
-    // TODO for pipe
-    // return pipewrite(f->pipe, addr, n);
-    panic("should implement pipewrite");
+    return pipewrite(f->pipe, addr, n);
   }
   if (f->type == FD_INODE) {
     // write a few blocks at a time to avoid exceeding

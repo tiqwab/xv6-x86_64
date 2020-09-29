@@ -66,5 +66,34 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
+  // check pipe
+  pid_t pid1;
+  int pipefd[2];
+
+  if (pipe(pipefd) < 0) {
+    printf("failed to pipe\n");
+    return 1;
+  }
+
+  if ((pid1 = fork()) < 0) {
+    printf("failed to fork\n");
+    return 1;
+  } else if (pid1 > 0) {
+    // parent: write to pipe
+    close(pipefd[0]);
+    write(pipefd[1], "pipe test", 10);
+    close(pipefd[1]);
+    wait();
+  } else {
+    // child: reads from pipe
+    close(pipefd[1]);
+    while (read(pipefd[0], buf, 1) > 0) {
+      write(1, buf, 1);
+    }
+    write(1, "\n", 1);
+    close(pipefd[0]);
+    exit();
+  }
+
   return 0;
 }

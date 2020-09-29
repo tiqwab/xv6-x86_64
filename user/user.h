@@ -29,6 +29,7 @@ typedef int32_t pid_t;
 int fork(void);
 STD_WRAP(void exit(void))
 int wait(void);
+int pipe(int pipefd[2]);
 ssize_t read(int fd, void *buf, size_t count);
 // the last entry of argv should be NULL
 int exec(char *path, char **argv);
