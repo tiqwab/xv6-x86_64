@@ -19,6 +19,19 @@ typedef long long int64_t;
 
 typedef int32_t pid_t;
 
+// TODO: duplicated with kern/stat.h
+#define T_DIR 1  // Directory
+#define T_FILE 2 // File
+#define T_DEV 3  // Device
+
+struct stat {
+  short type;        // Type of file
+  int dev;           // File system's disk device
+  unsigned int ino;  // Inode number
+  short nlink;       // Number of links to file
+  unsigned int size; // Size of file in bytes
+};
+
 // wrap functions which exist in stds, but have different signatures.
 #define STD_WRAP(f)                                                            \
   _Pragma("GCC diagnostic push")                                               \
@@ -34,6 +47,7 @@ ssize_t read(int fd, void *buf, size_t count);
 STD_WRAP(int kill(pid_t pid))
 // the last entry of argv should be NULL
 int exec(char *path, char **argv);
+int fstat(int fd, struct stat *statbuf);
 int chdir(const char *path);
 int dup(int oldfd);
 int getpid(void);

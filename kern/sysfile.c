@@ -85,6 +85,16 @@ int64_t sys_close(void) {
   return 0;
 }
 
+int sys_fstat(void) {
+  struct file *f;
+  struct stat *st;
+
+  if (argfd(0, 0, &f) < 0 || argptr(1, (void *)&st, sizeof(*st)) < 0) {
+    return -1;
+  }
+  return filestat(f, st);
+}
+
 // Create the path new as a link to the same inode as old.
 int sys_link(void) {
   char name[DIRSIZ], *new, *old;

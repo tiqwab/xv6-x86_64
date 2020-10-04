@@ -3,7 +3,7 @@
 int main(int argc, char *argv[]) {
   fstest();
 
-  int fd1, fd2;
+  int fd1, fd2, fd3;
   ssize_t n;
   char *dir_name = "foo";
   char *file_name = "bar.txt";
@@ -110,7 +110,20 @@ int main(int argc, char *argv[]) {
   sleep(3);
   kill(pid1);
   wait();
-  printf("kill and sleep test\n");
+  printf("kill and sleep test: ok\n");
+
+  // check fstat
+  if ((fd3 = open("/", O_RDONLY)) < 0) {
+    printf("failed to open\n");
+  }
+  struct stat st;
+  if (fstat(fd1, &st) < 0) {
+    printf("failed to fstat\n");
+    return 1;
+  }
+  printf("stat for '/'. type: %d, dev: %d, ino: %d, nlink: %d, size: %d\n",
+         st.type, st.dev, st.ino, st.nlink, st.size);
+  close(fd3);
 
   return 0;
 }
