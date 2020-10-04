@@ -31,11 +31,13 @@ STD_WRAP(void exit(void))
 int wait(void);
 int pipe(int pipefd[2]);
 ssize_t read(int fd, void *buf, size_t count);
+STD_WRAP(int kill(pid_t pid))
 // the last entry of argv should be NULL
 int exec(char *path, char **argv);
 int chdir(const char *path);
 int dup(int oldfd);
 int getpid(void);
+int sleep(int n);
 int open(const char *pathname, int flags);
 ssize_t write(int fd, const void *buf, size_t count);
 STD_WRAP(int mknod(const char *pathname, int major, int minor))

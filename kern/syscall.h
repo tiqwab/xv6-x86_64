@@ -8,10 +8,12 @@
 #define SYS_wait 3
 #define SYS_pipe 4
 #define SYS_read 5
+#define SYS_kill 6
 #define SYS_exec 7
 #define SYS_chdir 9
 #define SYS_dup 10
 #define SYS_getpid 11
+#define SYS_sleep 13
 #define SYS_open 15
 #define SYS_write 16
 #define SYS_mknod 17

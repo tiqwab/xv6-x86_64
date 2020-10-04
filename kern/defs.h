@@ -121,6 +121,7 @@ void sleep(void *chan, struct spinlock *lk);
 void userinit(void);
 pid_t wait(void);
 void wakeup(void *chan);
+int kill(pid_t pid);
 void yield(void);
 
 // sleeplock.c
@@ -162,6 +163,8 @@ void syscall(void);
 // trap.c
 void idtinit(void);
 void tvinit(void);
+extern uint ticks;
+extern struct spinlock tickslock;
 
 // uart.c
 void uartinit(void);

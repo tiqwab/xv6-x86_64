@@ -53,6 +53,7 @@ int main(int argc, char *argv[]) {
 
   // check stdin, stdout, and stderr
   memset(buf, 0, sizeof(buf));
+  printf("please enter something: ");
   if ((n = read(0, buf, 128)) < 0) {
     printf("failed to read from stdin\n");
     return 1;
@@ -94,6 +95,22 @@ int main(int argc, char *argv[]) {
     close(pipefd[0]);
     exit();
   }
+
+  // check kill
+  if ((pid1 = fork()) < 0) {
+    printf("failed to fork\n");
+    return 1;
+  } else if (pid1 == 0) {
+    // child
+    for (;;) {
+    }
+  }
+
+  // parent
+  sleep(3);
+  kill(pid1);
+  wait();
+  printf("kill and sleep test\n");
 
   return 0;
 }
