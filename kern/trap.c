@@ -39,6 +39,9 @@ void trap(struct trapframe *tf) {
 
   switch (tf->trapno) {
   case T_IRQ0 + IRQ_TIMER:
+    // interval of ticks is 10ms in QEMU.
+    // it depends on bus frequency according to https://wiki.osdev.org/APIC_timer.
+    // bus frequency is always 1 GHz in QEMU?: https://www.mail-archive.com/qemu-devel@nongnu.org/msg711610.html
     if (cpuid() == 0) {
       acquire(&tickslock);
       ticks++;
