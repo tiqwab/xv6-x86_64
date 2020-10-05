@@ -112,6 +112,7 @@ int pipewrite(struct pipe *, char *, int);
 void exit(void);
 #pragma GCC diagnostic pop
 pid_t fork(void);
+int growproc(int n);
 struct cpu *mycpu(void);
 int cpuid(void);
 struct proc *myproc(void);

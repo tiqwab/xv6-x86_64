@@ -11,6 +11,7 @@ typedef unsigned long long uint64_t;
 typedef unsigned long long uintptr_t;
 typedef unsigned long size_t;
 typedef long ssize_t;
+typedef long long intptr_t;
 
 typedef char int8_t;
 typedef short int16_t;
@@ -51,6 +52,7 @@ int fstat(int fd, struct stat *statbuf);
 int chdir(const char *path);
 int dup(int oldfd);
 int getpid(void);
+void *sbrk(intptr_t increment);
 int sleep(int n);
 int open(const char *pathname, int flags);
 ssize_t write(int fd, const void *buf, size_t count);

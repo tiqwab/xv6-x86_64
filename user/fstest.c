@@ -125,5 +125,16 @@ int main(int argc, char *argv[]) {
          st.type, st.dev, st.ino, st.nlink, st.size);
   close(fd3);
 
+  // check sbrk
+  void *addr = sbrk(0);
+  printf("the current top: 0x%p\n", addr);
+  sbrk(4097);
+  for (int i = 0; i < 0x1000 * 2; i++) {
+    volatile char c = *(((char *)addr) + i);
+  }
+  addr = sbrk(0);
+  printf("the current top: 0x%p\n", addr);
+  printf("sbrk test: ok\n");
+
   return 0;
 }

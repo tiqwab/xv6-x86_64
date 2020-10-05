@@ -21,6 +21,18 @@ int64_t sys_kill(void) {
 
 int64_t sys_getpid(void) { return (int64_t)myproc()->pid; }
 
+int64_t sys_sbrk(void) {
+  uintptr_t addr;
+  int n;
+
+  if (argint(0, &n) < 0)
+    return -1;
+  addr = myproc()->sz;
+  if (growproc(n) < 0)
+    return -1;
+  return addr;
+}
+
 int64_t sys_sleep(void) {
   uint n;
   uint ticks0;

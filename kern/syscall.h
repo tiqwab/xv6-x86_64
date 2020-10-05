@@ -14,6 +14,7 @@
 #define SYS_chdir 9
 #define SYS_dup 10
 #define SYS_getpid 11
+#define SYS_sbrk 12
 #define SYS_sleep 13
 #define SYS_open 15
 #define SYS_write 16
