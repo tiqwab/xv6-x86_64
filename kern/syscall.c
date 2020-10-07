@@ -113,17 +113,6 @@ int64_t sys_hello(void) {
   return 0;
 }
 
-// TODO: remove later
-int64_t sys_putc(void) {
-  uint64_t c;
-  if (arg(0, &c) < 0) {
-    cprintf("failed to fetch a character from system call argument\n");
-    return -1;
-  }
-  cprintf("%c", (char)c);
-  return 0;
-}
-
 // TODO: remove after fs
 int64_t sys_fstest(void) {
   struct buf *b1 = bread(1, 0);
@@ -168,11 +157,10 @@ static int64_t (*syscalls[])(void) = {
     [SYS_chdir] = sys_chdir,   [SYS_dup] = sys_dup,
     [SYS_getpid] = sys_getpid, [SYS_sbrk] = sys_sbrk,
     [SYS_sleep] = sys_sleep,   [SYS_hello] = sys_hello,
-    [SYS_putc] = sys_putc,     [SYS_fstest] = sys_fstest,
-    [SYS_open] = sys_open,     [SYS_write] = sys_write,
-    [SYS_mknod] = sys_mknod,   [SYS_unlink] = sys_unlink,
-    [SYS_link] = sys_link,     [SYS_mkdir] = sys_mkdir,
-    [SYS_close] = sys_close,
+    [SYS_fstest] = sys_fstest, [SYS_open] = sys_open,
+    [SYS_write] = sys_write,   [SYS_mknod] = sys_mknod,
+    [SYS_unlink] = sys_unlink, [SYS_link] = sys_link,
+    [SYS_mkdir] = sys_mkdir,   [SYS_close] = sys_close,
 };
 
 // FIXME: Accept up to 5 arguments for now.

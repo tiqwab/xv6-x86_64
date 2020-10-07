@@ -1,7 +1,7 @@
 #include "user.h"
 
 static void printchar(char c, int *print_cnt) {
-  putc(c);
+  write(0, &c, 1);
   (*print_cnt)++;
 }
 

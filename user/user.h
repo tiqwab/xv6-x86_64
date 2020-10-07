@@ -63,7 +63,6 @@ STD_WRAP(int mkdir(const char *pathname))
 int close(int fd);
 
 int hello(void);
-STD_WRAP(int putc(char c))
 int fstest(void);
 
 // TODO: duplicated with kern/fcntl.h

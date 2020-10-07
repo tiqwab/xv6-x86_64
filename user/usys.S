@@ -21,7 +21,6 @@
 #define SYS_close 21
 
 #define SYS_hello 32
-#define SYS_putc 34
 #define SYS_fstest 35
 
 #define T_SYSCALL 0x30
@@ -55,5 +54,4 @@ SYSCALL(mkdir)
 SYSCALL(close)
 
 SYSCALL(hello)
-SYSCALL(putc)
 SYSCALL(fstest)
