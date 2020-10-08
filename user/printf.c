@@ -1,11 +1,11 @@
 #include "user.h"
 
-static void printchar(char c, int *print_cnt) {
-  write(0, &c, 1);
+static void printchar(int fd, char c, int *print_cnt) {
+  write(fd, &c, 1);
   (*print_cnt)++;
 }
 
-static void printint(long xx, int base, int sign, int *print_cnt) {
+static void printint(int fd, long xx, int base, int sign, int *print_cnt) {
   static char digits[] = "0123456789ABCDEF";
   char buf[16];
   int i, neg;
@@ -27,7 +27,7 @@ static void printint(long xx, int base, int sign, int *print_cnt) {
     buf[i++] = '-';
 
   while (--i >= 0) {
-    printchar(buf[i], print_cnt);
+    printchar(fd, buf[i], print_cnt);
   }
 }
 
@@ -40,16 +40,12 @@ __inline__ void prepare_args(void *args[]) {
   __asm__ volatile("mov %%r9,%0" : "=a"(args[4]) : :);
 }
 
-// Print to the given fd. Only understands %c, %d, %x, %p, %s.
-// FIXME: the current implementation accepts only five arguments other than fmt.
-int printf(const char *fmt, ...) {
+int __attribute__((noinline)) do_printf(const char *fmt, void *args[], int fd) {
   char *s;
   int c, i, state;
   long *ap;
   int print_cnt = 0;
 
-  void *args[5] = {0, 0, 0, 0, 0};
-  prepare_args(args);
   ap = (long *)args;
 
   state = 0;
@@ -58,14 +54,14 @@ int printf(const char *fmt, ...) {
       if (c == '%') {
         state = '%';
       } else {
-        printchar(c, &print_cnt);
+        printchar(fd, c, &print_cnt);
       }
     } else if (state == '%') {
       if (c == 'd') {
-        printint(*ap, 10, 1, &print_cnt);
+        printint(fd, *ap, 10, 1, &print_cnt);
         ap++;
       } else if (c == 'x' || c == 'p') {
-        printint(*ap, 16, 0, &print_cnt);
+        printint(fd, *ap, 16, 0, &print_cnt);
         ap++;
       } else if (c == 's') {
         s = (char *)*ap;
@@ -73,22 +69,38 @@ int printf(const char *fmt, ...) {
         if (s == 0)
           s = "(null)";
         while (*s != 0) {
-          printchar(*s, &print_cnt);
+          printchar(fd, *s, &print_cnt);
           s++;
         }
       } else if (c == 'c') {
-        printchar(*ap, &print_cnt);
+        printchar(fd, *ap, &print_cnt);
         ap++;
       } else if (c == '%') {
-        printchar(c, &print_cnt);
+        printchar(fd, c, &print_cnt);
       } else {
         // Unknown % sequence.  Print it to draw attention.
-        printchar('%', &print_cnt);
-        printchar(c, &print_cnt);
+        printchar(fd, '%', &print_cnt);
+        printchar(fd, c, &print_cnt);
       }
       state = 0;
     }
   }
 
   return print_cnt;
+}
+
+// Print to the stdout. Only understands %c, %d, %x, %p, %s.
+// FIXME: the current implementation accepts only five arguments other than fmt.
+int printf(const char *fmt, ...) {
+  void *args[5] = {0, 0, 0, 0, 0};
+  prepare_args(args);
+  return do_printf(fmt, args, 0);
+}
+
+// Print to the given fd. Only understands %c, %d, %x, %p, %s.
+// FIXME: the current implementation accepts only five arguments other than fmt.
+int dprintf(int fd, const char *fmt, ...) {
+  void *args[5] = {0, 0, 0, 0, 0};
+  prepare_args(args);
+  return do_printf(fmt, args, fd);
 }

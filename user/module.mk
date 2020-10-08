@@ -24,25 +24,25 @@ $(OBJDIR)/$(USER_DIR)/preemptiontest1: $(USER_DIR)/preemptiontest1.c $(ULIBS)
 	@mkdir -p $(@D)
 	$(CC) $(USER_CFLAGS) -c -o $@.o $<
 	$(LD) $(USER_LDFLAGS) -o $@ $@.o $(ULIBS)
-	$(OBJDUMP) -S $@.o > $@.asm
+	$(OBJDUMP) -S $@ > $@.asm
 
 $(OBJDIR)/$(USER_DIR)/preemptiontest2: $(USER_DIR)/preemptiontest2.c $(ULIBS)
 	@mkdir -p $(@D)
 	$(CC) $(USER_CFLAGS) -c -o $@.o $<
 	$(LD) $(USER_LDFLAGS) -o $@ $@.o $(ULIBS)
-	$(OBJDUMP) -S $@.o > $@.asm
+	$(OBJDUMP) -S $@ > $@.asm
 
 $(OBJDIR)/$(USER_DIR)/fstest: $(USER_DIR)/fstest.c $(ULIBS)
 	@mkdir -p $(@D)
 	$(CC) $(USER_CFLAGS) -c -o $@.o $<
 	$(LD) $(USER_LDFLAGS) -o $@ $@.o $(ULIBS)
-	$(OBJDUMP) -S $@.o > $@.asm
+	$(OBJDUMP) -S $@ > $@.asm
 
 $(OBJDIR)/$(USER_DIR)/init: $(USER_DIR)/init.c $(ULIBS)
 	@mkdir -p $(@D)
 	$(CC) $(USER_CFLAGS) -c -o $@.o $<
 	$(LD) $(USER_LDFLAGS) -o $@ $@.o $(ULIBS)
-	$(OBJDUMP) -S $@.o > $@.asm
+	$(OBJDUMP) -S $@ > $@.asm
 
 $(OBJDIR)/$(USER_DIR)/%.o: $(USER_DIR)/%.c
 	@mkdir -p $(@D)

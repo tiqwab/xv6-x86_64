@@ -73,6 +73,7 @@ int fstest(void);
 
 // library
 int printf(const char *fmt, ...);
+int dprintf(int fd, const char *fmt, ...);
 size_t strlen(const char *s);
 void *memset(void *s, int c, size_t n);
 
