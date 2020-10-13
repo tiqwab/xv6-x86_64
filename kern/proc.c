@@ -216,13 +216,12 @@ void exit(void) {
     panic("init exiting");
 
   // Close all open files.
-  // TODO for fs
-  // for(fd = 0; fd < NOFILE; fd++){
-  //   if(curproc->ofile[fd]){
-  //     fileclose(curproc->ofile[fd]);
-  //     curproc->ofile[fd] = 0;
-  //   }
-  // }
+  for (fd = 0; fd < NOFILE; fd++) {
+    if (curproc->ofile[fd]) {
+      fileclose(curproc->ofile[fd]);
+      curproc->ofile[fd] = 0;
+    }
+  }
 
   begin_op();
   iput(curproc->cwd);

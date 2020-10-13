@@ -35,9 +35,6 @@ KERN_OBJS := \
 KERN_BINARY_OBJS := \
 	$(OBJDIR)/$(KERN_DIR)/initcode \
 
-# TODO: remove later (after fs)
-KERN_BINARY_OBJS += $(UOBJS)
-
 KERN_CFLAGS := $(CFLAGS) -m64 -mcmodel=kernel
 KERN_LDFLAGS := $(LDFLAGS) -m elf_x86_64
 

@@ -181,7 +181,7 @@ int deallocuvm(pte_t *pgdir, size_t oldsz, size_t newsz);
 void freevm(pte_t *pgdir, uintptr_t utop);
 void inituvm(pte_t *pgdir, char *init, size_t sz);
 void kvmalloc(void);
-int loaduvm(pte_t *pgdir, char *addr, char *p_elf, size_t offset, size_t sz);
+int loaduvm(pte_t *pgdir, char *addr, struct inode *ip, uint offset, size_t sz);
 void seginit(void);
 pte_t *setupkvm(void);
 void switchkvm(void);

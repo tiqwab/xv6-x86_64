@@ -246,35 +246,15 @@ void inituvm(pte_t *pgdir, char *init, size_t sz) {
   memmove(mem, init, sz);
 }
 
-// TODO for fs
 // Load a program segment into pgdir.  addr must be page-aligned
 // and the pages from addr to addr+sz must already be mapped.
-// int loaduvm(pde_t *pgdir, char *addr, struct inode *ip, uint offset, uint sz)
-// {
-//   uint i, pa, n;
-//   pte_t *pte;
-//
-//   if((uint) addr % PGSIZE != 0)
-//     panic("loaduvm: addr must be page aligned");
-//   for(i = 0; i < sz; i += PGSIZE){
-//     if((pte = walkpgdir(pgdir, addr+i, 0)) == 0)
-//       panic("loaduvm: address should exist");
-//     pa = PTE_ADDR(*pte);
-//     if(sz - i < PGSIZE)
-//       n = sz - i;
-//     else
-//       n = PGSIZE;
-//     if(readi(ip, P2V(pa), offset+i, n) != n)
-//       return -1;
-//   }
-//   return 0;
-// }
-// TODO remove later after fs
-int loaduvm(pte_t *pgdir, char *addr, char *p_elf, size_t offset, size_t sz) {
+int loaduvm(pte_t *pgdir, char *addr, struct inode *ip, uint offset,
+            size_t sz) {
+  size_t n;
   uintptr_t pa;
   pte_t *pte;
 
-  if ((uintptr_t)addr % PGSIZE != 0) {
+  if (((uintptr_t)addr) % PGSIZE != 0) {
     panic("loaduvm: addr must be page aligned");
   }
   for (size_t i = 0; i < sz; i += PGSIZE) {
@@ -282,8 +262,13 @@ int loaduvm(pte_t *pgdir, char *addr, char *p_elf, size_t offset, size_t sz) {
       panic("loaduvm: address should exist");
     }
     pa = PTE_ADDR(*pte);
-    for (size_t j = 0; j < PGSIZE; j++) {
-      *((char *)(P2V(pa + j))) = *(p_elf + offset + i + j);
+    if (sz - i < PGSIZE) {
+      n = sz - i;
+    } else {
+      n = PGSIZE;
+    }
+    if (readi(ip, P2V(pa), offset + i, n) != (int)n) {
+      return -1;
     }
   }
   return 0;

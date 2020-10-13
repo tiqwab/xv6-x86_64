@@ -9,6 +9,7 @@ int exec(char *path, char **argv) {
   size_t sz;
   uintptr_t sp;
   struct elfhdr elf;
+  struct inode *ip;
   struct proghdr ph;
   pte_t *pgdir = NULL, *oldpgdir;
   struct proc *curproc = myproc();
@@ -16,45 +17,17 @@ int exec(char *path, char **argv) {
   int argc;
   uint64_t ustack[3 + MAXARG + 1];
 
-  // TODO remote later (after fs)
-  struct elfhdr *p_elf;
-  struct proghdr *p_ph;
+  begin_op();
 
-  // TODO for fs
-  // begin_op();
-
-  // TODO for fs
-  // if((ip = namei(path)) == 0){
-  //   end_op();
-  //   cprintf("exec: fail\n");
-  //   return -1;
-  // }
-  // ilock(ip);
+  if ((ip = namei(path)) == 0) {
+    end_op();
+    cprintf("exec: fail\n");
+    return -1;
+  }
+  ilock(ip);
 
   // Check ELF header
-  // TODO for fs
-  // if(readi(ip, (char*)&elf, 0, sizeof(elf)) != sizeof(elf)) {
-  //   goto bad;
-  // }
-  // Check ELF header
-  // TODO remove later (after fs)
-  if (strncmp(path, "/init", 15) == 0) {
-    extern char _binary_obj_user_init_start[];
-    p_elf = (struct elfhdr *)_binary_obj_user_init_start;
-    elf = *p_elf;
-  } else if (strncmp(path, "preemptiontest1", 15) == 0) {
-    extern char _binary_obj_user_preemptiontest1_start[];
-    p_elf = (struct elfhdr *)_binary_obj_user_preemptiontest1_start;
-    elf = *p_elf;
-  } else if (strncmp(path, "preemptiontest2", 15) == 0) {
-    extern char _binary_obj_user_preemptiontest2_start[];
-    p_elf = (struct elfhdr *)_binary_obj_user_preemptiontest2_start;
-    elf = *p_elf;
-  } else if (strncmp(path, "fstest", 6) == 0) {
-    extern char _binary_obj_user_fstest_start[];
-    p_elf = (struct elfhdr *)_binary_obj_user_fstest_start;
-    elf = *p_elf;
-  } else {
+  if (readi(ip, (char *)&elf, 0, sizeof(elf)) != sizeof(elf)) {
     goto bad;
   }
 
@@ -69,14 +42,9 @@ int exec(char *path, char **argv) {
   // Load program into memory.
   sz = 0;
   for (i = 0, off = elf.phoff; i < elf.phnum; i++, off += sizeof(ph)) {
-    // TODO for fs
-    // if(readi(ip, (char*)&ph, off, sizeof(ph)) != sizeof(ph)) {
-    //   goto bad;
-    // }
-    // TODO remove later (after fs)
-    p_ph = (struct proghdr *)(((char *)p_elf) + off);
-    ph = *p_ph;
-
+    if (readi(ip, (char *)&ph, off, sizeof(ph)) != sizeof(ph)) {
+      goto bad;
+    }
     if (ph.type != ELF_PROG_LOAD) {
       continue;
     }
@@ -92,20 +60,13 @@ int exec(char *path, char **argv) {
     if (ph.vaddr % PGSIZE != 0) {
       goto bad;
     }
-    // TODO for fs
-    // if (loaduvm(pgdir, (char *)ph.vaddr, ip, ph.off, ph.filesz) < 0) {
-    //   goto bad;
-    // }
-    // TODO remove later (after fs)
-    if (loaduvm(pgdir, (char *)ph.vaddr, (char *)p_elf, ph.off, ph.filesz) <
-        0) {
+    if (loaduvm(pgdir, (char *)ph.vaddr, ip, ph.off, ph.filesz) < 0) {
       goto bad;
     }
   }
-  // TODO for fs
-  // iunlockput(ip);
-  // end_op();
-  // ip = 0;
+  iunlockput(ip);
+  end_op();
+  ip = 0;
 
   // Allocate two pages at the next page boundary.
   // Make the first inaccessible.  Use the second as the user stack.
@@ -161,10 +122,9 @@ bad:
   if (pgdir) {
     freevm(pgdir, sz);
   }
-  // TODO for fs
-  // if(ip){
-  //   iunlockput(ip);
-  //   end_op();
-  // }
+  if (ip) {
+    iunlockput(ip);
+    end_op();
+  }
   return -1;
 }
