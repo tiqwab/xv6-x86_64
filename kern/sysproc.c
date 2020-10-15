@@ -25,11 +25,13 @@ int64_t sys_sbrk(void) {
   uintptr_t addr;
   int n;
 
-  if (argint(0, &n) < 0)
+  if (argint(0, &n) < 0) {
     return -1;
+  }
   addr = myproc()->sz;
-  if (growproc(n) < 0)
+  if (growproc(n) < 0) {
     return -1;
+  }
   return addr;
 }
 

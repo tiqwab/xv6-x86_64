@@ -76,5 +76,9 @@ int printf(const char *fmt, ...);
 int dprintf(int fd, const char *fmt, ...);
 size_t strlen(const char *s);
 void *memset(void *s, int c, size_t n);
+STD_WRAP(char *gets(char *buf, int max))
+char *strchr(const char *s, int c);
+void *malloc(size_t nbytes);
+void free(void *ap);
 
 #endif /* ifndef XV6_x86_64_USER_H */

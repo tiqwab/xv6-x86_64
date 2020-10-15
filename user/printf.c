@@ -31,15 +31,6 @@ static void printint(int fd, long xx, int base, int sign, int *print_cnt) {
   }
 }
 
-// The size of args must be equal to or larger than 5.
-__inline__ void prepare_args(void *args[]) {
-  __asm__ volatile("mov %%rsi,%0" : "=a"(args[0]) : :);
-  __asm__ volatile("mov %%rdx,%0" : "=a"(args[1]) : :);
-  __asm__ volatile("mov %%rcx,%0" : "=a"(args[2]) : :);
-  __asm__ volatile("mov %%r8,%0" : "=a"(args[3]) : :);
-  __asm__ volatile("mov %%r9,%0" : "=a"(args[4]) : :);
-}
-
 int __attribute__((noinline)) do_printf(const char *fmt, void *args[], int fd) {
   char *s;
   int c, i, state;
@@ -90,17 +81,30 @@ int __attribute__((noinline)) do_printf(const char *fmt, void *args[], int fd) {
 }
 
 // Print to the stdout. Only understands %c, %d, %x, %p, %s.
-// FIXME: the current implementation accepts only five arguments other than fmt.
+// FIXME: the current implementation accepts only *five* arguments other than
+// fmt.
 int printf(const char *fmt, ...) {
   void *args[5] = {0, 0, 0, 0, 0};
-  prepare_args(args);
+  // it is not a good way to use clobber list to prevent registers being
+  // edited...
+  __asm__ volatile("mov %%rsi,%0" : "=a"(args[0]) : : "%rsi");
+  __asm__ volatile("mov %%rdx,%0" : "=a"(args[1]) : : "%rdx");
+  __asm__ volatile("mov %%rcx,%0" : "=a"(args[2]) : : "%rcx");
+  __asm__ volatile("mov %%r8,%0" : "=a"(args[3]) : : "%r8");
+  __asm__ volatile("mov %%r9,%0" : "=a"(args[4]) : : "%r9");
   return do_printf(fmt, args, 0);
 }
 
 // Print to the given fd. Only understands %c, %d, %x, %p, %s.
-// FIXME: the current implementation accepts only five arguments other than fmt.
+// FIXME: the current implementation accepts only *four* arguments other than
+// fmt.
 int dprintf(int fd, const char *fmt, ...) {
   void *args[5] = {0, 0, 0, 0, 0};
-  prepare_args(args);
+  // it is not a good way to use clobber list to prevent registers being
+  // edited...
+  __asm__ volatile("mov %%rdx,%0" : "=a"(args[0]) : : "%rdx");
+  __asm__ volatile("mov %%rcx,%0" : "=a"(args[1]) : : "%rcx");
+  __asm__ volatile("mov %%r8,%0" : "=a"(args[2]) : : "%r8");
+  __asm__ volatile("mov %%r9,%0" : "=a"(args[3]) : : "%r9");
   return do_printf(fmt, args, fd);
 }

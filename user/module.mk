@@ -5,6 +5,7 @@ UOBJS += \
 		 $(OBJDIR)/$(USER_DIR)/preemptiontest1 \
 		 $(OBJDIR)/$(USER_DIR)/preemptiontest2 \
 		 $(OBJDIR)/$(USER_DIR)/fstest \
+		 $(OBJDIR)/$(USER_DIR)/sh \
 
 ULIBS := \
 	$(OBJDIR)/$(USER_DIR)/usys.o \
@@ -12,6 +13,9 @@ ULIBS := \
 	$(OBJDIR)/$(USER_DIR)/printf.o \
 	$(OBJDIR)/$(USER_DIR)/strlen.o \
 	$(OBJDIR)/$(USER_DIR)/memset.o \
+	$(OBJDIR)/$(USER_DIR)/gets.o \
+	$(OBJDIR)/$(USER_DIR)/strchr.o \
+	$(OBJDIR)/$(USER_DIR)/umalloc.o \
 
 USER_LINKER_SCRIPT := $(USER_DIR)/user.ld
 
@@ -33,6 +37,12 @@ $(OBJDIR)/$(USER_DIR)/preemptiontest2: $(USER_DIR)/preemptiontest2.c $(ULIBS)
 	$(OBJDUMP) -S $@ > $@.asm
 
 $(OBJDIR)/$(USER_DIR)/fstest: $(USER_DIR)/fstest.c $(ULIBS)
+	@mkdir -p $(@D)
+	$(CC) $(USER_CFLAGS) -c -o $@.o $<
+	$(LD) $(USER_LDFLAGS) -o $@ $@.o $(ULIBS)
+	$(OBJDUMP) -S $@ > $@.asm
+
+$(OBJDIR)/$(USER_DIR)/sh: $(USER_DIR)/sh.c $(ULIBS)
 	@mkdir -p $(@D)
 	$(CC) $(USER_CFLAGS) -c -o $@.o $<
 	$(LD) $(USER_LDFLAGS) -o $@ $@.o $(ULIBS)
