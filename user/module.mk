@@ -24,35 +24,16 @@ USER_LDFLAGS := $(LDFLAGS) -T $(USER_LINKER_SCRIPT)
 
 -include $(OBJDIR)/$(USER_DIR)/*.d
 
-$(OBJDIR)/$(USER_DIR)/preemptiontest1: $(USER_DIR)/preemptiontest1.c $(ULIBS)
-	@mkdir -p $(@D)
-	$(CC) $(USER_CFLAGS) -c -o $@.o $<
-	$(LD) $(USER_LDFLAGS) -o $@ $@.o $(ULIBS)
-	$(OBJDUMP) -S $@ > $@.asm
+# macro to generate rules for $(UBOJS)
+define RULE_UOBJ
+$(1): $(USER_DIR)/$(notdir $(1)).c $(ULIBS)
+	@mkdir -p $(dir $(1))
+	$(CC) $(USER_CFLAGS) -c -o $(1).o $(USER_DIR)/$(notdir $(1)).c
+	$(LD) $(USER_LDFLAGS) -o $(1) $(1).o $(ULIBS)
+	$(OBJDUMP) -S $(1) > $(1).asm
+endef
 
-$(OBJDIR)/$(USER_DIR)/preemptiontest2: $(USER_DIR)/preemptiontest2.c $(ULIBS)
-	@mkdir -p $(@D)
-	$(CC) $(USER_CFLAGS) -c -o $@.o $<
-	$(LD) $(USER_LDFLAGS) -o $@ $@.o $(ULIBS)
-	$(OBJDUMP) -S $@ > $@.asm
-
-$(OBJDIR)/$(USER_DIR)/fstest: $(USER_DIR)/fstest.c $(ULIBS)
-	@mkdir -p $(@D)
-	$(CC) $(USER_CFLAGS) -c -o $@.o $<
-	$(LD) $(USER_LDFLAGS) -o $@ $@.o $(ULIBS)
-	$(OBJDUMP) -S $@ > $@.asm
-
-$(OBJDIR)/$(USER_DIR)/sh: $(USER_DIR)/sh.c $(ULIBS)
-	@mkdir -p $(@D)
-	$(CC) $(USER_CFLAGS) -c -o $@.o $<
-	$(LD) $(USER_LDFLAGS) -o $@ $@.o $(ULIBS)
-	$(OBJDUMP) -S $@ > $@.asm
-
-$(OBJDIR)/$(USER_DIR)/init: $(USER_DIR)/init.c $(ULIBS)
-	@mkdir -p $(@D)
-	$(CC) $(USER_CFLAGS) -c -o $@.o $<
-	$(LD) $(USER_LDFLAGS) -o $@ $@.o $(ULIBS)
-	$(OBJDUMP) -S $@ > $@.asm
+$(foreach obj, $(UOBJS), $(eval $(call RULE_UOBJ, $(obj))))
 
 $(OBJDIR)/$(USER_DIR)/%.o: $(USER_DIR)/%.c
 	@mkdir -p $(@D)
