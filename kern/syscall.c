@@ -1,4 +1,4 @@
-#include "syscall.h"
+#include "inc/syscall.h"
 #include "buf.h"
 #include "defs.h"
 #include "proc.h"
