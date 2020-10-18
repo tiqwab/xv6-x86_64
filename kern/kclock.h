@@ -4,7 +4,7 @@
 // This file comes from JOS.
 // ref. https://wiki.osdev.org/Detecting_Memory_(x86)#CMOS
 
-#include "types.h"
+#include "inc/types.h"
 
 #define IO_RTC 0x070 /* RTC port */
 

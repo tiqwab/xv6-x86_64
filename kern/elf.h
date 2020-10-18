@@ -4,7 +4,7 @@
 // Format of an ELF executable file
 // This definitions are used for *64-bit* ELF executable.
 
-#include "types.h"
+#include "inc/types.h"
 
 #define ELF_MAGIC 0x464C457FU // "\x7FELF" in little endian
 

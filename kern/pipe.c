@@ -2,7 +2,6 @@
 #include "file.h"
 #include "proc.h"
 #include "spinlock.h"
-#include "types.h"
 
 #define PIPESIZE 512
 

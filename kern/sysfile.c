@@ -4,7 +4,6 @@
 #include "param.h"
 #include "proc.h"
 #include "stat.h"
-#include "types.h"
 
 // Fetch the nth word-sized system call argument as a file descriptor
 // and return both the descriptor and the corresponding struct file.

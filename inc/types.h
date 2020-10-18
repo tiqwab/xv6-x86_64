@@ -1,8 +1,6 @@
 #ifndef XV6_X86_64_TYPES_H
 #define XV6_X86_64_TYPES_H
 
-// TODO: share this header with user
-
 typedef unsigned long ulong;
 typedef unsigned int uint;
 typedef unsigned short ushort;
@@ -21,6 +19,8 @@ typedef unsigned int uint32_t;
 typedef unsigned long long uint64_t;
 typedef unsigned long long uintptr_t;
 typedef unsigned long size_t;
+typedef long ssize_t;
+typedef long long intptr_t;
 
 #define NULL 0
 

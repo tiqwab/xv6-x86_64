@@ -18,7 +18,7 @@
 // __ASSEMBLER__ is defined by gcc when processing assembly files
 #ifndef __ASSEMBLER__
 
-#include "types.h"
+#include "inc/types.h"
 
 // Segment Descriptor
 // in x86-64, only type, s, dpl, p, and l is effective (other fields are
@@ -125,7 +125,7 @@ struct tssdesc {
 
 #ifndef __ASSEMBLER__
 
-#include "types.h"
+#include "inc/types.h"
 
 // 64-bit mode task state segment format
 // ref. Intel SDM vol.3 Figure 7-11

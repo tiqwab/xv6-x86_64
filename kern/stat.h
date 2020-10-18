@@ -1,7 +1,7 @@
 #ifndef XV6_X86_64_STAT_H
 #define XV6_X86_64_STAT_H
 
-#include "types.h"
+#include "inc/types.h"
 
 #define T_DIR 1  // Directory
 #define T_FILE 2 // File

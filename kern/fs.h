@@ -5,7 +5,7 @@
 // Both the kernel and user programs use this header file.
 // TODO: share this header with user
 
-#include "types.h"
+#include "inc/types.h"
 
 #define ROOTINO 1 // root i-number
 #define BSIZE 512 // block size

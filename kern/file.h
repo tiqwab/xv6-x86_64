@@ -2,8 +2,8 @@
 #define XV6_X86_64_FILE_H
 
 #include "fs.h"
+#include "inc/types.h"
 #include "sleeplock.h"
-#include "types.h"
 
 struct file {
   enum { FD_NONE, FD_PIPE, FD_INODE } type;

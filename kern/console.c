@@ -4,7 +4,6 @@
 #include "proc.h"
 #include "spinlock.h"
 #include "trap.h"
-#include "types.h"
 #include "x86.h"
 
 // ref. http://oswiki.osask.jp/?VGA

@@ -2,7 +2,6 @@
 
 #include "defs.h"
 #include "trap.h"
-#include "types.h"
 
 #define REG_ID 0x00    // Register index: ID
 #define REG_VER 0x01   // Register index: version

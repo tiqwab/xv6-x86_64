@@ -4,7 +4,7 @@
 // ref. Intel Multiprocessor Specification (MPspec)
 // https://pdos.csail.mit.edu/6.828/2014/readings/ia32/MPspec.pdf
 
-#include "types.h"
+#include "inc/types.h"
 
 // MPspec 4.1 MP Floating Pointer Structure
 struct mp {

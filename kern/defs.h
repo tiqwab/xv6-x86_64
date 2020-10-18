@@ -1,7 +1,7 @@
 #ifndef XV6_X86_64_DEFS_H
 #define XV6_X86_64_DEFS_H
 
-#include "types.h"
+#include "inc/types.h"
 
 struct buf;
 struct context;

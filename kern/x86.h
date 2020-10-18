@@ -1,7 +1,7 @@
 #ifndef XV6_X86_64_X86_H
 #define XV6_X86_64_X86_H
 
-#include "types.h"
+#include "inc/types.h"
 
 static inline uchar inb(ushort port) {
   uchar data;

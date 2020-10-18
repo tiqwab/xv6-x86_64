@@ -19,7 +19,7 @@
 // __ASSEMBLER__ is defined by gcc when processing assembly files
 #ifndef __ASSEMBLER__
 
-#include "types.h"
+#include "inc/types.h"
 
 #define V2P(a) (((uintptr_t)(a)) - KERNBASE)
 #define P2V(a) ((void *)(((char *)(a)) + KERNBASE))

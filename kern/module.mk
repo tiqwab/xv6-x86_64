@@ -67,7 +67,7 @@ $(OBJDIR)/$(KERN_DIR)/%.o: $(KERN_DIR)/%.S
 	$(CC) -o $@ $(KERN_CFLAGS) -fno-pic -nostdinc -I. -c $<
 
 $(OBJDIR)/$(KERN_DIR)/mkfs: $(KERN_DIR)/mkfs.c
-	$(CC) -std=c11 -Wall -Wextra -Wno-format -Wno-unused -Wno-address-of-packed-member -Werror \
+	$(CC) -std=c11 -Wall -Wextra -Wno-format -Wno-unused -Wno-address-of-packed-member -Werror -I. \
 		-o $@ $<
 
 $(FS_IMG): $(OBJDIR)/$(KERN_DIR)/mkfs $(UOBJS)
