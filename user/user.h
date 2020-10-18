@@ -3,6 +3,7 @@
 
 #define NULL 0
 
+#include "inc/fcntl.h"
 #include "inc/stat.h"
 #include "inc/types.h"
 
@@ -37,12 +38,6 @@ int close(int fd);
 
 int hello(void);
 int fstest(void);
-
-// TODO: duplicated with kern/fcntl.h
-#define O_RDONLY 0x000
-#define O_WRONLY 0x001
-#define O_RDWR 0x002
-#define O_CREATE 0x200
 
 // library
 int printf(const char *fmt, ...);

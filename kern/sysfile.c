@@ -1,6 +1,6 @@
 #include "defs.h"
-#include "fcntl.h"
 #include "file.h"
+#include "inc/fcntl.h"
 #include "inc/stat.h"
 #include "param.h"
 #include "proc.h"
