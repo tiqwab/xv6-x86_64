@@ -2,9 +2,9 @@
 #include "buf.h"
 #include "defs.h"
 #include "file.h"
+#include "inc/stat.h"
 #include "param.h"
 #include "proc.h"
-#include "stat.h"
 
 #define min(a, b) ((a) < (b) ? (a) : (b))
 

@@ -9,9 +9,9 @@
 #define stat xv6_stat // avoid clash with host struct stat
 #define USE_STD       // avoid clash with host types
 #include "fs.h"
+#include "inc/stat.h"
 #include "inc/types.h"
 #include "param.h"
-#include "stat.h"
 
 #ifndef static_assert
 #define static_assert(a, b)                                                    \
