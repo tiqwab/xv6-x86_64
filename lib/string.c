@@ -1,7 +1,7 @@
 // TODO: This file should be moved from kern
 
 #include "inc/types.h"
-#include "x86.h"
+#include "inc/x86.h"
 
 int memcmp(const void *v1, const void *v2, size_t n) {
   const uchar *s1, *s2;

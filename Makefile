@@ -15,6 +15,7 @@ CP = cp
 DD = dd
 MKDIR = mkdir
 GDB = gdb
+AR = ar
 
 CFLAGS = -fno-pic -static -fno-builtin -fno-strict-aliasing -MD -ggdb -fno-omit-frame-pointer
 # CFLAGS += -O2 -std=c11 -Wall -Wextra -Wno-format -Wno-unused -Wno-address-of-packed-member -Werror
@@ -48,6 +49,7 @@ default: $(IMAGES)
 .PHONY: clean default format
 
 include boot/module.mk
+include lib/module.mk
 include user/module.mk
 include kern/module.mk
 

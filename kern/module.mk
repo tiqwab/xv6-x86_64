@@ -5,7 +5,6 @@ KERN_OBJS := \
 	$(OBJDIR)/$(KERN_DIR)/kalloc.o \
 	$(OBJDIR)/$(KERN_DIR)/spinlock.o \
 	$(OBJDIR)/$(KERN_DIR)/console.o \
-	$(OBJDIR)/$(KERN_DIR)/string.o \
 	$(OBJDIR)/$(KERN_DIR)/mp.o \
 	$(OBJDIR)/$(KERN_DIR)/proc.o \
 	$(OBJDIR)/$(KERN_DIR)/vm.o \
@@ -54,8 +53,9 @@ $(OBJDIR)/$(KERN_DIR)/initcode: $(KERN_DIR)/initcode.S
 	$(OBJDUMP) -S $@.o > $@.asm
 
 # TODO: remote UBOJS later (after fs)
-$(OBJDIR)/$(KERNEL): $(KERN_OBJS) $(KERN_LINKER_SCRIPT) $(KERN_BINARY_OBJS) $(UBOJS)
-	$(LD) $(KERN_LDFLAGS) -T $(KERN_LINKER_SCRIPT) -o $@ $(KERN_OBJS) -b binary $(KERN_BINARY_OBJS)
+$(OBJDIR)/$(KERNEL): $(KERN_OBJS) $(KERN_LINKER_SCRIPT) $(KERN_BINARY_OBJS) $(UBOJS) $(LIB_ARCHIVE_FILE)
+	$(LD) $(KERN_LDFLAGS) -T $(KERN_LINKER_SCRIPT) -o $@ $(KERN_OBJS) \
+		-L $(OBJDIR)/$(LIB_DIR) -l$(LIB_ARCHIVE_NAME) -b binary $(KERN_BINARY_OBJS)
 	$(OBJDUMP) -S $@ > $@.asm
 
 $(OBJDIR)/$(KERN_DIR)/%.o: $(KERN_DIR)/%.c

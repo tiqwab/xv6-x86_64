@@ -28,13 +28,6 @@ static inline void outsl(int port, const void *addr, int cnt) {
                    : "cc");
 }
 
-static inline void stosb(void *addr, int data, int cnt) {
-  __asm__ volatile("cld; rep stosb"
-                   : "=D"(addr), "=c"(cnt)
-                   : "0"(addr), "1"(cnt), "a"(data)
-                   : "memory", "cc");
-}
-
 struct segdesc;
 
 static inline void lgdt(struct segdesc *p, uint16_t size) {

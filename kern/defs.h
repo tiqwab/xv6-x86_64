@@ -1,6 +1,7 @@
 #ifndef XV6_X86_64_DEFS_H
 #define XV6_X86_64_DEFS_H
 
+#include "inc/string.h"
 #include "inc/types.h"
 
 struct buf;
@@ -142,15 +143,6 @@ void initlock(struct spinlock *, char *);
 void release(struct spinlock *);
 void pushcli(void);
 void popcli(void);
-
-// string.c
-int memcmp(const void *v1, const void *v2, size_t n);
-void *memset(void *, int, size_t);
-void *memmove(void *, const void *, size_t);
-char *strncpy(char *s, const char *t, size_t n);
-char *safestrcpy(char *s, const char *t, int n);
-size_t strlen(const char *s);
-int strncmp(const char *p, const char *q, size_t n);
 
 // syscall.c
 int arg(int n, uint64_t *ip);
