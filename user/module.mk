@@ -11,10 +11,7 @@ ULIBS := \
 	$(OBJDIR)/$(USER_DIR)/usys.o \
 	$(OBJDIR)/$(USER_DIR)/entry.o \
 	$(OBJDIR)/$(USER_DIR)/printf.o \
-	$(OBJDIR)/$(USER_DIR)/strlen.o \
-	$(OBJDIR)/$(USER_DIR)/memset.o \
 	$(OBJDIR)/$(USER_DIR)/gets.o \
-	$(OBJDIR)/$(USER_DIR)/strchr.o \
 	$(OBJDIR)/$(USER_DIR)/umalloc.o \
 
 USER_LINKER_SCRIPT := $(USER_DIR)/user.ld
@@ -26,10 +23,10 @@ USER_LDFLAGS := $(LDFLAGS) -T $(USER_LINKER_SCRIPT)
 
 # macro to generate rules for $(UBOJS)
 define RULE_UOBJ
-$(1): $(USER_DIR)/$(notdir $(1)).c $(ULIBS)
+$(1): $(USER_DIR)/$(notdir $(1)).c $(ULIBS) $(LIB_ARCHIVE_FILE)
 	@mkdir -p $(dir $(1))
 	$(CC) $(USER_CFLAGS) -c -o $(1).o $(USER_DIR)/$(notdir $(1)).c
-	$(LD) $(USER_LDFLAGS) -o $(1) $(1).o $(ULIBS)
+	$(LD) $(USER_LDFLAGS) -o $(1) $(1).o $(ULIBS) -L $(OBJDIR)/$(LIB_DIR) -l$(LIB_ARCHIVE_NAME)
 	$(OBJDUMP) -S $(1) > $(1).asm
 endef
 

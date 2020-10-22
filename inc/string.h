@@ -10,5 +10,6 @@ char *strncpy(char *s, const char *t, size_t n);
 char *safestrcpy(char *s, const char *t, int n);
 size_t strlen(const char *s);
 int strncmp(const char *p, const char *q, size_t n);
+char *strchr(const char *s, int c);
 
 #endif /* ifndef XV6_X86_64_STRING_H */

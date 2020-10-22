@@ -5,6 +5,7 @@
 
 #include "inc/fcntl.h"
 #include "inc/stat.h"
+#include "inc/string.h"
 #include "inc/types.h"
 
 // wrap functions which exist in stds, but have different signatures.
@@ -42,10 +43,7 @@ int fstest(void);
 // library
 int printf(const char *fmt, ...);
 int dprintf(int fd, const char *fmt, ...);
-size_t strlen(const char *s);
-void *memset(void *s, int c, size_t n);
 STD_WRAP(char *gets(char *buf, int max))
-char *strchr(const char *s, int c);
 void *malloc(size_t nbytes);
 void free(void *ap);
 

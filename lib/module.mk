@@ -9,6 +9,8 @@ LIB_ARCHIVE_FILE := $(OBJDIR)/$(LIB_DIR)/lib$(LIB_ARCHIVE_NAME).a
 LIB_CFLAGS := $(CFLAGS) -m64 -fno-pic -nostdinc -I.
 LIB_LDFLAGS := $(LDFLAGS) -m elf_x86_64
 
+-include $(OBJDIR)/$(LIB_DIR)/*.d
+
 $(LIB_ARCHIVE_FILE): $(LIB_OBJS)
 	$(AR) r $@ $(LIB_OBJS)
 
