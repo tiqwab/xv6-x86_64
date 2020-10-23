@@ -7,6 +7,7 @@ UOBJS += \
 		 $(OBJDIR)/$(USER_DIR)/fstest \
 		 $(OBJDIR)/$(USER_DIR)/sh \
 		 $(OBJDIR)/$(USER_DIR)/ls \
+		 $(OBJDIR)/$(USER_DIR)/mkdir \
 
 ULIBS := \
 	$(OBJDIR)/$(USER_DIR)/usys.o \
