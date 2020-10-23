@@ -3,6 +3,7 @@
 
 #define NULL 0
 
+#include "inc/dir.h"
 #include "inc/fcntl.h"
 #include "inc/stat.h"
 #include "inc/string.h"
@@ -46,5 +47,6 @@ int dprintf(int fd, const char *fmt, ...);
 STD_WRAP(char *gets(char *buf, int max))
 void *malloc(size_t nbytes);
 void free(void *ap);
+int stat(const char *path, struct stat *buf);
 
 #endif /* ifndef XV6_x86_64_USER_H */

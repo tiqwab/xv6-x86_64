@@ -6,12 +6,14 @@ UOBJS += \
 		 $(OBJDIR)/$(USER_DIR)/preemptiontest2 \
 		 $(OBJDIR)/$(USER_DIR)/fstest \
 		 $(OBJDIR)/$(USER_DIR)/sh \
+		 $(OBJDIR)/$(USER_DIR)/ls \
 
 ULIBS := \
 	$(OBJDIR)/$(USER_DIR)/usys.o \
 	$(OBJDIR)/$(USER_DIR)/entry.o \
 	$(OBJDIR)/$(USER_DIR)/printf.o \
 	$(OBJDIR)/$(USER_DIR)/gets.o \
+	$(OBJDIR)/$(USER_DIR)/stat.o \
 	$(OBJDIR)/$(USER_DIR)/umalloc.o \
 
 USER_LINKER_SCRIPT := $(USER_DIR)/user.ld

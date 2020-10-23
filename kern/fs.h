@@ -5,6 +5,7 @@
 // Both the kernel and user programs use this header file.
 // TODO: share this header with user
 
+#include "inc/dir.h"
 #include "inc/types.h"
 
 #define ROOTINO 1 // root i-number
@@ -51,13 +52,5 @@ struct dinode {
 
 // Block of free map containing bit for block b
 #define BBLOCK(b, sb) (b / BPB + sb.bmapstart)
-
-// Directory is a file containing a sequence of dirent structures.
-#define DIRSIZ 14
-
-struct dirent {
-  ushort inum;
-  char name[DIRSIZ];
-};
 
 #endif /* ifndef XV6_X86_64_FS_H */
