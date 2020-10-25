@@ -269,6 +269,7 @@ static struct inode *create(char *path, short type, short major, short minor) {
 int64_t sys_open(void) {
   char *path;
   int fd, omode;
+  size_t sz, off;
   struct file *f;
   struct inode *ip;
 
@@ -296,6 +297,8 @@ int64_t sys_open(void) {
     }
   }
 
+  sz = (size_t)ip->size;
+
   if ((f = filealloc()) == 0 || (fd = fdalloc(f)) < 0) {
     if (f) {
       fileclose(f);
@@ -309,7 +312,7 @@ int64_t sys_open(void) {
 
   f->type = FD_INODE;
   f->ip = ip;
-  f->off = 0;
+  f->off = (omode & O_APPEND) ? sz : 0;
   f->readable = !(omode & O_WRONLY);
   f->writable = (omode & O_WRONLY) || (omode & O_RDWR);
   return fd;
