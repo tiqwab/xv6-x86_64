@@ -10,6 +10,8 @@ UOBJS += \
 		 $(OBJDIR)/$(USER_DIR)/mkdir \
 		 $(OBJDIR)/$(USER_DIR)/cat \
 		 $(OBJDIR)/$(USER_DIR)/echo \
+		 $(OBJDIR)/$(USER_DIR)/ln \
+		 $(OBJDIR)/$(USER_DIR)/rm \
 
 ULIBS := \
 	$(OBJDIR)/$(USER_DIR)/usys.o \
