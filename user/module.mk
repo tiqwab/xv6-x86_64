@@ -8,6 +8,8 @@ UOBJS += \
 		 $(OBJDIR)/$(USER_DIR)/sh \
 		 $(OBJDIR)/$(USER_DIR)/ls \
 		 $(OBJDIR)/$(USER_DIR)/mkdir \
+		 $(OBJDIR)/$(USER_DIR)/cat \
+		 $(OBJDIR)/$(USER_DIR)/echo \
 
 ULIBS := \
 	$(OBJDIR)/$(USER_DIR)/usys.o \
