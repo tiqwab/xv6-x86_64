@@ -455,3 +455,36 @@ void sleep(void *chan, struct spinlock *lk) {
     acquire(lk);
   }
 }
+
+// Print a process listing to console.  For debugging.
+// Runs when user types ^P on console.
+// No lock to avoid wedging a stuck machine further.
+void procdump(void) {
+  static char *states[] = {
+      [UNUSED] "unused",   [EMBRYO] "embryo",  [SLEEPING] "sleep ",
+      [RUNNABLE] "runble", [RUNNING] "run   ", [ZOMBIE] "zombie"};
+  int i;
+  struct proc *p;
+  char *state;
+  uint pc[10];
+
+  for (p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
+    if (p->state == UNUSED) {
+      continue;
+    }
+    if (p->state >= 0 && p->state < NELEM(states) && states[p->state]) {
+      state = states[p->state];
+    } else {
+      state = "???";
+    }
+    cprintf("%d %s %s", p->pid, state, p->name);
+    // TODO after getcallerpcs
+    // if (p->state == SLEEPING) {
+    //   getcallerpcs((uint *)p->context->ebp + 2, pc);
+    //   for (i = 0; i < 10 && pc[i] != 0; i++) {
+    //     cprintf(" %p", pc[i]);
+    //   }
+    // }
+    cprintf("\n");
+  }
+}

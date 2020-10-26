@@ -236,8 +236,7 @@ void consoleintr(int (*getc)(void)) {
   }
   release(&cons.lock);
   if (doprocdump) {
-    // TODO for procdump
-    // procdump(); // now call procdump() wo. cons.lock held
+    procdump(); // now call procdump() wo. cons.lock held
   }
 }
 

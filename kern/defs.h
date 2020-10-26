@@ -125,6 +125,7 @@ pid_t wait(void);
 void wakeup(void *chan);
 int kill(pid_t pid);
 void yield(void);
+void procdump(void);
 
 // sleeplock.c
 void acquiresleep(struct sleeplock *);
