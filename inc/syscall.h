@@ -22,7 +22,4 @@
 #define SYS_mkdir 20
 #define SYS_close 21
 
-#define SYS_hello 32
-#define SYS_fstest 35
-
 #endif /* ifndef XV6_X86_64_SYSCALL_H */

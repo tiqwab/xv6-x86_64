@@ -1,5 +1,3 @@
-// TODO: This file should be moved from kern
-
 #include "inc/types.h"
 #include "inc/x86.h"
 

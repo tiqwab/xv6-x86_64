@@ -52,8 +52,7 @@ $(OBJDIR)/$(KERN_DIR)/initcode: $(KERN_DIR)/initcode.S
 	$(OBJCOPY) -S -O binary $@.out $@
 	$(OBJDUMP) -S $@.o > $@.asm
 
-# TODO: remote UBOJS later (after fs)
-$(OBJDIR)/$(KERNEL): $(KERN_OBJS) $(KERN_LINKER_SCRIPT) $(KERN_BINARY_OBJS) $(UBOJS) $(LIB_ARCHIVE_FILE)
+$(OBJDIR)/$(KERNEL): $(KERN_OBJS) $(KERN_LINKER_SCRIPT) $(KERN_BINARY_OBJS) $(LIB_ARCHIVE_FILE)
 	$(LD) $(KERN_LDFLAGS) -T $(KERN_LINKER_SCRIPT) -o $@ $(KERN_OBJS) \
 		-L $(OBJDIR)/$(LIB_DIR) -l$(LIB_ARCHIVE_NAME) -b binary $(KERN_BINARY_OBJS)
 	$(OBJDUMP) -S $@ > $@.asm

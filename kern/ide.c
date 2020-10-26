@@ -136,7 +136,6 @@ void idestart(struct buf *b) {
     //
     // The detail of write protocol is in 10.2 of Spec
     outb(PRIMARY_COMMAND_BASE_REG + REG_COMMAND, write_cmd);
-    // TODO: does it work as expected?
     outsl(PRIMARY_COMMAND_BASE_REG + REG_DATA, b->data, BSIZE / 4);
   } else {
     // The detail of read protocol is in 10.1 of Spec
@@ -159,7 +158,6 @@ void ideintr(void) {
 
   // Read data if needed.
   if (!(b->flags & B_DIRTY) && idewait(1) >= 0) {
-    // TODO: does it work as expected?
     insl(PRIMARY_COMMAND_BASE_REG + REG_DATA, b->data, BSIZE / 4);
   }
 

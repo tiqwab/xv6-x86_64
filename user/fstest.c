@@ -1,8 +1,6 @@
 #include "user.h"
 
 int main(int argc, char *argv[]) {
-  fstest();
-
   int fd1, fd2, fd3;
   ssize_t n;
   char *dir_name = "foo";

@@ -38,9 +38,6 @@ int link(const char *oldpath, const char *newpath);
 STD_WRAP(int mkdir(const char *pathname))
 int close(int fd);
 
-int hello(void);
-int fstest(void);
-
 // library
 int printf(const char *fmt, ...);
 int dprintf(int fd, const char *fmt, ...);

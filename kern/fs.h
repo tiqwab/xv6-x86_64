@@ -3,7 +3,6 @@
 
 // On-disk file system format.
 // Both the kernel and user programs use this header file.
-// TODO: share this header with user
 
 #include "inc/dir.h"
 #include "inc/types.h"

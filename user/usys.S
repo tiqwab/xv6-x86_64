@@ -29,6 +29,3 @@ SYSCALL(unlink)
 SYSCALL(link)
 SYSCALL(mkdir)
 SYSCALL(close)
-
-SYSCALL(hello)
-SYSCALL(fstest)
