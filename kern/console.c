@@ -9,8 +9,6 @@
 // ref. http://oswiki.osask.jp/?VGA
 // ref. https://os.phil-opp.com/vga-text-mode/
 
-// TODO 2: add useful info to panic
-
 static void consputc(int);
 
 static int panicked = 0;
@@ -113,7 +111,7 @@ void cprintf(char *fmt, ...) {
 }
 
 void panic(char *s) {
-  // TODO2
+  // TODO after getcallerpcs
   int i;
   uint pcs[10];
 

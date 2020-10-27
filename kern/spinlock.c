@@ -4,13 +4,10 @@
 #include "proc.h"
 #include "x86.h"
 
-// TODO 2: handle lk->CPU and lk->pcs in initlock, acquire, and release
-
 void initlock(struct spinlock *lk, char *name) {
   lk->name = name;
   lk->locked = 0;
-  // TODO for multicore
-  // lk->cpu = 0;
+  lk->cpu = 0;
 }
 
 // Acquire the lock.
@@ -31,9 +28,9 @@ void acquire(struct spinlock *lk) {
   // references happen after the lock is acquired.
   __sync_synchronize();
 
-  // TODO2
   // Record info about lock acquisition for debugging.
-  // lk->cpu = mycpu();
+  lk->cpu = mycpu();
+  // TODO after getcallerpcs
   // getcallerpcs(&lk, lk->pcs);
 }
 
@@ -42,9 +39,9 @@ void release(struct spinlock *lk) {
   if (!holding(lk))
     panic("release");
 
-  // TODO2
+  // TODO after getcallerpcs
   // lk->pcs[0] = 0;
-  // lk->cpu = 0;
+  lk->cpu = 0;
 
   // Tell the C compiler and the processor to not move loads or stores
   // past this point, to ensure that all the stores in the critical
@@ -65,9 +62,7 @@ void release(struct spinlock *lk) {
 int holding(struct spinlock *lock) {
   int r;
   pushcli();
-  r = lock->locked;
-  // TODO for multicore
-  // r = lock->locked && lock->cpu == mycpu();
+  r = lock->locked && lock->cpu == mycpu();
   popcli();
   return r;
 }

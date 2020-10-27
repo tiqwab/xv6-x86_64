@@ -5,7 +5,6 @@
 #include "param.h"
 #include "x86.h"
 
-// TODO for multicore
 // Per-CPU state
 // scheduler contains rsp before swtch.
 struct cpu {
