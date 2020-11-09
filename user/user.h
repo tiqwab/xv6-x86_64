@@ -6,6 +6,7 @@
 #include "inc/dir.h"
 #include "inc/fcntl.h"
 #include "inc/stat.h"
+#include "inc/stdarg.h"
 #include "inc/string.h"
 #include "inc/types.h"
 

@@ -13,6 +13,7 @@ UOBJS += \
 		 $(OBJDIR)/$(USER_DIR)/ln \
 		 $(OBJDIR)/$(USER_DIR)/rm \
 		 $(OBJDIR)/$(USER_DIR)/wc \
+		 $(OBJDIR)/$(USER_DIR)/vatest \
 
 ULIBS := \
 	$(OBJDIR)/$(USER_DIR)/usys.o \

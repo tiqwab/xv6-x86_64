@@ -31,13 +31,14 @@ static void printint(int fd, long xx, int base, int sign, int *print_cnt) {
   }
 }
 
-int __attribute__((noinline)) do_printf(const char *fmt, void *args[], int fd) {
+static int do_printf(const char *fmt, int fd, va_list va) {
   char *s;
   int c, i, state;
-  long *ap;
   int print_cnt = 0;
 
-  ap = (long *)args;
+  char *val_s;
+  int val_d;
+  char val_c;
 
   state = 0;
   for (i = 0; (c = fmt[i] & 0xff) != 0; i++) {
@@ -49,23 +50,24 @@ int __attribute__((noinline)) do_printf(const char *fmt, void *args[], int fd) {
       }
     } else if (state == '%') {
       if (c == 'd') {
-        printint(fd, *ap, 10, 1, &print_cnt);
-        ap++;
+        val_d = va_arg(va, int);
+        printint(fd, val_d, 10, 1, &print_cnt);
       } else if (c == 'x' || c == 'p') {
-        printint(fd, *ap, 16, 0, &print_cnt);
-        ap++;
+        // FIXME: handle 64 bit value
+        val_d = va_arg(va, int);
+        printint(fd, val_d, 16, 0, &print_cnt);
       } else if (c == 's') {
-        s = (char *)*ap;
-        ap++;
-        if (s == 0)
-          s = "(null)";
-        while (*s != 0) {
-          printchar(fd, *s, &print_cnt);
-          s++;
+        val_s = va_arg(va, char *);
+        if (val_s == 0) {
+          val_s = "(null)";
+        }
+        while (*val_s != 0) {
+          printchar(fd, *val_s, &print_cnt);
+          val_s++;
         }
       } else if (c == 'c') {
-        printchar(fd, *ap, &print_cnt);
-        ap++;
+        val_c = (char)va_arg(va, int);
+        printchar(fd, val_c, &print_cnt);
       } else if (c == '%') {
         printchar(fd, c, &print_cnt);
       } else {
@@ -81,30 +83,19 @@ int __attribute__((noinline)) do_printf(const char *fmt, void *args[], int fd) {
 }
 
 // Print to the stdout. Only understands %c, %d, %x, %p, %s.
-// FIXME: the current implementation accepts only *five* arguments other than
-// fmt.
 int printf(const char *fmt, ...) {
-  void *args[5] = {0, 0, 0, 0, 0};
-  // it is not a good way to use clobber list to prevent registers being
-  // edited...
-  __asm__ volatile("mov %%rsi,%0" : "=a"(args[0]) : : "%rsi");
-  __asm__ volatile("mov %%rdx,%0" : "=a"(args[1]) : : "%rdx");
-  __asm__ volatile("mov %%rcx,%0" : "=a"(args[2]) : : "%rcx");
-  __asm__ volatile("mov %%r8,%0" : "=a"(args[3]) : : "%r8");
-  __asm__ volatile("mov %%r9,%0" : "=a"(args[4]) : : "%r9");
-  return do_printf(fmt, args, 0);
+  va_list va;
+  va_start(va, fmt);
+  int res = do_printf(fmt, 0, va);
+  va_end(va);
+  return res;
 }
 
 // Print to the given fd. Only understands %c, %d, %x, %p, %s.
-// FIXME: the current implementation accepts only *four* arguments other than
-// fmt.
 int dprintf(int fd, const char *fmt, ...) {
-  void *args[5] = {0, 0, 0, 0, 0};
-  // it is not a good way to use clobber list to prevent registers being
-  // edited...
-  __asm__ volatile("mov %%rdx,%0" : "=a"(args[0]) : : "%rdx");
-  __asm__ volatile("mov %%rcx,%0" : "=a"(args[1]) : : "%rcx");
-  __asm__ volatile("mov %%r8,%0" : "=a"(args[2]) : : "%r8");
-  __asm__ volatile("mov %%r9,%0" : "=a"(args[3]) : : "%r9");
-  return do_printf(fmt, args, fd);
+  va_list va;
+  va_start(va, fmt);
+  int res = do_printf(fmt, fd, va);
+  va_end(va);
+  return res;
 }
