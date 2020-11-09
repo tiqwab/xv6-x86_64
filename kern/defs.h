@@ -16,9 +16,6 @@ struct spinlock;
 struct stat;
 struct superblock;
 
-// args.c
-void prepare_args(void *args[]);
-
 // bio.c
 void binit(void);
 struct buf *bread(uint dev, uint blockno);

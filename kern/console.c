@@ -1,5 +1,6 @@
 #include "defs.h"
 #include "file.h"
+#include "inc/stdarg.h"
 #include "memlayout.h"
 #include "proc.h"
 #include "spinlock.h"
@@ -42,17 +43,16 @@ static void printint(long xx, int base, int sign) {
 }
 
 // Print to the console. only understands %c, %d, %x, %p, %s.
-// FIXME: Accept up to 5 arguments for now.
 void cprintf(char *fmt, ...) {
   int i, c, locking;
   void **argp;
   char *s;
 
-  // have to do copy them to args at first because these values might be
-  // overwrited
-  void *args[5] = {0, 0, 0, 0, 0};
-  prepare_args(args);
-  argp = args;
+  va_list va;
+  char val_c;
+  int val_d;
+  long val_l;
+  char *val_s;
 
   locking = cons.locking;
   if (locking) {
@@ -62,6 +62,8 @@ void cprintf(char *fmt, ...) {
   if (fmt == 0) {
     panic("null fmt");
   }
+
+  va_start(va, fmt);
 
   for (i = 0; (c = fmt[i] & 0xff) != 0; i++) {
     if (c != '%') {
@@ -75,25 +77,30 @@ void cprintf(char *fmt, ...) {
     case 'c':
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpointer-to-int-cast"
-      consputc((char)*argp++);
+      val_c = (char)va_arg(va, int);
+      consputc(val_c);
 #pragma GCC diagnostic pop
       break;
     case 'd':
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpointer-to-int-cast"
-      // it has to cast as int or accept value sign extended
-      printint((long)(int)*argp++, 10, 1);
+      val_d = va_arg(va, int);
+      printint((long)val_d, 10, 1);
 #pragma GCC diagnostic pop
       break;
     case 'x':
     case 'p':
-      printint((long)*argp++, 16, 0);
+      val_l = va_arg(va, long);
+      printint(val_l, 16, 0);
       break;
     case 's':
-      if ((s = (char *)*argp++) == 0)
-        s = "(null)";
-      for (; *s; s++)
-        consputc(*s);
+      val_s = va_arg(va, char *);
+      if (val_s == 0) {
+        val_s = "(null)";
+      }
+      for (; *val_s; val_s++) {
+        consputc(*val_s);
+      }
       break;
     case '%':
       consputc('%');
@@ -106,8 +113,11 @@ void cprintf(char *fmt, ...) {
     }
   }
 
-  if (locking)
+  va_end(va);
+
+  if (locking) {
     release(&cons.lock);
+  }
 }
 
 void panic(char *s) {
