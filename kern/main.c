@@ -31,6 +31,7 @@ int main(void) {
   cprintf("cprintf format test1: %d, 0x%x, 0x%p, %s\n", 256, 256, main,
           "hello");
   cprintf("cprintf format test2: %c %c %c\n", 'a', 'b', 'c');
+  cprintf("cprintf format test3: %d %u\n", 1 << 31, 1 << 31);
   cprintf("initialization finished\n");
 
   mpmain(); // finish this processor's setup

@@ -51,6 +51,7 @@ void cprintf(char *fmt, ...) {
   va_list va;
   char val_c;
   int val_d;
+  unsigned int val_u;
   long val_l;
   char *val_s;
 
@@ -87,6 +88,10 @@ void cprintf(char *fmt, ...) {
       val_d = va_arg(va, int);
       printint((long)val_d, 10, 1);
 #pragma GCC diagnostic pop
+      break;
+    case 'u':
+      val_u = va_arg(va, unsigned int);
+      printint((long)val_u, 10, 0);
       break;
     case 'x':
     case 'p':

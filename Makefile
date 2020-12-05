@@ -52,6 +52,7 @@ include boot/module.mk
 include lib/module.mk
 include user/module.mk
 include kern/module.mk
+include net/module.mk
 
 # Disc sector start no where kernel image is loaded
 # TODO: duplicated with KERNEL_START_SECTOR in boot/stage_2.c
