@@ -2,6 +2,7 @@ LIB_DIR := lib
 
 LIB_OBJS := \
 	$(OBJDIR)/$(LIB_DIR)/string.o \
+	$(OBJDIR)/$(LIB_DIR)/atoi.o \
 
 LIB_ARCHIVE_NAME := xv6_x86_64
 LIB_ARCHIVE_FILE := $(OBJDIR)/$(LIB_DIR)/lib$(LIB_ARCHIVE_NAME).a

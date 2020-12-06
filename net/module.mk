@@ -28,6 +28,14 @@ $(OBJDIR)/$(LWIP_DIR)/%.o: $(LWIP_DIR)/%.S
 	@mkdir -p $(@D)
 	$(CC) -o $@ $(LWIP_CFLAGS) -fno-pic -nostdinc $(LWIP_INCLUDES) -c $<
 
+$(OBJDIR)/$(LWIP_CUSTOM_DIR)/%.o: $(LWIP_CUSTOM_DIR)/%.c
+	@mkdir -p $(@D)
+	$(CC) -o $@ $(LWIP_CFLAGS) -fno-pic -nostdinc $(LWIP_INCLUDES) -c $<
+
+$(OBJDIR)/$(LWIP_CUSTOM_DIR)/%.o: $(LWIP_CUSTOM_DIR)/%.S
+	@mkdir -p $(@D)
+	$(CC) -o $@ $(LWIP_CFLAGS) -fno-pic -nostdinc $(LWIP_INCLUDES) -c $<
+
 $(OBJDIR)/$(NET_DIR)/liblwip.a: $(LWIP_OBJS)
 	@mkdir -p $(@D)
 	$(AR) r $@ $(LWIP_OBJS)

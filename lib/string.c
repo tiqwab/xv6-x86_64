@@ -38,6 +38,10 @@ void *memmove(void *dst, const void *src, size_t n) {
   return dst;
 }
 
+void *memcpy(void *dst, const void *src, size_t n) {
+    memmove(dst, src, n);
+}
+
 int strncmp(const char *p, const char *q, size_t n) {
   while (n > 0 && *p && *p == *q) {
     n--;

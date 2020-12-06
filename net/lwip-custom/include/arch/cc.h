@@ -53,6 +53,10 @@ typedef long ptrdiff_t;
 // See net/lwip/include/lwip/arch.h L175.
 #define LWIP_NO_CTYPE_H 1
 
+// We don't provide errno.h, so use it defined in lwip.
+// See net/lwip/include/lwip/errno.h
+#define LWIP_PROVIDE_ERRNO 1
+
 #define PACK_STRUCT_FIELD(x) x
 #define PACK_STRUCT_STRUCT
 #define PACK_STRUCT_BEGIN
@@ -66,7 +70,11 @@ typedef long ptrdiff_t;
 #define U32_F "u"
 #define X32_F "x"
 
-#define LWIP_PLATFORM_DIAG(x) cprintf x
+// will be defined in kernel
+void cprintf(char *, ...);
+void panic(char *) __attribute__((noreturn));
+
+#define LWIP_PLATFORM_DIAG(x) cprintf(x)
 #define LWIP_PLATFORM_ASSERT(x) panic(x)
 
 #ifndef BYTE_ORDER

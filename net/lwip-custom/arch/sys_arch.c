@@ -11,12 +11,12 @@
 //     LIST_REMOVE(se, link);
 //     assert(se->freed);
 //     se->freed = 0;
-// 
+//
 //     se->counter = count;
 //     se->gen++;
 //     return se - &sems[0];
 // }
-// 
+//
 // void
 // sys_sem_free(sys_sem_t sem)
 // {
@@ -25,7 +25,7 @@
 //     sems[sem].gen++;
 //     LIST_INSERT_HEAD(&sem_free, &sems[sem], link);
 // }
-// 
+//
 // void
 // sys_sem_signal(sys_sem_t sem)
 // {
@@ -36,15 +36,15 @@
 // 	thread_wakeup(&sems[sem].v);
 //     }
 // }
-// 
+//
 // u32_t
 // sys_arch_sem_wait(sys_sem_t sem, u32_t tm_msec)
 // {
 //     assert(!sems[sem].freed);
 //     u32_t waited = 0;
-// 
+//
 //     int gen = sems[sem].gen;
-// 
+//
 //     while (tm_msec == 0 || waited < tm_msec) {
 // 	if (sems[sem].counter > 0) {
 // 	    sems[sem].counter--;
@@ -67,6 +67,6 @@
 // 	    waited += (b - a);
 // 	}
 //     }
-// 
+//
 //     return SYS_ARCH_TIMEOUT;
 // }
