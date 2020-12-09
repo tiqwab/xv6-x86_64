@@ -1,5 +1,6 @@
 #include "defs.h"
 #include "proc.h"
+#include "spinlock.h"
 
 int64_t sys_fork(void) { return fork(); }
 

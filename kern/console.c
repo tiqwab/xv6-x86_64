@@ -42,13 +42,11 @@ static void printint(long xx, int base, int sign) {
     consputc(buf[i]);
 }
 
-// Print to the console. only understands %c, %d, %x, %p, %s.
-void cprintf(char *fmt, ...) {
+void vcprintf(char *fmt, va_list va) {
   int i, c, locking;
   void **argp;
   char *s;
 
-  va_list va;
   char val_c;
   int val_d;
   unsigned int val_u;
@@ -63,8 +61,6 @@ void cprintf(char *fmt, ...) {
   if (fmt == 0) {
     panic("null fmt");
   }
-
-  va_start(va, fmt);
 
   for (i = 0; (c = fmt[i] & 0xff) != 0; i++) {
     if (c != '%') {
@@ -118,22 +114,35 @@ void cprintf(char *fmt, ...) {
     }
   }
 
-  va_end(va);
-
   if (locking) {
     release(&cons.lock);
   }
 }
 
-void panic(char *s) {
+// Print to the console. only understands %c, %d, %x, %p, %s.
+void cprintf(char *fmt, ...) {
+  va_list va;
+  va_start(va, fmt);
+  vcprintf(fmt, va);
+  va_end(va);
+}
+
+void panic(char *s, ...) {
   // TODO after getcallerpcs
   int i;
   uint pcs[10];
 
+  va_list va;
+  va_start(va, s);
+
   cli();
   cons.locking = 0;
   // use lapiccpunum so that we can call panic from mycpu()
-  cprintf("kernel panic! lapicid %d: panic: %s\n", lapicid(), s);
+  cprintf("kernel panic! lapicid %d: panic: ", lapicid());
+  vcprintf(s, va);
+
+  va_end(va);
+
   // getcallerpcs(&s, pcs);
   // for(i=0; i<10; i++)
   //   cprintf(" %p", pcs[i]);

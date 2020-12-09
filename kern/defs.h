@@ -26,7 +26,7 @@ void brelse(struct buf *b);
 void consoleinit(void);
 void consoleintr(int (*)(void));
 void cprintf(char *, ...);
-void panic(char *) __attribute__((noreturn));
+void panic(char *, ...) __attribute__((noreturn));
 
 // exec.c
 int exec(char *, char **);
@@ -124,23 +124,12 @@ int kill(pid_t pid);
 void yield(void);
 void procdump(void);
 
-// sleeplock.c
-void acquiresleep(struct sleeplock *);
-void releasesleep(struct sleeplock *);
-int holdingsleep(struct sleeplock *);
-void initsleeplock(struct sleeplock *, char *);
+// spinlock.c
+void pushcli(void);
+void popcli(void);
 
 // swtch.S
 void swtch(struct context **, struct context *);
-
-// spinlock.c
-void acquire(struct spinlock *);
-// void            getcallerpcs(void*, uint*);
-int holding(struct spinlock *);
-void initlock(struct spinlock *, char *);
-void release(struct spinlock *);
-void pushcli(void);
-void popcli(void);
 
 // syscall.c
 int arg(int n, uint64_t *ip);

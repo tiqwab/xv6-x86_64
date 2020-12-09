@@ -29,6 +29,7 @@ KERN_OBJS := \
 	$(OBJDIR)/$(KERN_DIR)/log.o \
 	$(OBJDIR)/$(KERN_DIR)/file.o \
 	$(OBJDIR)/$(KERN_DIR)/pipe.o \
+	$(OBJDIR)/$(KERN_DIR)/time.o \
 
 KERN_BINARY_OBJS := \
 	$(OBJDIR)/$(KERN_DIR)/initcode \

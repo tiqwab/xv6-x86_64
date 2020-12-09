@@ -15,4 +15,10 @@ struct sleeplock {
   pid_t pid;  // Process holding lock
 };
 
+// sleeplock.c
+void acquiresleep(struct sleeplock *);
+void releasesleep(struct sleeplock *);
+int holdingsleep(struct sleeplock *);
+void initsleeplock(struct sleeplock *, char *);
+
 #endif /* ifndef XV6_X86_64_SLEEPLOCK_H */
