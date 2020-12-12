@@ -9,6 +9,7 @@
 #define NSEM 256
 #define NMBOX 128
 #define MBOXSLOTS 32
+#define NMUTEX 64
 
 struct sys_sem_entry {
   struct spinlock lock;
@@ -41,14 +42,26 @@ struct sys_mbox_entry {
 
 static struct sys_mbox_entry mboxes[NMBOX];
 static LIST_HEAD(mbox_list, sys_mbox_entry) mbox_free;
-// Get this lock if we use sems or mbox_free
+// Get this lock if we use mboxes or mbox_free
 static struct spinlock mboxes_lock;
+
+struct sys_mutex_entry {
+    struct spinlock lock;
+    int freed;
+    LIST_ENTRY(sys_mutex_entry) link;
+};
+
+static struct sys_mutex_entry mutexes[NMUTEX];
+static LIST_HEAD(mutex_list, sys_mutex_entry) mutex_free;
+// Get this lock if we use mutexes or mutex_free
+static struct spinlock mutexes_lock;
 
 void sys_init(void) {
   int i = 0;
 
   initlock(&sems_lock, "sems");
   initlock(&mboxes_lock, "mboxes");
+  initlock(&mutexes_lock, "mutexes");
 
   for (i = 0; i < NSEM; i++) {
     initlock(&sems[i].lock, "sem");
@@ -61,7 +74,17 @@ void sys_init(void) {
       mboxes[i].freed = 1;
       LIST_INSERT_HEAD(&mbox_free, &mboxes[i], link);
   }
+
+  for (i = 0; i < NMUTEX; i++) {
+      initlock(&mutexes[i].lock, "mutex");
+      mutexes[i].freed = 1;
+      LIST_INSERT_HEAD(&mutex_free, &mutexes[i], link);
+  }
 }
+
+/**************
+ * Semaphore
+ **************/
 
 err_t sys_sem_new(sys_sem_t *sem, u8_t count) {
   acquire(&sems_lock);
@@ -160,6 +183,10 @@ u32_t sys_arch_sem_wait(sys_sem_t *sem, u32_t tm_msec) {
 void lwip_core_lock(void) {}
 
 void lwip_core_unlock(void) {}
+
+/**************
+ * Mailbox
+ **************/
 
 err_t sys_mbox_new(sys_mbox_t *mbox, int size) {
     assert(size < MBOXSLOTS);
@@ -280,4 +307,54 @@ u32_t sys_arch_mbox_fetch(sys_mbox_t *mbox, void **msg, u32_t tm_msec) {
 // FIXME: this should return SYS_MBOX_EMPTY not SYS_ARCH_TIMEOUT?
 u32_t  sys_arch_mbox_tryfetch(sys_mbox_t *mbox, void **msg) {
     return sys_arch_mbox_fetch(mbox, msg, SYS_ARCH_NOWAIT);
+}
+
+/**************
+ * Mailbox
+ **************/
+
+err_t sys_mutex_new(sys_mutex_t *mutex) {
+  acquire(&mutexes_lock);
+
+  struct sys_mutex_entry *me = LIST_FIRST(&mutex_free);
+  if (!me) {
+    cprintf("lwip: sys_mutex_new: out of mutexes\n");
+    release(&mutexes_lock);
+    return ERR_MEM;
+  }
+  LIST_REMOVE(me, link);
+  assert(me->freed);
+  me->freed = 0;
+
+  *mutex = me;
+
+  release(&mutexes_lock);
+  return ERR_OK;
+}
+
+void sys_mutex_free(sys_mutex_t *mutex) {
+    struct sys_mutex_entry *me = *mutex;
+
+    acquire(&me->lock);
+
+    assert(!me->freed);
+    me->freed = 1;
+
+    release(&me->lock);
+
+    acquire(&mutexes_lock);
+
+    LIST_INSERT_HEAD(&mutex_free, me, link);
+
+    release(&mutexes_lock);
+}
+
+void sys_mutex_lock(sys_mutex_t *mutex) {
+    struct sys_mutex_entry *me = *mutex;
+    acquire(&me->lock);
+}
+
+void sys_mutex_unlock(sys_mutex_t *mutex) {
+    struct sys_mutex_entry *me = *mutex;
+    release(&me->lock);
 }
