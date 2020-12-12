@@ -4,7 +4,9 @@
 struct sys_sem_entry;
 typedef struct sys_sem_entry *sys_sem_t;
 
-typedef int sys_mbox_t;
+struct sys_mbox_entry;
+typedef struct sys_mbox_entry *sys_mbox_t;
+
 typedef int sys_thread_t;
 typedef int sys_mutex_t;
 
