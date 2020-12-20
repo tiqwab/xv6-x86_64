@@ -10,6 +10,8 @@
 #include "inc/string.h"
 #include "inc/types.h"
 
+#include "lwip/sockets.h"
+
 // wrap functions which exist in stds, but have different signatures.
 #define STD_WRAP(f)                                                            \
   _Pragma("GCC diagnostic push")                                               \
@@ -39,6 +41,7 @@ int link(const char *oldpath, const char *newpath);
 STD_WRAP(int mkdir(const char *pathname))
 int close(int fd);
 int socket(int domain, int type, int protocol);
+int bind(int s, const struct sockaddr *name, socklen_t namelen);
 
 // library
 int printf(const char *fmt, ...);

@@ -6,10 +6,20 @@
 #include "arch/queue.h"
 #include "arch/sys_arch.h"
 
+#include "kern/sleeplock.h"
+#include "kern/spinlock.h"
+
 #define NSEM 256
 #define NMBOX 128
 #define MBOXSLOTS 32
 #define NMUTEX 64
+
+/*
+ * definitions from kernel
+ */
+unsigned int time_msec();
+void sleep(void *chan, struct spinlock *lk);
+void wakeup(void *chan);
 
 struct sys_sem_entry {
   struct spinlock lock;

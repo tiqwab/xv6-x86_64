@@ -760,6 +760,8 @@ lwip_bind(int s, const struct sockaddr *name, socklen_t namelen)
   u16_t local_port;
   err_t err;
 
+  LWIP_PLATFORM_DIAG(("sock: %d\n", s));
+
   sock = get_socket(s);
   if (!sock) {
     return -1;

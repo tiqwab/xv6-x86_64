@@ -45,7 +45,7 @@ struct backcmd {
   struct cmd *cmd;
 };
 
-void panic(char *);
+static void _panic(char *);
 int fork1(void); // Fork but panics on failure.
 struct cmd *parsecmd(char *);
 
@@ -64,7 +64,7 @@ void runcmd(struct cmd *cmd) {
 
   switch (cmd->type) {
   default:
-    panic("runcmd");
+    _panic("runcmd");
     break;
 
   case EXEC:
@@ -98,7 +98,7 @@ void runcmd(struct cmd *cmd) {
   case PIPE:
     pcmd = (struct pipecmd *)cmd;
     if (pipe(p) < 0) {
-      panic("pipe");
+      _panic("pipe");
     }
     if (fork1() == 0) {
       close(1);
@@ -170,7 +170,7 @@ int main(void) {
   exit();
 }
 
-void panic(char *s) {
+void _panic(char *s) {
   dprintf(2, "%s\n", s);
   exit();
 }
@@ -180,7 +180,7 @@ int fork1(void) {
 
   pid = fork();
   if (pid == -1) {
-    panic("fork");
+    _panic("fork");
   }
   return pid;
 }
@@ -323,7 +323,7 @@ struct cmd *parsecmd(char *s) {
   peek(&s, es, "");
   if (s != es) {
     dprintf(2, "leftovers: %s\n", s);
-    panic("syntax");
+    _panic("syntax");
   }
   nulterminate(cmd);
   return cmd;
@@ -362,7 +362,7 @@ struct cmd *parseredirs(struct cmd *cmd, char **ps, char *es) {
   while (peek(ps, es, "<>")) {
     tok = gettoken(ps, es, 0, 0);
     if (gettoken(ps, es, &q, &eq) != 'a')
-      panic("missing file for redirection");
+      _panic("missing file for redirection");
     switch (tok) {
     case '<':
       cmd = redircmd(cmd, q, eq, O_RDONLY, 0);
@@ -382,12 +382,12 @@ struct cmd *parseblock(char **ps, char *es) {
   struct cmd *cmd;
 
   if (!peek(ps, es, "(")) {
-    panic("parseblock");
+    _panic("parseblock");
   }
   gettoken(ps, es, 0, 0);
   cmd = parseline(ps, es);
   if (!peek(ps, es, ")")) {
-    panic("syntax - missing )");
+    _panic("syntax - missing )");
   }
   gettoken(ps, es, 0, 0);
   cmd = parseredirs(cmd, ps, es);
@@ -412,12 +412,12 @@ struct cmd *parseexec(char **ps, char *es) {
     if ((tok = gettoken(ps, es, &q, &eq)) == 0)
       break;
     if (tok != 'a')
-      panic("syntax");
+      _panic("syntax");
     cmd->argv[argc] = q;
     cmd->eargv[argc] = eq;
     argc++;
     if (argc >= MAXARGS)
-      panic("too many args");
+      _panic("too many args");
     ret = parseredirs(ret, ps, es);
   }
   cmd->argv[argc] = 0;

@@ -1,7 +1,6 @@
 #ifndef XV6_X86_64_ARCH_CC_H
 #define XV6_X86_64_ARCH_CC_H
 
-#include "arch/kern.h"
 #include "inc/types.h"
 
 typedef uint32_t u32_t;
@@ -78,5 +77,12 @@ typedef long ptrdiff_t;
 #ifndef BYTE_ORDER
 #define BYTE_ORDER LITTLE_ENDIAN
 #endif
+
+/*
+ * definitions from kernel
+ */
+
+void cprintf(char *, ...);
+void panic(char *, ...) __attribute__((noreturn));
 
 #endif /* ifndef XV6_X86_64_ARCH_CC_H */

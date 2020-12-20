@@ -51,8 +51,8 @@ default: $(IMAGES)
 
 include boot/module.mk
 include lib/module.mk
-include user/module.mk
 include net/module.mk
+include user/module.mk
 include kern/module.mk
 
 # Disc sector start no where kernel image is loaded

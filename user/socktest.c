@@ -6,9 +6,19 @@
 
 int main(int argc, char *argv[]) {
   int fd;
+  struct sockaddr_in server;
 
   if ((fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
     printf("socket: failed\n");
+    return 1;
+  }
+
+  server.sin_family = AF_INET;
+  server.sin_addr.s_addr = lwip_htonl(INADDR_ANY);
+  server.sin_port = lwip_htons(12345);
+
+  if (bind(fd, (struct sockaddr *)&server, sizeof(server)) < 0) {
+    printf("bind: failed\n");
     return 1;
   }
 

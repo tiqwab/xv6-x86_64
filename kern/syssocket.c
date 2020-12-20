@@ -61,3 +61,29 @@ int sys_socket(void) {
   }
   return sockfd;
 }
+
+int sys_bind(void) {
+  int s, fd;
+  struct sockaddr *name;
+  socklen_t namelen;
+  struct proc *curproc = myproc();
+
+  if (argint(0, &fd) < 0) {
+    return -1;
+  }
+  if (argint(2, (int *)&namelen) < 0) {
+    return -1;
+  }
+  if (argptr(1, (char **)&name, namelen) < 0) {
+    return -1;
+  }
+
+  struct file *f = curproc->ofile[fd];
+  if (f->type != FD_SOCKET) {
+    return -1;
+  }
+
+  s = f->sock->sockid;
+
+  return lwip_bind(s, name, namelen);
+}
