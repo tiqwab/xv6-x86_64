@@ -87,3 +87,21 @@ int sys_bind(void) {
 
   return lwip_bind(s, name, namelen);
 }
+
+int sys_listen(void) {
+  int s, fd, backlog;
+  struct proc *curproc = myproc();
+
+  if (argint(0, &fd) < 0 || argint(1, &backlog) < 0) {
+    return -1;
+  }
+
+  struct file *f = curproc->ofile[fd];
+  if (f->type != FD_SOCKET) {
+    return -1;
+  }
+
+  s = f->sock->sockid;
+
+  return lwip_listen(s, backlog);
+}

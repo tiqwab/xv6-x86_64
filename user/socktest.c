@@ -22,6 +22,11 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
+  if (listen(fd, 5) < 0) {
+    printf("listen: failed\n");
+    return 1;
+  }
+
   if (close(fd) < 0) {
     printf("close: failed\n");
     return 1;

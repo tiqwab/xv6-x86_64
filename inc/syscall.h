@@ -23,5 +23,6 @@
 #define SYS_close 21
 #define SYS_socket 22
 #define SYS_bind 23
+#define SYS_listen 24
 
 #endif /* ifndef XV6_X86_64_SYSCALL_H */

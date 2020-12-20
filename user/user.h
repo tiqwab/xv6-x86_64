@@ -42,6 +42,7 @@ STD_WRAP(int mkdir(const char *pathname))
 int close(int fd);
 int socket(int domain, int type, int protocol);
 int bind(int s, const struct sockaddr *name, socklen_t namelen);
+int listen(int s, int backlog);
 
 // library
 int printf(const char *fmt, ...);
