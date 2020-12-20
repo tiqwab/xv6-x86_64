@@ -8,6 +8,7 @@ include $(LWIP_DIR)/Filelists.mk
 
 LWIP_SRCS := $(LWIPNOAPPSFILES) \
 	$(LWIP_CUSTOM_DIR)/arch/sys_arch.c \
+	$(LWIP_CUSTOM_DIR)/arch/errno.c \
 
 LWIP_INCLUDES := \
 	-I$(LWIP_DIR)/include \
@@ -17,8 +18,12 @@ LWIP_INCLUDES := \
 LWIP_OBJS := $(patsubst %.c, $(OBJDIR)/%.o, $(LWIP_SRCS))
 LWIP_OBJS += $(patsubst %.S, $(OBJDIR)/%.o, $(LWIP_SRCS))
 
-LWIP_CFLAGS := $(CFLAGS) -m64 -I.
+# net is used with kernel, so specify mcmodel=kernel
+LWIP_CFLAGS := $(CFLAGS) -m64 -I. -mcmodel=kernel
 LWIP_LDFLAGS := $(LDFLAGS) -m elf_x86_64
+
+LWIP_ARCHIVE_NAME := lwip
+LWIP_ARCHIVE_FILE := $(OBJDIR)/$(NET_DIR)/liblwip.a
 
 $(OBJDIR)/$(LWIP_DIR)/%.o: $(LWIP_DIR)/%.c
 	@mkdir -p $(@D)
@@ -36,6 +41,6 @@ $(OBJDIR)/$(LWIP_CUSTOM_DIR)/%.o: $(LWIP_CUSTOM_DIR)/%.S
 	@mkdir -p $(@D)
 	$(CC) -o $@ $(LWIP_CFLAGS) -fno-pic -nostdinc $(LWIP_INCLUDES) -c $<
 
-$(OBJDIR)/$(NET_DIR)/liblwip.a: $(LWIP_OBJS)
+$(LWIP_ARCHIVE_FILE): $(LWIP_OBJS)
 	@mkdir -p $(@D)
 	$(AR) r $@ $(LWIP_OBJS)

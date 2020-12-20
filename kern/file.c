@@ -1,6 +1,8 @@
 #include "file.h"
 #include "defs.h"
 #include "param.h"
+#include "proc.h"
+#include "socket.h"
 
 struct devsw devsw[NDEV];
 
@@ -38,6 +40,21 @@ struct file *filedup(struct file *f) {
   return f;
 }
 
+// Allocate a file descriptor for the given file.
+// Takes over file reference from caller on success.
+int fdalloc(struct file *f) {
+  int fd;
+  struct proc *curproc = myproc();
+
+  for (fd = 0; fd < NOFILE; fd++) {
+    if (curproc->ofile[fd] == 0) {
+      curproc->ofile[fd] = f;
+      return fd;
+    }
+  }
+  return -1;
+}
+
 // Close file f.  (Decrement ref count, close when reaches 0.)
 void fileclose(struct file *f) {
   struct file ff;
@@ -57,9 +74,11 @@ void fileclose(struct file *f) {
 
   if (ff.type == FD_PIPE) {
     pipeclose(ff.pipe, ff.writable);
+  } else if (ff.type == FD_SOCKET) {
+    socketclose(ff.sock);
   } else if (ff.type == FD_INODE) {
     begin_op();
-    iput(ff.ip);
+    iclose(ff.ip);
     end_op();
   }
 }

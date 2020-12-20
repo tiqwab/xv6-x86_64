@@ -7,6 +7,7 @@
 struct buf;
 struct context;
 struct cpu;
+struct file;
 struct inode;
 struct ioapic;
 struct pipe;
@@ -32,6 +33,7 @@ void panic(char *, ...) __attribute__((noreturn));
 int exec(char *, char **);
 
 // file.c
+int fdalloc(struct file *f);
 struct file *filealloc(void);
 void fileclose(struct file *);
 struct file *filedup(struct file *);
@@ -52,6 +54,7 @@ void iput(struct inode *);
 void iunlock(struct inode *);
 void iunlockput(struct inode *);
 void iupdate(struct inode *);
+int iclose(struct inode *);
 int namecmp(const char *, const char *);
 struct inode *namei(char *);
 struct inode *nameiparent(char *, char *);

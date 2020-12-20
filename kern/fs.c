@@ -469,6 +469,22 @@ int writei(struct inode *ip, char *src, uint off, uint n) {
   return n;
 }
 
+int iclose(struct inode *ip) {
+  if (ip->type == T_DEV) {
+    if (ip->major < 0 || ip->major >= NDEV) {
+      return -1;
+    }
+    if (devsw[ip->major].close) {
+      return devsw[ip->major].close(ip);
+    } else {
+      return 0;
+    }
+  } else {
+    iput(ip);
+    return 0;
+  }
+}
+
 //
 // Directories
 //

@@ -21,5 +21,6 @@
 #define SYS_link 19
 #define SYS_mkdir 20
 #define SYS_close 21
+#define SYS_socket 22
 
 #endif /* ifndef XV6_X86_64_SYSCALL_H */

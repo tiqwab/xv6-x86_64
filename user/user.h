@@ -38,6 +38,7 @@ int unlink(const char *pathname);
 int link(const char *oldpath, const char *newpath);
 STD_WRAP(int mkdir(const char *pathname))
 int close(int fd);
+int socket(int domain, int type, int protocol);
 
 // library
 int printf(const char *fmt, ...);

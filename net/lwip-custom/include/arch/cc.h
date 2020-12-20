@@ -54,14 +54,13 @@ typedef long ptrdiff_t;
 // See net/lwip/include/lwip/arch.h L175.
 #define LWIP_NO_CTYPE_H 1
 
-// We don't provide errno.h, so use it defined in lwip.
-// See net/lwip/include/lwip/errno.h
-#define LWIP_PROVIDE_ERRNO 1
+// We define socket library functions.
+// See net/lwip/include/lwip/opt.h L1982
+#define LWIP_COMPAT_SOCKETS 0
 
-#define PACK_STRUCT_FIELD(x) x
-#define PACK_STRUCT_STRUCT
-#define PACK_STRUCT_BEGIN
-#define PACK_STRUCT_END
+#define S8_F "d"
+#define U8_F "u"
+#define X8_F "x"
 
 #define S16_F "d"
 #define U16_F "u"
@@ -71,7 +70,9 @@ typedef long ptrdiff_t;
 #define U32_F "u"
 #define X32_F "x"
 
-#define LWIP_PLATFORM_DIAG(x) cprintf(x)
+#define SZT_F "u"
+
+#define LWIP_PLATFORM_DIAG(x) cprintf x
 #define LWIP_PLATFORM_ASSERT(x) panic(x)
 
 #ifndef BYTE_ORDER

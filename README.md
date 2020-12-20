@@ -1,5 +1,16 @@
 x86\_64 implementation of [xv6](https://github.com/mit-pdos/xv6-public).
 
+```
+# Compile
+$ make
+
+# Compile with debug print
+$ XV6_CFLAGS="-DLWIP_DEBUG" make
+
+# Run
+$ make qemu
+```
+
 The below is the original README of xv6.
 
 ---

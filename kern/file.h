@@ -6,12 +6,13 @@
 #include "sleeplock.h"
 
 struct file {
-  enum { FD_NONE, FD_PIPE, FD_INODE } type;
+  enum { FD_NONE, FD_PIPE, FD_INODE, FD_SOCKET } type;
   int ref; // reference count
   char readable;
   char writable;
   struct pipe *pipe;
   struct inode *ip;
+  struct socket *sock;
   uint off;
 };
 
@@ -36,6 +37,7 @@ struct inode {
 struct devsw {
   int (*read)(struct inode *, char *, int);
   int (*write)(struct inode *, char *, int);
+  int (*close)(struct inode *);
 };
 
 extern struct devsw devsw[];
