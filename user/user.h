@@ -43,6 +43,7 @@ int close(int fd);
 int socket(int domain, int type, int protocol);
 int bind(int s, const struct sockaddr *name, socklen_t namelen);
 int listen(int s, int backlog);
+int accept(int s, struct sockaddr *addr, socklen_t *addrlen);
 
 // library
 int printf(const char *fmt, ...);

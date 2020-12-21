@@ -43,6 +43,17 @@ bad:
   return -1;
 }
 
+static int fd_to_sock(int fd) {
+  struct proc *curproc = myproc();
+
+  struct file *f = curproc->ofile[fd];
+  if (f->type != FD_SOCKET) {
+    return -1;
+  }
+
+  return f->sock->sockid;
+}
+
 int sys_socket(void) {
   int domain, type, protocol;
   int sockid, sockfd;
@@ -66,7 +77,6 @@ int sys_bind(void) {
   int s, fd;
   struct sockaddr *name;
   socklen_t namelen;
-  struct proc *curproc = myproc();
 
   if (argint(0, &fd) < 0) {
     return -1;
@@ -78,30 +88,48 @@ int sys_bind(void) {
     return -1;
   }
 
-  struct file *f = curproc->ofile[fd];
-  if (f->type != FD_SOCKET) {
-    return -1;
+  s = fd_to_sock(fd);
+  if (s < 0) {
+    return s;
   }
-
-  s = f->sock->sockid;
 
   return lwip_bind(s, name, namelen);
 }
 
 int sys_listen(void) {
   int s, fd, backlog;
-  struct proc *curproc = myproc();
 
   if (argint(0, &fd) < 0 || argint(1, &backlog) < 0) {
     return -1;
   }
 
-  struct file *f = curproc->ofile[fd];
-  if (f->type != FD_SOCKET) {
+  s = fd_to_sock(fd);
+  if (s < 0) {
+    return s;
+  }
+
+  return lwip_listen(s, backlog);
+}
+
+int sys_accept(void) {
+  int s, fd;
+  struct sockaddr *addr;
+  socklen_t *addrlen;
+
+  if (argint(0, &fd) < 0) {
+    return -1;
+  }
+  if (argptr(2, (char **)&addrlen, sizeof(int)) < 0) {
+    return -1;
+  }
+  if (argptr(1, (char **)&addr, (int)*addrlen) < 0) {
     return -1;
   }
 
-  s = f->sock->sockid;
+  s = fd_to_sock(fd);
+  if (s < 0) {
+    return s;
+  }
 
-  return lwip_listen(s, backlog);
+  return lwip_accept(s, addr, addrlen);
 }
