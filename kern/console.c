@@ -19,11 +19,17 @@ static struct {
   int locking;
 } cons;
 
-static void printint(long xx, int base, int sign) {
+#define MAX_DIGIT_LEN 16
+
+static void printint(long xx, int base, int sign, char pad, int digit_len) {
   static char digits[] = "0123456789abcdef";
-  char buf[16];
+  char buf[MAX_DIGIT_LEN];
   int i;
   ulong x;
+
+  if (digit_len > MAX_DIGIT_LEN) {
+    digit_len = MAX_DIGIT_LEN;
+  }
 
   if (sign && (sign = xx < 0))
     x = -xx;
@@ -35,17 +41,31 @@ static void printint(long xx, int base, int sign) {
     buf[i++] = digits[x % base];
   } while ((x /= base) != 0);
 
-  if (sign)
-    buf[i++] = '-';
+  if (sign) {
+    digit_len--;
+  }
 
-  while (--i >= 0)
+  while (i < digit_len) {
+    buf[i++] = pad;
+  }
+
+  if (sign) {
+    buf[i++] = '-';
+  }
+
+  while (--i >= 0) {
     consputc(buf[i]);
+  }
 }
 
 void vcprintf(char *fmt, va_list va) {
   int i, c, locking;
+  char pad = ' ';
+  int digit_len = 0;
   void **argp;
   char *s;
+  int percent_flag = 0;
+  int digit_i;
 
   char val_c;
   int val_d;
@@ -63,54 +83,86 @@ void vcprintf(char *fmt, va_list va) {
   }
 
   for (i = 0; (c = fmt[i] & 0xff) != 0; i++) {
-    if (c != '%') {
-      consputc(c);
-      continue;
-    }
-    c = fmt[++i] & 0xff;
-    if (c == 0)
-      break;
-    switch (c) {
-    case 'c':
+    if (!percent_flag) {
+      if (c == '%') {
+        percent_flag = 1;
+      } else {
+        consputc(c);
+      }
+    } else {
+      if (c == 0) {
+        break;
+      }
+
+      switch (c) {
+      case ' ':
+        pad = ' ';
+        continue;
+      case '0':
+        pad = '0';
+        continue;
+      case '1':
+      case '2':
+      case '3':
+      case '4':
+      case '5':
+      case '6':
+      case '7':
+      case '8':
+      case '9':
+        digit_i = i;
+        while (c >= '0' && c <= '9') {
+          digit_len = digit_len * 10 + (c - '0');
+          digit_i++;
+          c = fmt[digit_i];
+        }
+        i = digit_i - 1;
+        continue;
+      case 'c':
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpointer-to-int-cast"
-      val_c = (char)va_arg(va, int);
-      consputc(val_c);
+        val_c = (char)va_arg(va, int);
+        consputc(val_c);
 #pragma GCC diagnostic pop
-      break;
-    case 'd':
+        break;
+      case 'd':
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpointer-to-int-cast"
-      val_d = va_arg(va, int);
-      printint((long)val_d, 10, 1);
+        val_d = va_arg(va, int);
+        printint((long)val_d, 10, 1, pad, digit_len);
 #pragma GCC diagnostic pop
-      break;
-    case 'u':
-      val_u = va_arg(va, unsigned int);
-      printint((long)val_u, 10, 0);
-      break;
-    case 'x':
-    case 'p':
-      val_l = va_arg(va, long);
-      printint(val_l, 16, 0);
-      break;
-    case 's':
-      val_s = va_arg(va, char *);
-      if (val_s == 0) {
-        val_s = "(null)";
+        break;
+      case 'u':
+        val_u = va_arg(va, unsigned int);
+        printint((long)val_u, 10, 0, pad, digit_len);
+        break;
+      case 'x':
+      case 'p':
+        val_l = va_arg(va, long);
+        printint(val_l, 16, 0, pad, digit_len);
+        break;
+      case 's':
+        val_s = va_arg(va, char *);
+        if (val_s == 0) {
+          val_s = "(null)";
+        }
+        for (; *val_s; val_s++) {
+          consputc(*val_s);
+        }
+        break;
+      case '%':
+        consputc('%');
+        break;
+      default:
+        // Print unknown % sequence to draw attention.
+        consputc('%');
+        consputc(c);
+        break;
       }
-      for (; *val_s; val_s++) {
-        consputc(*val_s);
-      }
-      break;
-    case '%':
-      consputc('%');
-      break;
-    default:
-      // Print unknown % sequence to draw attention.
-      consputc('%');
-      consputc(c);
-      break;
+
+      percent_flag = 0;
+      digit_len = 0;
+      pad = ' ';
     }
   }
 
