@@ -10,6 +10,7 @@
 #include "inc/string.h"
 #include "inc/types.h"
 
+#include "lwip/inet.h"
 #include "lwip/sockets.h"
 
 // wrap functions which exist in stds, but have different signatures.
@@ -44,10 +45,12 @@ int socket(int domain, int type, int protocol);
 int bind(int s, const struct sockaddr *name, socklen_t namelen);
 int listen(int s, int backlog);
 int accept(int s, struct sockaddr *addr, socklen_t *addrlen);
+int connect(int s, struct sockaddr *addr, socklen_t addrlen);
 
 // library
 int printf(const char *fmt, ...);
 int dprintf(int fd, const char *fmt, ...);
+int vdprintf(int fd, const char *fmt, va_list va);
 STD_WRAP(char *gets(char *buf, int max))
 void *malloc(size_t nbytes);
 void free(void *ap);

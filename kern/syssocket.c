@@ -133,3 +133,26 @@ int sys_accept(void) {
 
   return lwip_accept(s, addr, addrlen);
 }
+
+int sys_connect(void) {
+  int s, fd;
+  struct sockaddr *name;
+  socklen_t namelen;
+
+  if (argint(0, &fd) < 0) {
+    return -1;
+  }
+  if (argint(2, (int *)&namelen) < 0) {
+    return -1;
+  }
+  if (argptr(1, (char **)&name, (int)namelen) < 0) {
+    return -1;
+  }
+
+  s = fd_to_sock(fd);
+  if (s < 0) {
+    return s;
+  }
+
+  return lwip_connect(s, name, namelen);
+}

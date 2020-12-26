@@ -23,6 +23,7 @@ ULIBS := \
 	$(OBJDIR)/$(USER_DIR)/gets.o \
 	$(OBJDIR)/$(USER_DIR)/stat.o \
 	$(OBJDIR)/$(USER_DIR)/umalloc.o \
+	$(OBJDIR)/$(USER_DIR)/lwip.o \
 
 USER_LINKER_SCRIPT := $(USER_DIR)/user.ld
 

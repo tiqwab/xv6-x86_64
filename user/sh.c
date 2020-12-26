@@ -45,7 +45,7 @@ struct backcmd {
   struct cmd *cmd;
 };
 
-static void _panic(char *);
+void _panic(char *);
 int fork1(void); // Fork but panics on failure.
 struct cmd *parsecmd(char *);
 

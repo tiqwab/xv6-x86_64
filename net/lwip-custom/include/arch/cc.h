@@ -79,10 +79,12 @@ typedef long ptrdiff_t;
 #endif
 
 /*
- * definitions from kernel
+ * Definitions used by the above LWIP macro
+ * FIXME: How should we define it?
+ * Both kern and user use lwip...
  */
 
 void cprintf(char *, ...);
-void panic(char *, ...) __attribute__((noreturn));
+void __attribute__((noreturn)) panic(char *, ...);
 
 #endif /* ifndef XV6_X86_64_ARCH_CC_H */

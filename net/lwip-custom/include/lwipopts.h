@@ -50,4 +50,8 @@
 #define DHCP6_DEBUG LWIP_DBG_ON
 #endif
 
+// Define loopback interface
+// See net/lwip/include/lwip/opt.h L.1727
+#define LWIP_HAVE_LOOPIF 1
+
 #endif /* ifndef XV6_X86_64_LWIPOPTS_H */

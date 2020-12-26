@@ -31,7 +31,7 @@ static void printint(int fd, long xx, int base, int sign, int *print_cnt) {
   }
 }
 
-static int do_printf(const char *fmt, int fd, va_list va) {
+int vdprintf(int fd, const char *fmt, va_list va) {
   char *s;
   int c, i, state;
   int print_cnt = 0;
@@ -86,7 +86,7 @@ static int do_printf(const char *fmt, int fd, va_list va) {
 int printf(const char *fmt, ...) {
   va_list va;
   va_start(va, fmt);
-  int res = do_printf(fmt, 0, va);
+  int res = vdprintf(0, fmt, va);
   va_end(va);
   return res;
 }
@@ -95,7 +95,7 @@ int printf(const char *fmt, ...) {
 int dprintf(int fd, const char *fmt, ...) {
   va_list va;
   va_start(va, fmt);
-  int res = do_printf(fmt, fd, va);
+  int res = vdprintf(fd, fmt, va);
   va_end(va);
   return res;
 }
