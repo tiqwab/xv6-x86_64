@@ -25,17 +25,19 @@ int main(void) {
   binit();    // buffer cache
   fileinit(); // file table
   ideinit();  // disk
+
   // startothers();   // start other processors
-  kinit2();   // must come after startothers()
+  kinit2(); // must come after startothers()
+
+  pci_init();
+  net_init();
+
   userinit(); // first user process
   cprintf("cprintf format test1: %d, 0x%x, 0x%p, %s\n", 256, 256, main,
           "hello");
   cprintf("cprintf format test2: %c %c %c\n", 'a', 'b', 'c');
   cprintf("cprintf format test3: %d %u\n", 1 << 31, 1 << 31);
   cprintf("cprintf format test3: %4d %04d\n", 12, 12);
-
-  pci_init();
-  net_init();
 
   cprintf("initialization finished\n");
 

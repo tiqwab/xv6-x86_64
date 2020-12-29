@@ -1,6 +1,7 @@
 #include "e1000.h"
 #include "defs.h"
 #include "inc/types.h"
+#include "lwip/err.h"
 #include "memlayout.h"
 
 uintptr_t physaddr_e1000;
@@ -114,38 +115,36 @@ int attachfn_e1000(struct pci_func *pcif) {
 /*
  * ref. PCI/PCI-X Family of Gigabit Ethernet Controllers SDM 3.3.3 and 3.4
  */
-// int transmit_packet(char *data, uint16_t len) {
-//   struct tx_desc *const begin =
-//       (struct tx_desc
-//       *)KADDR(PCI_E1000_REG_VALUE(PCI_E1000_REG_OFFSET_TDBAL));
-//   struct tx_desc *const end = begin + PCI_E1000_NUM_TX_DESC;
-//   struct tx_desc *tail = begin +
-//   PCI_E1000_REG_VALUE(PCI_E1000_REG_OFFSET_TDT);
-//
-//   if ((tail->cmd & TX_DESC_CMD_RS) && !(tail->status & TX_DESC_STATUS_DD)) {
-//     // ring buffer is full
-//     return -E_BUF_FULL;
-//   }
-//
-//   tail->addr = (uint64_t)((uint32_t)PADDR(tx_buf[tail - begin]));
-//   memcpy(tx_buf[tail - begin], data, len);
-//   tail->length = len;
-//   tail->cso = 0;
-//   tail->cmd = TX_DESC_CMD_EOP | TX_DESC_CMD_RS;
-//   tail->status = 0;
-//   tail->css = 0;
-//   tail->special = 0;
-//
-//   char *x = (char *)KADDR(tail->addr);
-//
-//   // update TDT;
-//   uint32_t *p;
-//   tail++;
-//   if (tail == end) {
-//     tail = begin;
-//   }
-//   p = PCI_E1000_REG_ADDR(PCI_E1000_REG_OFFSET_TDT);
-//   *p = (uint32_t)(tail - begin);
-//
-//   return 0;
-// }
+int transmit_packet(char *data, uint16_t len) {
+  struct tx_desc *const begin = (struct tx_desc *)P2V(
+      (uintptr_t)PCI_E1000_REG_VALUE(PCI_E1000_REG_OFFSET_TDBAL));
+  struct tx_desc *const end = begin + PCI_E1000_NUM_TX_DESC;
+  struct tx_desc *tail = begin + PCI_E1000_REG_VALUE(PCI_E1000_REG_OFFSET_TDT);
+
+  if ((tail->cmd & TX_DESC_CMD_RS) && !(tail->status & TX_DESC_STATUS_DD)) {
+    // ring buffer is full
+    return ERR_BUF;
+  }
+
+  tail->addr = (uint64_t)((uint32_t)V2P(tx_buf[tail - begin]));
+  memcpy(tx_buf[tail - begin], data, len);
+  tail->length = len;
+  tail->cso = 0;
+  tail->cmd = TX_DESC_CMD_EOP | TX_DESC_CMD_RS;
+  tail->status = 0;
+  tail->css = 0;
+  tail->special = 0;
+
+  char *x = (char *)P2V((uintptr_t)tail->addr);
+
+  // update TDT;
+  uint32_t *p;
+  tail++;
+  if (tail == end) {
+    tail = begin;
+  }
+  p = PCI_E1000_REG_ADDR(PCI_E1000_REG_OFFSET_TDT);
+  *p = (uint32_t)(tail - begin);
+
+  return 0;
+}

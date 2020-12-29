@@ -2,6 +2,7 @@
 #include "lwip/inet.h"
 #include "lwip/tcpip.h"
 
+#include "e1000.h"
 #include "string.h"
 
 #define IP "10.0.2.15"
@@ -27,39 +28,8 @@ static void low_level_init(struct netif *netif) {
 }
 
 static err_t low_level_output(struct netif *netif, struct pbuf *p) {
-  // int r = sys_page_alloc(0, (void *)PKTMAP, PTE_U|PTE_W|PTE_P);
-  // if (r < 0)
-  // panic("jif: could not allocate page of memory");
-  // struct jif_pkt *pkt = (struct jif_pkt *)PKTMAP;
-
-  // struct jif *jif;
-  // jif = netif->state;
-
-  // char *txbuf = pkt->jp_data;
-  // int txsize = 0;
-  // struct pbuf *q;
-  // for (q = p; q != NULL; q = q->next) {
-  // /* Send the data from the pbuf to the interface, one pbuf at a
-  //    time. The size of the data in each pbuf is kept in the ->len
-  //    variable. */
-
-  // if (txsize + q->len > 2000)
-  //     panic("oversized packet, fragment %d txsize %d\n", q->len, txsize);
-  // memcpy(&txbuf[txsize], q->payload, q->len);
-  // txsize += q->len;
-  // }
-
-  // pkt->jp_len = txsize;
-
-  // // char b[300];
-  // // memcpy(b, pkt->jp_data, pkt->jp_len);
-  // // b[pkt->jp_len] = '\0';
-  // // cprintf("[low_level_input] data: %s, len: %d\n", &b[60], pkt->jp_len);
-
-  // ipc_send(jif->envid, NSREQ_OUTPUT, (void *)pkt, PTE_P|PTE_W|PTE_U);
-  // sys_page_unmap(0, (void *)pkt);
-
-  cprintf("low_level_output\n");
+  cprintf("[low_level_output] len: %d\n", p->len);
+  transmit_packet(p->payload, p->len);
 
   return ERR_OK;
 }

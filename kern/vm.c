@@ -37,7 +37,11 @@ static struct kmap {
   uintptr_t phys_start;
   uintptr_t phys_end;
   int perm;
-} kmap[4];
+  int is_present;
+} kmap[5];
+
+#define KMAP_MMIO 3
+#define KMAP_DEV 4
 
 // Initialize kmap.
 // We couldn't initilize it at load time...:
@@ -54,24 +58,37 @@ void init_kmap(void) {
   kmap[0].phys_start = 0;
   kmap[0].phys_end = EXTMEM;
   kmap[0].perm = PTE_W;
+  kmap[0].is_present = 1;
 
   // kern text+rodata
   kmap[1].virt = (void *)KERNLINK;
   kmap[1].phys_start = V2P(KERNLINK);
   kmap[1].phys_end = V2P(data);
   kmap[1].perm = 0;
+  kmap[1].is_present = 1;
 
   // kern data+memory
   kmap[2].virt = (void *)data;
   kmap[2].phys_start = V2P(data);
   kmap[2].phys_end = phys_top;
   kmap[2].perm = PTE_W;
+  kmap[2].is_present = 1;
+
+  // Memory-mapped I/O
+  // This is not used when kpgdir is initialized.
+  // Updated by mmio_map_region
+  kmap[KMAP_MMIO].virt = 0x0;
+  kmap[KMAP_MMIO].phys_start = 0x0;
+  kmap[KMAP_MMIO].phys_end = 0x0;
+  kmap[KMAP_MMIO].perm = 0x0;
+  kmap[KMAP_MMIO].is_present = 0;
 
   // devspace
-  kmap[3].virt = DEVSPACE_P2V(DEVSPACE_PHYS);
-  kmap[3].phys_start = DEVSPACE_PHYS;
-  kmap[3].phys_end = 0x100000000;
-  kmap[3].perm = PTE_W;
+  kmap[KMAP_DEV].virt = DEVSPACE_P2V(DEVSPACE_PHYS);
+  kmap[KMAP_DEV].phys_start = DEVSPACE_PHYS;
+  kmap[KMAP_DEV].phys_end = 0x100000000;
+  kmap[KMAP_DEV].perm = PTE_W;
+  kmap[KMAP_DEV].is_present = 1;
 }
 
 // Set up CPU's kernel segment descriptors.
@@ -174,6 +191,9 @@ pte_t *setupkvm(void) {
     panic("PHYSTOP too high");
   }
   for (k = kmap; k < &kmap[NELEM(kmap)]; k++) {
+    if (k->is_present == 0) {
+      continue;
+    }
     cprintf("setupkvm for 0x%p\n", k->virt);
     if (mappages(pgdir, k->virt, k->phys_end - k->phys_start,
                  (uint)k->phys_start, k->perm) < 0) {
@@ -454,6 +474,8 @@ int copyout(pte_t *pgdir, uintptr_t va, void *p, size_t len) {
 }
 
 void *mmio_map_region(uintptr_t orig_pa, size_t orig_size) {
+  // FIXME: cannot call twice
+
   static uintptr_t base = MMIOBASE;
 
   void *start = (void *)base;
@@ -461,9 +483,18 @@ void *mmio_map_region(uintptr_t orig_pa, size_t orig_size) {
 
   uintptr_t pa = PGROUNDDOWN(orig_pa);
   size_t size = PGROUNDUP(orig_pa - pa + orig_size);
+  cprintf("[mmio_map_region] orig_pa: 0x%x, orig_size: 0x%x, pa: 0x%x, size: "
+          "0x%x\n",
+          orig_pa, orig_size, pa, size);
 
   mappages(kpgdir, start, size, pa, PTE_W);
   base += size;
+
+  kmap[KMAP_MMIO].virt = start;
+  kmap[KMAP_MMIO].phys_start = pa;
+  kmap[KMAP_MMIO].phys_end = pa + size;
+  kmap[KMAP_MMIO].perm = PTE_W;
+  kmap[KMAP_MMIO].is_present = 1;
 
   return start;
 }
