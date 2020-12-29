@@ -70,6 +70,9 @@ $(XV6_IMG): format $(OBJDIR)/$(BOOT_BLOCK) $(OBJDIR)/$(KERNEL)
 # http://www.gnu.org/software/make/manual/html_node/Chained-Rules.html
 .PRECIOUS: %.o
 
+PORT7	:= $(shell expr $(GDBPORT) + 1)
+PORT80	:= $(shell expr $(GDBPORT) + 2)
+
 # Enter QEMU monitor by 'Ctrl+a then c' if -serial mon:stdio is specified
 # ref. https://kashyapc.wordpress.com/2016/02/11/qemu-command-line-behavior-of-serial-stdio-vs-serial-monstdio/
 QEMUOPTS := $(QEMUOPTS)
@@ -77,6 +80,8 @@ QEMUOPTS += -drive file=$(XV6_IMG),index=0,media=disk,format=raw \
 			-drive file=$(FS_IMG),index=1,media=disk,format=raw \
 			-serial mon:stdio -gdb tcp::$(GDBPORT) -smp $(CPUS)
 QEMUOPTS += $(shell if $(QEMU) -nographic -help | grep -q '^-D '; then echo '-D qemu.log'; fi)
+QEMUOPTS += -netdev user,id=ethernet.0,hostfwd=tcp::$(PORT7)-:7,hostfwd=tcp::$(PORT80)-:80,hostfwd=udp::$(PORT7)-:7 \
+			-device e1000,netdev=ethernet.0 -object filter-dump,id=dump.0,netdev=ethernet.0,file=qemu.pcap
 
 .gdbinit: .gdbinit.tmpl
 	sed "s/localhost:1234/localhost:$(GDBPORT)/" < $^ > $@

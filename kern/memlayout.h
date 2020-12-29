@@ -8,6 +8,11 @@
 
 // Start of extended memory
 #define EXTMEM 0x100000
+
+// address for Memory-mapped I/O
+#define MMIOBASE 0xfffffffffd000000
+#define MMIOSIZE 0x1000000
+
 // address for other devices are at high addresses such as ioapic and lapic
 #define DEVSPACE_PHYS 0xfe000000
 #define DEVSPACE_P2V(a) ((void *)(((uint64_t)(a)) + 0xffffffff00000000))
@@ -36,6 +41,8 @@
  *    256 TB -------->  +------------------------------+
  *                      |                              | RW/--
  *     DEVSPACE ----->  +------------------------------+ 0xfffffffffe000000
+ *                      :                              : RW/--
+ *     MMIOBASE ----->  +------------------------------+ 0xfffffffffd000000
  *                      :                              :
  *     phys_top ----->  +------------------------------+
  *                      |                              | RW/--

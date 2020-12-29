@@ -50,8 +50,27 @@
 #define DHCP6_DEBUG LWIP_DBG_ON
 #endif
 
-// Define loopback interface
-// See net/lwip/include/lwip/opt.h L.1727
-#define LWIP_HAVE_LOOPIF 1
+/**
+ * Define loopback interface
+ * See net/lwip/include/lwip/opt.h L.1727
+ */
+// #define LWIP_HAVE_LOOPIF 1
+
+/**
+ * LWIP_NETIF_LOOPBACK_MULTITHREADING: Indicates whether threading is enabled in
+ * the system, as netifs must change how they behave depending on this setting
+ * for the LWIP_NETIF_LOOPBACK option to work.
+ * Setting this is needed to avoid reentering non-reentrant functions like
+ * tcp_input().
+ *    LWIP_NETIF_LOOPBACK_MULTITHREADING==1: Indicates that the user is using a
+ *       multithreaded environment like tcpip.c. In this case, netif->input()
+ *       is called directly.
+ *    LWIP_NETIF_LOOPBACK_MULTITHREADING==0: Indicates a polling (or NO_SYS)
+ * setup. The packets are put on a list and netif_poll() must be called in the
+ * main application loop.
+ *
+ * See net/lwip/include/lwip/opt.h L.1767
+ */
+// #define LWIP_NETIF_LOOPBACK_MULTITHREADING 0
 
 #endif /* ifndef XV6_X86_64_LWIPOPTS_H */

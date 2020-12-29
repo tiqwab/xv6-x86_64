@@ -89,6 +89,9 @@ void log_write(struct buf *);
 void begin_op();
 void end_op();
 
+// lwip.c
+void net_init();
+
 // kalloc.c
 char *kalloc(void);
 void kfree(char *);
@@ -97,6 +100,9 @@ void kinit2();
 
 // mp.c
 void mpinit(void);
+
+// pci.c
+int pci_init(void);
 
 // picirq.c
 void picinit(void);
@@ -164,6 +170,7 @@ void freevm(pte_t *pgdir, uintptr_t utop);
 void inituvm(pte_t *pgdir, char *init, size_t sz);
 void kvmalloc(void);
 int loaduvm(pte_t *pgdir, char *addr, struct inode *ip, uint offset, size_t sz);
+void *mmio_map_region(uintptr_t pa, size_t size);
 void seginit(void);
 pte_t *setupkvm(void);
 void switchkvm(void);

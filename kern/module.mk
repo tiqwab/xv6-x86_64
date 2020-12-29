@@ -32,6 +32,9 @@ KERN_OBJS := \
 	$(OBJDIR)/$(KERN_DIR)/time.o \
 	$(OBJDIR)/$(KERN_DIR)/socket.o \
 	$(OBJDIR)/$(KERN_DIR)/syssocket.o \
+	$(OBJDIR)/$(KERN_DIR)/lwip.o \
+	$(OBJDIR)/$(KERN_DIR)/pci.o \
+	$(OBJDIR)/$(KERN_DIR)/e1000.o \
 
 KERN_BINARY_OBJS := \
 	$(OBJDIR)/$(KERN_DIR)/initcode \

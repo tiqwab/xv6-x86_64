@@ -10,6 +10,13 @@ static inline uchar inb(ushort port) {
   return data;
 }
 
+static inline uint32_t inl(ushort port) {
+  uint32_t data;
+
+  __asm__ volatile("inl %w1,%0" : "=a"(data) : "d"(port));
+  return data;
+}
+
 static inline void insl(int port, void *addr, int cnt) {
   __asm__ volatile("cld; rep insl"
                    : "=D"(addr), "=c"(cnt)
@@ -19,6 +26,10 @@ static inline void insl(int port, void *addr, int cnt) {
 
 static inline void outb(ushort port, uchar data) {
   __asm__ volatile("out %0,%1" : : "a"(data), "d"(port));
+}
+
+static inline void outl(ushort port, uint32_t data) {
+  __asm__ volatile("outl %0,%w1" : : "a"(data), "d"(port));
 }
 
 static inline void outsl(int port, const void *addr, int cnt) {

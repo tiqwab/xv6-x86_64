@@ -4,8 +4,6 @@
 #include "proc.h"
 #include "x86.h"
 
-#include "lwip/tcpip.h"
-
 static void mpmain(void) __attribute__((noreturn));
 extern char end[]; // first address after kernel loaded from ELF file
 
@@ -35,9 +33,11 @@ int main(void) {
   cprintf("cprintf format test2: %c %c %c\n", 'a', 'b', 'c');
   cprintf("cprintf format test3: %d %u\n", 1 << 31, 1 << 31);
   cprintf("cprintf format test3: %4d %04d\n", 12, 12);
-  cprintf("initialization finished\n");
 
-  tcpip_init(NULL, NULL); // initialize lwip
+  pci_init();
+  net_init();
+
+  cprintf("initialization finished\n");
 
   mpmain(); // finish this processor's setup
 }

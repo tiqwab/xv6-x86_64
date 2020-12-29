@@ -16,4 +16,5 @@ mkfs
 .gdbinit
 *.bin
 qemu.log
+qemu.pcap
 obj/

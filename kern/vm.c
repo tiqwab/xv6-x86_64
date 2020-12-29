@@ -44,6 +44,9 @@ static struct kmap {
 // kern/memlayout.h:21:16: error: initializer element is not computable at load
 // time
 //   21 | #define V2P(a) (((uintptr_t)(a)) - KERNBASE)
+//
+// There is also kernel region for Memory-mapped I/O.
+// See kern/memlayout.h
 void init_kmap(void) {
 
   // I/O space
@@ -64,6 +67,7 @@ void init_kmap(void) {
   kmap[2].phys_end = phys_top;
   kmap[2].perm = PTE_W;
 
+  // devspace
   kmap[3].virt = DEVSPACE_P2V(DEVSPACE_PHYS);
   kmap[3].phys_start = DEVSPACE_PHYS;
   kmap[3].phys_end = 0x100000000;
@@ -447,4 +451,19 @@ int copyout(pte_t *pgdir, uintptr_t va, void *p, size_t len) {
     va = va0 + PGSIZE;
   }
   return 0;
+}
+
+void *mmio_map_region(uintptr_t orig_pa, size_t orig_size) {
+  static uintptr_t base = MMIOBASE;
+
+  void *start = (void *)base;
+  int i;
+
+  uintptr_t pa = PGROUNDDOWN(orig_pa);
+  size_t size = PGROUNDUP(orig_pa - pa + orig_size);
+
+  mappages(kpgdir, start, size, pa, PTE_W);
+  base += size;
+
+  return start;
 }

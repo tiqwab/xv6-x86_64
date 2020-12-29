@@ -4,6 +4,7 @@
 
 #define AF_INET 2
 
+#define ADDR "10.0.2.15"
 #define PORT 12345
 
 int do_client() {
@@ -19,7 +20,7 @@ int do_client() {
   }
 
   server.sin_family = AF_INET;
-  server.sin_addr.s_addr = inet_addr("127.0.0.1");
+  server.sin_addr.s_addr = inet_addr(ADDR);
   server.sin_port = lwip_htons(PORT);
 
   if (connect(fd, (struct sockaddr *)&server, sizeof(server)) < 0) {
