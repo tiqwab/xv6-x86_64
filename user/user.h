@@ -46,6 +46,7 @@ int bind(int s, const struct sockaddr *name, socklen_t namelen);
 int listen(int s, int backlog);
 int accept(int s, struct sockaddr *addr, socklen_t *addrlen);
 int connect(int s, struct sockaddr *addr, socklen_t addrlen);
+int tcpip_worker(void);
 
 // library
 int printf(const char *fmt, ...);

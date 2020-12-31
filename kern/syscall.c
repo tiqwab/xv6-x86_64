@@ -131,6 +131,7 @@ extern int64_t sys_bind(void);
 extern int64_t sys_listen(void);
 extern int64_t sys_accept(void);
 extern int64_t sys_connect(void);
+extern int64_t sys_tcpip_worker(void);
 
 static int64_t (*syscalls[])(void) = {
     [SYS_fork] = sys_fork,       [SYS_exit] = sys_exit,
@@ -145,7 +146,7 @@ static int64_t (*syscalls[])(void) = {
     [SYS_mkdir] = sys_mkdir,     [SYS_close] = sys_close,
     [SYS_socket] = sys_socket,   [SYS_bind] = sys_bind,
     [SYS_listen] = sys_listen,   [SYS_accept] = sys_accept,
-    [SYS_connect] = sys_connect,
+    [SYS_connect] = sys_connect, [SYS_tcpip_worker] = sys_tcpip_worker,
 };
 
 // FIXME: Accept up to 5 arguments for now.

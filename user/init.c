@@ -12,6 +12,14 @@ int main(void) {
   dup(0); // stdout
   dup(0); // stderr
 
+  // process for network
+  if ((pid = fork()) < 0) {
+    printf("init: fork failed\n");
+    exit();
+  } else if (pid == 0) {
+    tcpip_worker();
+  }
+
   for (;;) {
     printf("init: starting sh\n");
     pid = fork();

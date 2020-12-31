@@ -5,7 +5,7 @@
 #define AF_INET 2
 
 #define ADDR "10.0.2.15"
-#define PORT 12345
+#define PORT 80
 
 int do_client() {
   int fd;

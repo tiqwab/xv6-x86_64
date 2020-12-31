@@ -156,3 +156,8 @@ int sys_connect(void) {
 
   return lwip_connect(s, name, namelen);
 }
+
+int sys_tcpip_worker() {
+  net_init(); // not return
+  return 0;
+}

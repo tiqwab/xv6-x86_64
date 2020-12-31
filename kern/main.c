@@ -30,7 +30,6 @@ int main(void) {
   kinit2(); // must come after startothers()
 
   pci_init();
-  net_init();
 
   userinit(); // first user process
   cprintf("cprintf format test1: %d, 0x%x, 0x%p, %s\n", 256, 256, main,

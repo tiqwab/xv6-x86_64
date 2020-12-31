@@ -46,6 +46,7 @@ void trap(struct trapframe *tf) {
     if (cpuid() == 0) {
       acquire(&tickslock);
       ticks++;
+      xif_input();
       wakeup(&ticks);
       release(&tickslock);
     }

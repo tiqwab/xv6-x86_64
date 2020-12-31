@@ -113,6 +113,46 @@ int attachfn_e1000(struct pci_func *pcif) {
 }
 
 /*
+ * ref. PCI/PCI-X Family of Gigabit Ethernet Controllers SDM 3.2
+ *
+ * Store packet length in len if it is not null.
+ */
+int receive_packet(char *buf, uint16_t *len) {
+  struct rx_desc *const begin = (struct rx_desc *)P2V(
+      (uintptr_t)PCI_E1000_REG_VALUE(PCI_E1000_REG_OFFSET_RDBAL));
+  struct rx_desc *const end = begin + PCI_E1000_NUM_RX_DESC;
+  struct rx_desc *tail = begin + PCI_E1000_REG_VALUE(PCI_E1000_REG_OFFSET_RDT);
+
+  uint32_t *p;
+  tail++;
+  if (tail == end) {
+    tail = begin;
+  }
+
+  if (!(tail->status & RX_DESC_STATUS_DD)) {
+    // not buffer to read
+    return -1;
+  }
+
+  if (tail->errors) {
+    cprintf("errors of receive descriptor shows something wrong: 0x%02\n",
+            tail->errors);
+  }
+
+  memcpy((void *)buf, (void *)P2V(((uintptr_t)tail->addr)), tail->length);
+
+  // update RDT
+  p = PCI_E1000_REG_ADDR(PCI_E1000_REG_OFFSET_RDT);
+  *p = (uint32_t)(tail - begin);
+
+  // store len if required
+  if (len != NULL) {
+    *len = tail->length;
+  }
+  return 0;
+}
+
+/*
  * ref. PCI/PCI-X Family of Gigabit Ethernet Controllers SDM 3.3.3 and 3.4
  */
 int transmit_packet(char *data, uint16_t len) {

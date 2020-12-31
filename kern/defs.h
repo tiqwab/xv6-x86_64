@@ -91,6 +91,7 @@ void end_op();
 
 // lwip.c
 void net_init();
+void xif_input();
 
 // kalloc.c
 char *kalloc(void);

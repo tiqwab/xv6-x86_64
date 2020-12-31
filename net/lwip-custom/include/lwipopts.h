@@ -4,7 +4,7 @@
 #include "lwip/debug.h"
 
 // ref. https://lwip.fandom.com/wiki/Porting_for_an_OS#cc.h
-#define ETH_PAD_SIZE 2
+// #define ETH_PAD_SIZE 2
 #define MEM_ALIGNMENT 4
 
 // We don't provide errno.h, so use it defined in lwip.
