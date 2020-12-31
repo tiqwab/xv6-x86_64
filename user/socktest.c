@@ -7,6 +7,8 @@
 #define ADDR "10.0.2.15"
 #define PORT 80
 
+#define BUF_LEN 2000
+
 int do_client() {
   int fd;
   struct sockaddr_in server;
@@ -28,6 +30,10 @@ int do_client() {
     return 1;
   }
 
+  if (send(fd, "hello", 5, 0) < 0) {
+    printf("[client] send: failed\n");
+  }
+
   return 0;
 }
 
@@ -37,6 +43,8 @@ int do_server() {
   struct sockaddr_in client;
   socklen_t client_len;
   int client_fd;
+  char buf[BUF_LEN];
+  int len;
 
   if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
     printf("[server] socket: failed\n");
@@ -65,6 +73,14 @@ int do_server() {
   }
   printf("[server] client connected from %s:%d\n", inet_ntoa(client.sin_addr),
          client.sin_port);
+
+  if ((len = recv(client_fd, buf, BUF_LEN - 1, 0)) < 0) {
+    printf("[server] recv failed: %d\n", len);
+    return 1;
+  }
+
+  buf[len] = '\0';
+  printf("[server] receive '%s'\n", buf);
 
   if (close(client_fd) < 0) {
     printf("[server] close: failed for client\n");

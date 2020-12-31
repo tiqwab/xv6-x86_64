@@ -112,7 +112,7 @@ int sys_listen(void) {
 }
 
 int sys_accept(void) {
-  int s, fd;
+  int s, fd, client_s, client_fd;
   struct sockaddr *addr;
   socklen_t *addrlen;
 
@@ -131,7 +131,15 @@ int sys_accept(void) {
     return s;
   }
 
-  return lwip_accept(s, addr, addrlen);
+  if ((client_s = lwip_accept(s, addr, addrlen)) < 0) {
+    return client_s;
+  }
+  if ((client_fd = alloc_sockfd(client_s)) < 0) {
+    lwip_close(client_s);
+    return client_fd;
+  }
+
+  return client_fd;
 }
 
 int sys_connect(void) {
@@ -157,7 +165,59 @@ int sys_connect(void) {
   return lwip_connect(s, name, namelen);
 }
 
-int sys_tcpip_worker() {
+int sys_tcpip_worker(void) {
   net_init(); // not return
   return 0;
+}
+
+int sys_send(void) {
+  int s, fd, flags;
+  char *buf;
+  int len;
+
+  if (argint(0, &fd) < 0) {
+    return -1;
+  }
+  if (argint(2, &len) < 0) {
+    return -1;
+  }
+  if (argptr(1, (char **)&buf, len) < 0) {
+    return -1;
+  }
+  if (argint(3, &flags) < 0) {
+    return -1;
+  }
+
+  s = fd_to_sock(fd);
+  if (s < 0) {
+    return s;
+  }
+
+  return lwip_send(s, buf, len, flags);
+}
+
+int sys_recv(void) {
+  int s, fd, flags;
+  char *buf;
+  int len;
+
+  if (argint(0, &fd) < 0) {
+    return -1;
+  }
+  if (argint(2, &len) < 0) {
+    return -1;
+  }
+  if (argptr(1, (char **)&buf, len) < 0) {
+    return -1;
+  }
+  if (argint(3, &flags) < 0) {
+    return -1;
+  }
+
+  s = fd_to_sock(fd);
+  if (s < 0) {
+    return s;
+  }
+
+  return lwip_recv(s, buf, len, flags);
 }
