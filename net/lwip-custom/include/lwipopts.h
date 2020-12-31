@@ -73,4 +73,12 @@
  */
 // #define LWIP_NETIF_LOOPBACK_MULTITHREADING 0
 
+/**
+ * LWIP_NETIF_LOOPBACK==1: Support sending packets with a destination IP
+ * address equal to the netif IP address, looping them back up the stack.
+ *
+ * See net/lwip/include/lwip/opt.h L.1742
+ */
+#define LWIP_NETIF_LOOPBACK 1
+
 #endif /* ifndef XV6_X86_64_LWIPOPTS_H */
