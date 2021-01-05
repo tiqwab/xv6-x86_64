@@ -156,6 +156,7 @@ int receive_packet(char *buf, uint16_t *len) {
  * ref. PCI/PCI-X Family of Gigabit Ethernet Controllers SDM 3.3.3 and 3.4
  */
 int transmit_packet(char *data, uint16_t len) {
+  cprintf("trasmit_packet: len: %d\n", len);
   struct tx_desc *const begin = (struct tx_desc *)P2V(
       (uintptr_t)PCI_E1000_REG_VALUE(PCI_E1000_REG_OFFSET_TDBAL));
   struct tx_desc *const end = begin + PCI_E1000_NUM_TX_DESC;

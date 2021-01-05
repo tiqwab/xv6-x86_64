@@ -81,4 +81,34 @@
  */
 #define LWIP_NETIF_LOOPBACK 1
 
+/**
+ * LWIP_RAW==1: Enable application layer to hook into the IP layer itself.
+ *
+ * See net/lwip/include/lwip/opt.h L.895
+ */
+#define LWIP_RAW 1
+
+/**
+ * LWIP_NETIF_TX_SINGLE_PBUF: if this is set to 1, lwIP *tries* to put all data
+ * to be sent into one single pbuf. This is for compatibility with DMA-enabled
+ * MACs that do not support scatter-gather.
+ * Beware that this might involve CPU-memcpy before transmitting that would not
+ * be needed without this flag! Use this only if you need to!
+ *
+ * ATTENTION: a driver should *NOT* rely on getting single pbufs but check TX
+ * pbufs for being in one piece. If not, @ref pbuf_clone can be used to get
+ * a single pbuf:
+ *   if (p->next != NULL) {
+ *     struct pbuf *q = pbuf_clone(PBUF_RAW, PBUF_RAM, p);
+ *     if (q == NULL) {
+ *       return ERR_MEM;
+ *     }
+ *     p = q; ATTENTION: do NOT free the old 'p' as the ref belongs to the
+ * caller!
+ *   }
+ *
+ * See net/lwip/include/lwip/opt.h L.1697
+ */
+#define LWIP_NETIF_TX_SINGLE_PBUF 1
+
 #endif /* ifndef XV6_X86_64_LWIPOPTS_H */

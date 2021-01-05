@@ -15,6 +15,7 @@ UOBJS += \
 		 $(OBJDIR)/$(USER_DIR)/wc \
 		 $(OBJDIR)/$(USER_DIR)/vatest \
 		 $(OBJDIR)/$(USER_DIR)/socktest \
+		 $(OBJDIR)/$(USER_DIR)/ping \
 
 ULIBS := \
 	$(OBJDIR)/$(USER_DIR)/usys.o \
