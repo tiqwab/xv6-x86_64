@@ -49,6 +49,7 @@ int connect(int s, struct sockaddr *addr, socklen_t addrlen);
 int tcpip_worker(void);
 int send(int sockfd, const void *buf, size_t len, int flags);
 int recv(int sockfd, void *buf, size_t len, int flags);
+int millis_from_start(void);
 
 // library
 int printf(const char *fmt, ...);

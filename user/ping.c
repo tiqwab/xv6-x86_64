@@ -1,15 +1,83 @@
 #include "lwip/icmp.h"
 #include "lwip/inet_chksum.h"
+#include "lwip/ip4.h"
 #include "user.h"
 
-#define BUF_LEN 2000
-#define PING_DATA_SIZE 32
+#define BUF_LEN 1000
+#define PING_DATA_SIZE (4 + 32)
 
 static int ping_seq_num = 0;
 
-static void ping_prepare_echo(struct icmp_echo_hdr *hdr, u16_t len) {
+void ping_prepare_echo(struct icmp_echo_hdr *hdr, u16_t len);
+int ping_process_response(char *ipaddr, int ttl, struct icmp_echo_hdr *req_buf,
+                          struct icmp_echo_hdr *res_buf, int res_len);
+
+int main(int argc, char *argv[]) {
+  int sock;
+  struct sockaddr_in addr;
+  char req_buf[BUF_LEN], res_buf[BUF_LEN];
+  char *raw_ipaddr;
+  struct ip_hdr *ip_hdr;
+  struct icmp_echo_hdr *req_hdr, *res_hdr;
+  size_t ping_size = sizeof(struct icmp_echo_hdr) + PING_DATA_SIZE;
+  int n;
+
+  if (argc != 2) {
+    printf("usage: %s <ipaddr>\n", argv[0]);
+    return 1;
+  }
+
+  raw_ipaddr = argv[1];
+
+  sock = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);
+  if (sock < 0) {
+    printf("socket: failed\n");
+    return 1;
+  }
+
+  addr.sin_family = AF_INET;
+  addr.sin_addr.s_addr = inet_addr(raw_ipaddr);
+
+  if (connect(sock, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
+    printf("connect: failed\n");
+    return 1;
+  }
+
+  printf("PING %s (%s) %d bytes of data.\n", raw_ipaddr, raw_ipaddr,
+         PING_DATA_SIZE);
+
+  for (int i = 0; i < 3; i++) {
+    req_hdr = (struct icmp_echo_hdr *)req_buf;
+    ping_prepare_echo(req_hdr, ping_size);
+
+    if ((n = send(sock, req_buf, ping_size, 0)) < 0) {
+      printf("send: failed\n");
+      return 1;
+    }
+
+    if ((n = recv(sock, res_buf, BUF_LEN, 0)) < 0) {
+      printf("recv: failed\n");
+      return 1;
+    }
+
+    ip_hdr = (struct ip_hdr *)res_buf;
+
+    // skip ip header
+    res_hdr = (struct icmp_echo_hdr *)(res_buf + sizeof(struct ip_hdr));
+    n -= sizeof(struct ip_hdr);
+
+    ping_process_response(raw_ipaddr, IPH_TTL(ip_hdr), req_hdr, res_hdr, n);
+
+    sleep(1);
+  }
+
+  return 0;
+}
+
+void ping_prepare_echo(struct icmp_echo_hdr *hdr, u16_t len) {
   size_t i;
   size_t data_len = len - sizeof(struct icmp_echo_hdr);
+  char *p;
 
   memset(hdr, 0, sizeof(struct icmp_echo_hdr));
 
@@ -19,167 +87,64 @@ static void ping_prepare_echo(struct icmp_echo_hdr *hdr, u16_t len) {
   hdr->id = 0xAFAF; // shouldn't use the fixed value
   hdr->seqno = lwip_htons(++ping_seq_num);
 
+  p = (char *)hdr;
+  p += sizeof(struct icmp_echo_hdr);
+
+  /* add current millis from start */
+  *((unsigned int *)p) = millis_from_start();
+  p += sizeof(unsigned int);
+
   /* fill the additional data buffer with some data */
   for (size_t i = 0; i < data_len; i++) {
-    ((char *)hdr)[sizeof(struct icmp_echo_hdr) + i] = (char)i;
+    *p++ = (char)i;
   }
 
   hdr->chksum = inet_chksum(hdr, len);
 }
 
-int main(int argc, char *argv[]) {
-  int sock;
-  struct sockaddr_in addr;
-  char buf[BUF_LEN];
-  struct icmp_echo_hdr *hdr;
-  size_t ping_size = sizeof(struct icmp_echo_hdr) + PING_DATA_SIZE;
-  int n;
+int ping_process_response(char *ipaddr, int ttl, struct icmp_echo_hdr *req_hdr,
+                          struct icmp_echo_hdr *res_hdr, int res_len) {
+  uint16_t req_id, res_id;
+  uint16_t req_seqno, res_seqno;
+  char *p;
+  unsigned int start_time, current_time;
 
-  if (argc != 2) {
-    printf("usage: %s <ipaddr>\n", argv[0]);
+  if (inet_chksum(res_hdr, res_len) == (uint16_t)-1) {
+    printf("ping: checksum is illegal\n");
     return 1;
   }
 
-  sock = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);
-  if (sock < 0) {
-    printf("socket: failed\n");
+  if (ICMPH_TYPE(res_hdr) != 0) {
+    printf("ping: this is not echo reply: %d\n", res_hdr->type);
     return 1;
   }
 
-  hdr = (struct icmp_echo_hdr *)buf;
-  ping_prepare_echo(hdr, ping_size);
-
-  addr.sin_family = AF_INET;
-  addr.sin_addr.s_addr = inet_addr(argv[1]);
-
-  if (connect(sock, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
-    printf("connect: failed\n");
+  if (ICMPH_CODE(res_hdr) != 0) {
+    printf("ping: code should be zero: %d\n", res_hdr->code);
     return 1;
   }
 
-  if ((n = send(sock, buf, ping_size, 0)) < 0) {
-    printf("send: failed\n");
+  req_id = lwip_ntohs(req_hdr->id);
+  res_id = lwip_ntohs(res_hdr->id);
+  if (req_hdr->id != res_hdr->id) {
+    printf("ping: id is not same\n");
     return 1;
   }
 
+  req_seqno = lwip_ntohs(req_hdr->seqno);
+  res_seqno = lwip_ntohs(res_hdr->seqno);
+  if (req_seqno != res_seqno) {
+    printf("ping: seqno is not same\n");
+    return 1;
+  }
+
+  p = (char *)res_hdr;
+  p += sizeof(struct icmp_echo_hdr);
+  start_time = *((unsigned int *)p);
+  current_time = millis_from_start();
+
+  printf("%d bytes from %s: icmp_seq=%d ttl=%d time=%d ms\n",
+         res_len - sizeof(struct icmp_echo_hdr), ipaddr, res_seqno, ttl,
+         current_time - start_time);
   return 0;
 }
-
-// #include <stdio.h>
-//
-// #include <sys/socket.h>
-// #include <netinet/in.h>
-//
-// #include <netinet/ip.h>
-// #include <netinet/ip_icmp.h>
-//
-// /*
-//  * チェックサムを計算する関数です。
-//  * ICMPヘッダのチェックサムフィールドを埋めるために利用します。
-//  * IPヘッダなどでも全く同じ計算を利用するので、
-//  * IPヘッダのチェックサム計算用としても利用できます。
-//  */
-// unsigned short
-// checksum(unsigned short *buf, int bufsz)
-// {
-//   unsigned long sum = 0;
-//
-//   while (bufsz > 1) {
-//     sum += *buf;
-//     buf++;
-//     bufsz -= 2;
-//   }
-//
-//   if (bufsz == 1) {
-//     sum += *(unsigned char *)buf;
-//   }
-//
-//   sum = (sum & 0xffff) + (sum >> 16);
-//   sum = (sum & 0xffff) + (sum >> 16);
-//
-//   return ~sum;
-// }
-//
-// /* main 文はここからです。*/
-// int
-// main(int argc, char *argv[])
-// {
-//   int sock;
-//   struct icmphdr hdr;
-//   struct sockaddr_in addr;
-//   int n;
-//
-//   char buf[2000];
-//   struct icmphdr *icmphdrptr;
-//   struct iphdr *iphdrptr;
-//
-//   if (argc != 2) {
-//     printf("usage : %s IPADDR\n", argv[0]);
-//     return 1;
-//   }
-//
-//   addr.sin_family = AF_INET;
-//   addr.sin_addr.s_addr = inet_addr(argv[1]);
-//
-//   /* RAWソケットを作成します */
-//   sock = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);
-//   if (sock < 0) {
-//     perror("socket");
-//     return 1;
-//   }
-//
-//   memset(&hdr, 0, sizeof(hdr));
-//
-//   /* ICMPヘッダを用意します */
-//   hdr.type = ICMP_ECHO;
-//   hdr.code = 0;
-//   hdr.checksum = 0;
-//   hdr.un.echo.id = 0;
-//   hdr.un.echo.sequence = 0;
-//
-//   /* ICMPヘッダのチェックサムを計算します */
-//   hdr.checksum = checksum((unsigned short *)&hdr, sizeof(hdr));
-//
-//   /* ICMPヘッダだけのICMPパケットを送信します */
-//   /* ICMPデータ部分はプログラムを簡潔にするために省いています */
-//   n = sendto(sock,
-//              (char *)&hdr, sizeof(hdr),
-//              0, (struct sockaddr *)&addr, sizeof(addr));
-//   if (n < 1) {
-//     perror("sendto");
-//   }
-//
-//   /* ICMP送信部分はここまでです*/
-//   /* ここから下はICMP ECHO REPLY受信部分になります */
-//
-//   memset(buf, 0, sizeof(buf));
-//
-//   /* 相手ホストからのICMP ECHO REPLYを待ちます */
-//   n = recv(sock, buf, sizeof(buf), 0);
-//   if (n < 1) {
-//     perror("recv");
-//   }
-//
-//   /* 受信データからIPヘッダ部分へのポインタを取得します */
-//   iphdrptr = (struct iphdr *)buf;
-//
-//   /*
-//    * 本当はIPヘッダを調べて
-//    * パケットがICMPパケットかどうか調べるべきです
-//    */
-//
-//   /* 受信データからICMPヘッダ部分へのポインタを取得します */
-//   icmphdrptr = (struct icmphdr *)(buf + (iphdrptr->ihl * 4));
-//
-//   /* ICMPヘッダからICMPの種類を特定します */
-//   if (icmphdrptr->type == ICMP_ECHOREPLY) {
-//     printf("received ICMP ECHO REPLY\n");
-//   } else {
-//     printf("received ICMP %d\n", icmphdrptr->type);
-//   }
-//
-//   /* 終了 */
-//   close(sock);
-//
-//   return 0;
-// }

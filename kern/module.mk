@@ -35,6 +35,7 @@ KERN_OBJS := \
 	$(OBJDIR)/$(KERN_DIR)/lwip.o \
 	$(OBJDIR)/$(KERN_DIR)/pci.o \
 	$(OBJDIR)/$(KERN_DIR)/e1000.o \
+	$(OBJDIR)/$(KERN_DIR)/systime.o \
 
 KERN_BINARY_OBJS := \
 	$(OBJDIR)/$(KERN_DIR)/initcode \

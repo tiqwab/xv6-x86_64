@@ -29,5 +29,6 @@
 #define SYS_tcpip_worker 27
 #define SYS_send 28
 #define SYS_recv 29
+#define SYS_millis_from_start 30
 
 #endif /* ifndef XV6_X86_64_SYSCALL_H */

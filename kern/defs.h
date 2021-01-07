@@ -150,6 +150,9 @@ int fetchint(uintptr_t addr, uint64_t *ip);
 int fetchstr(uintptr_t addr, char **pp);
 void syscall(void);
 
+// time.c
+unsigned int time_msec();
+
 // trap.c
 void idtinit(void);
 void tvinit(void);
