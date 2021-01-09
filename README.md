@@ -9,6 +9,32 @@ $ XV6_CFLAGS="-DLWIP_DEBUG" make
 
 # Run
 $ make qemu
+
+$ ls
+.              1 1 512
+..             1 1 512
+init           2 2 25432
+preempttest1   2 3 25320
+preempttest2   2 4 24688
+fstest         2 5 33888
+sh             2 6 48040
+ls             2 7 32456
+mkdir          2 8 24688
+cat            2 9 26176
+echo           2 10 25248
+ln             2 11 24440
+rm             2 12 24680
+wc             2 13 32376
+vatest         2 14 24968
+socktest       2 15 51592
+ping           2 16 63688
+console        3 17 0
+
+$ ping 8.8.8.8
+PING 8.8.8.8 (8.8.8.8) 36 bytes of data.
+36 bytes from 8.8.8.8: icmp_seq=1 ttl=255 time=20 ms
+36 bytes from 8.8.8.8: icmp_seq=2 ttl=255 time=20 ms
+36 bytes from 8.8.8.8: icmp_seq=3 ttl=255 time=20 ms
 ```
 
 The below is the original README of xv6.

@@ -2,8 +2,8 @@ USER_DIR := user
 
 UOBJS += \
 		 $(OBJDIR)/$(USER_DIR)/init \
-		 $(OBJDIR)/$(USER_DIR)/preemptiontest1 \
-		 $(OBJDIR)/$(USER_DIR)/preemptiontest2 \
+		 $(OBJDIR)/$(USER_DIR)/preempttest1 \
+		 $(OBJDIR)/$(USER_DIR)/preempttest2 \
 		 $(OBJDIR)/$(USER_DIR)/fstest \
 		 $(OBJDIR)/$(USER_DIR)/sh \
 		 $(OBJDIR)/$(USER_DIR)/ls \
